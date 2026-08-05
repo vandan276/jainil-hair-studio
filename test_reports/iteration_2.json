@@ -1,0 +1,46 @@
+{
+  "summary": "All v2 incremental features verified end-to-end. Backend: 12/12 new pytest cases pass (slot-conflict 409, admin calendar, upload + public serve, regression). Frontend: WhatsApp FAB+popup+send opens correct wa.me URL, Language switcher persists 'eminence_lang' to localStorage and re-renders Hero text in hi/gu, Admin Calendar tab renders month grid with booking badges + conflict highlighting + status update dropdown, Image uploader in Admin Services CRUD uploads PNG, sets full /api/files/<path> URL on form, and shows preview.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/admin/upload", "issue": "5MB size limit is enforced AFTER reading entire file into memory (file.read()). For abusive uploads this could spike RAM. Consider streaming + early reject via Content-Length."},
+      {"endpoint": "GET /api/files/{path}", "issue": "No HTTP caching headers (Cache-Control / ETag) — every page load refetches images through backend. Add Cache-Control: public, max-age=31536000."},
+      {"endpoint": "POST /api/bookings", "issue": "Slot-conflict logic only triggers when stylist_id is provided. A booking with stylist_id=null can collide with itself unbounded; consider warning admin or capping per-time slot count."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Landing (and any page with WhatsApp FAB)", "issues": ["The 'Made with Emergent' badge sits at bottom-right and partially overlaps the WhatsApp FAB (z-index/position collision). FAB is still clickable via JS but a real user might mis-click. Consider shifting FAB up (e.g., bottom-24) or left so it doesn't share the same corner as the platform badge."]},
+      {"screen": "Admin Services CRUD form", "issues": ["The 'paste URL' text input next to the Upload button shows the full backend URL (https://saloon-ecom.preview.emergentagent.com/api/files/...) which is long and unfriendly. Consider showing only the relative path or trimming the visible portion while keeping the full value."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_v2_features.py",
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/v2_results.xml"
+  ],
+  "action_items": [
+    "Optional polish: reposition WhatsApp FAB (e.g., bottom-24 right-6) so it doesn't overlap the 'Made with Emergent' badge.",
+    "Optional: add Cache-Control headers in GET /api/files/{path}.",
+    "Optional: split server.py (~700 lines) into routers (auth/catalog/bookings/orders/admin/uploads) before further growth.",
+    "Optional: enforce upload size before reading entire body into memory."
+  ],
+  "critical_code_review_comments": [
+    "Slot conflict logic correctly excludes cancelled bookings (status:{$ne:'cancelled'}), but does NOT consider service duration overlap — only exact start time match. A 60-min booking at 11:00 won't block an 11:30 booking with the same stylist. For MVP it's acceptable; flag for v3.",
+    "ImageUpload.jsx hardcodes max-size 5MB on the client — matches backend; good. Accept attribute is image/* but backend whitelist is jpeg/png/webp/gif — a user picking a HEIC/AVIF file gets a 400; consider matching client accept to backend whitelist.",
+    "WhatsAppButton.jsx hardcodes phone number '912652468800' and default message — fine for MVP, but should ideally come from a settings doc to be admin-editable.",
+    "BookingsCalendar.jsx grid first-row offset uses Sunday=0 which matches Sun-first header — correct.",
+    "server.put_object raises_for_status without translating remote storage errors → frontend will see opaque 500. Wrap with try/except and surface a 502/503 with friendly detail.",
+    "get_current_user still prefers cookie over Authorization header — already flagged in iteration_1. Bearer-token-based testing works because pytest uses fresh sessions, but in browser any stale cookie could mask a different identity."
+  ],
+  "updated_files": ["/app/backend/tests/test_v2_features.py", "/app/test_reports/pytest/v2_results.xml"],
+  "success_rate": {"backend": "100% (12/12 v2 + prior 24/24 still green)", "frontend": "100% (WhatsApp, Language, Calendar, Upload all PASS)"},
+  "test_credentials": "admin@eminence.com/Admin@123, demo@eminence.com/Demo@123 — both verified at backend + UI level.",
+  "seed_data_creation": "Backend tests create future-dated bookings on 2030-12-15 (11:30 + 16:45) via demo user to validate slot-conflict and calendar grouping. These persist in DB; safe to leave (far future) or clean up via /api/admin/bookings PATCH if desired.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All v2 features green. /app/backend/tests/test_v2_features.py is reusable as regression. Slot-conflict, calendar grouping, upload+serve, status update from calendar all verified. The wa.me URL correctly redirects to api.whatsapp.com/send/?phone=912652468800 — both share the same number; do NOT assert the literal 'wa.me/' substring after navigation.",
+  "rca of the issue": "No bugs found in v2 increments. Earlier iteration_1 CORS issue is resolved (frontend/.env REACT_APP_BACKEND_URL now matches backend FRONTEND_URL = saloon-ecom.preview.emergentagent.com); login + all axios calls succeed."
+}

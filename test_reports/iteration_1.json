@@ -1,0 +1,40 @@
+{
+  "summary": "Backend fully verified via pytest (24/24 passing). Frontend is broken end-to-end due to a stale REACT_APP_BACKEND_URL in frontend/.env pointing to https://saloon-ecom.preview.emergentagent.com instead of the current preview host. ALL axios calls fail CORS, leaving the UI as a static shell with 'Uncaught runtime errors: Network Error'.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "get_current_user", "issue": "Cookie takes precedence over Authorization header. If a stale cookie exists, the Bearer token is ignored. Consider preferring Authorization header (or matching by role) to avoid masking a different identity."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "App-wide axios client", "issue": "REACT_APP_BACKEND_URL points to wrong host (saloon-ecom.preview.emergentagent.com) so every API call (services, products, stylists, login, register, bookings, orders, admin) is blocked by CORS. UI shows 'Uncaught runtime errors: Network Error' overlay.", "selector": "axios instance / .env", "priority": "CRITICAL"}
+    ],
+    "integration_issues": [
+      {"flow": "All flows (catalog, auth, cart, booking, checkout, dashboard, admin)", "issue": "Frontend cannot reach backend due to mismatched REACT_APP_BACKEND_URL.", "affected_selectors": ["nav-shop", "nav-services", "login", "register", "book", "checkout", "/admin"]}
+    ],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "Fix frontend/.env REACT_APP_BACKEND_URL to https://8d3f580e-9fa3-48e4-9fe2-51b4ffaf2cf8.preview.emergentagent.com (current preview host) and restart frontend (sudo supervisorctl restart frontend).",
+    "Verify backend/.env FRONTEND_URL matches the same preview host so CORS allow_origins includes it (current login-cookie response uses allow_credentials=true, so the Origin must be explicitly listed).",
+    "Re-run frontend playwright after URL fix to validate full e2e flow.",
+    "Consider preferring Authorization header over cookie in get_current_user to avoid stale-cookie masking issues during multi-account testing."
+  ],
+  "critical_code_review_comments": [
+    "Backend server.py (~600 lines) is monolithic - acceptable for MVP but should be split into routers (auth, catalog, bookings, orders, admin) before further growth.",
+    "Bcrypt + JWT + httpOnly cookie + Bearer dual support is correctly implemented; bcrypt hash format $2b$ confirmed via successful login.",
+    "seed_admin is idempotent and resets password if admin exists with mismatched hash - good.",
+    "No rate limiting / brute-force lockout implemented (review_request mentions lockout after 5 fails - NOT present in code).",
+    "OrderIn / BookingIn lack stricter validation (e.g., date/time format, pincode regex)."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (24/24)", "frontend": "0% (cannot reach API)"},
+  "test_credentials": "admin@eminence.com/Admin@123, demo@eminence.com/Demo@123 (both verified working at backend level)",
+  "seed_data_creation": "Auto-seeded by backend startup: 8 services, 10 products, 5 stylists, 1 admin, 1 demo user. Verified via API.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend is fully green. Only fix REACT_APP_BACKEND_URL in frontend/.env (and FRONTEND_URL in backend/.env if needed), restart services, then re-run UI tests for catalog, auth, booking, checkout, and /admin role gating. Pytest suite at /app/backend/tests/backend_test.py uses fresh requests.Session() per test to avoid cookie precedence masking Bearer tokens.",
+  "rca of the issue": "Browser console: 'Access to XMLHttpRequest at https://saloon-ecom.preview.emergentagent.com/api/services from origin https://8d3f580e-...preview.emergentagent.com has been blocked by CORS policy'. Reproduction: load any page, observe network tab + red error overlay. Mitigation: align frontend/.env REACT_APP_BACKEND_URL with the actual public preview URL the user is accessing; ensure backend FRONTEND_URL env var contains the same origin so CORS allow_origins permits it with credentials."
+}

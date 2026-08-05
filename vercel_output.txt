@@ -1,0 +1,106 @@
+Retrieving project…
+Deploying vandan-panchals-projects/new-hair-saloon
+Uploading [--------------------] (0.0B/73B)
+Uploading [====================] (73.0B/73B)
+Inspect: https://vercel.com/vandan-panchals-projects/new-hair-saloon/BDaGaZkCkcSDNKZiyh6e5D8EKG5c [4s]
+Production: https://new-hair-saloon-3lhz1y76b-vandan-panchals-projects.vercel.app [4s]
+https://new-hair-saloon-3lhz1y76b-vandan-panchals-projects.vercel.appBuilding...
+Building: Running build in Washington, D.C., USA (East) – iad1
+Building: Build machine configuration: 2 cores, 8 GB
+Building: Retrieving list of deployment files...
+Building: Downloading 193 deployment files...
+Building: Downloading 193 deployment files...
+Building: Restored build cache from previous deployment (6w4evZv215VeZG3hzNTuwivoMiEn)
+Building: Running "vercel build"
+Building: Vercel CLI 53.3.2
+Building: Installing dependencies...
+Building: Using CPython 3.14.3
+Building: Resolved 50 packages in 372ms
+Building: Downloading grpcio (6.5MiB)
+Building: Downloading pillow (6.8MiB)
+Building: Downloading reportlab (1.9MiB)
+Building: Downloading cryptography (4.5MiB)
+Building: Downloading pydantic-core (2.0MiB)
+Building: Downloaded pydantic-core
+Building: Downloaded grpcio
+Building: Downloaded cryptography
+Building: Downloaded reportlab
+Building: Downloaded pillow
+Building: Prepared 50 packages in 474ms
+Building: warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+Building: If the cache and target directories are on different filesystems, hardlinking may not be supported.
+Building: If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Building: Installed 50 packages in 205ms
+Building: + annotated-doc==0.0.4
+Building: + annotated-types==0.7.0
+Building: + anyio==4.13.0
+Building: + bcrypt==5.0.0
+Building: + cachecontrol==0.14.4
+Building: + certifi==2026.4.22
+Building: + cffi==2.0.0
+Building: + charset-normalizer==3.4.7
+Building: + click==8.3.3
+Building: + cryptography==48.0.0
+Building: + dnspython==2.8.0
+Building: + email-validator==2.3.0
+Building: + fastapi==0.136.1
+Building: + firebase-admin==7.4.0
+Building: + google-api-core==2.30.3
+Building: + google-auth==2.52.0
+Building: + google-cloud-core==2.6.0
+Building: + google-cloud-firestore==2.27.0
+Building: + google-cloud-storage==3.10.1
+Building: + google-crc32c==1.8.0
+Building: + google-resumable-media==2.9.0
+Building: + googleapis-common-protos==1.75.0
+Building: + grpcio==1.80.0
+Building: + grpcio-status==1.80.0
+Building: + h11==0.16.0
+Building: + h2==4.3.0
+Building: + hpack==4.1.0
+Building: + httpcore==1.0.9
+Building: + httpx==0.28.1
+Building: + hyperframe==6.1.0
+Building: + idna==3.15
+Building: + msgpack==1.1.2
+Building: + pillow==12.2.0
+Building: + proto-plus==1.28.0
+Building: + protobuf==6.33.6
+Building: + pyasn1==0.6.3
+Building: + pyasn1-modules==0.4.2
+Building: + pycparser==3.0
+Building: + pydantic==2.13.4
+Building: + pydantic-core==2.46.4
+Building: + pyjwt==2.12.1
+Building: + python-dotenv==1.2.2
+Building: + python-multipart==0.0.28
+Building: + reportlab==4.5.1
+Building: + requests==2.34.1
+Building: + starlette==1.0.0
+Building: + typing-extensions==4.15.0
+Building: + typing-inspection==0.4.2
+Building: + urllib3==2.7.0
+Building: + uvicorn==0.46.0
+Building: up to date, audited 1504 packages in 4s
+Building: 285 packages are looking for funding
+Building: run `npm fund` for details
+Building: 30 vulnerabilities (11 low, 3 moderate, 16 high)
+Building: To address issues that do not require attention, run:
+Building: npm audit fix
+Building: To address all issues (including breaking changes), run:
+Building: npm audit fix --force
+Building: Run `npm audit` for details.
+Building: > frontend@0.1.0 build
+Building: > craco build
+Building: (node:151) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+Building: (Use `node --trace-deprecation ...` to show where the warning was created)
+Building: Creating an optimized production build...
+Building: Treating warnings as errors because process.env.CI = true.
+Building: Most CI servers set it automatically.
+Building: Failed to compile.
+Building: [eslint]
+Building: src/pages/SalesPanel.jsx
+Building: Line 117:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+Building: Line 122:6:  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+Building: Error: Command "cd frontend && npm install && npm run build" exited with 1
+Error: Command "cd frontend && npm install && npm run build" exited with 1

@@ -1,0 +1,98 @@
+{
+  "theme": "dark",
+  "archetype": "5 (Jewel & Luxury)",
+  "brand_name": "Eminence",
+  "typography": {
+    "heading_font": "Cormorant Garamond",
+    "body_font": "Outfit",
+    "dashboard_font": "Outfit",
+    "scale": {
+      "h1": "text-5xl md:text-6xl+ tracking-tighter leading-none font-light",
+      "h2": "text-3xl md:text-4xl tracking-tight leading-none font-light",
+      "h3": "text-xl md:text-2xl font-light",
+      "h4": "text-lg md:text-xl font-medium tracking-wide",
+      "body": "text-sm md:text-base leading-relaxed font-light",
+      "overline": "text-xs tracking-[0.2em] uppercase font-bold"
+    }
+  },
+  "colors": {
+    "background": "#050505",
+    "surface": "#121110",
+    "surface_glass": "rgba(18, 17, 16, 0.6)",
+    "primary": "#D2B57B",
+    "primary_hover": "#E6CC98",
+    "text_primary": "#FAFAFA",
+    "text_secondary": "#A39F98",
+    "border": "#262420",
+    "error": "#7F1D1D",
+    "success": "#14532D"
+  },
+  "spacing_and_layout": {
+    "container_padding": "p-6 md:p-12 lg:p-24",
+    "bento_grid_gap": "gap-8 md:gap-12",
+    "dashboard_grid_gap": "gap-4 md:gap-6",
+    "border_radius": "rounded-none",
+    "alignment": "left-aligned default, never center everything, use strict grid hierarchy"
+  },
+  "surfaces_and_micro_themes": {
+    "header": "Crystal Glass: bg-[#121110]/60 backdrop-blur-xl border-b border-[#262420]",
+    "cards": "Flat solid: bg-[#121110] border border-[#262420] rounded-none. Hover state: -translate-y-1, shadow-2xl",
+    "footer": "Grid Borders: border-t border-[#262420] py-24",
+    "buttons": "Sharp edges (rounded-none). Primary CTA: bg-[#D2B57B] text-[#050505] hover:bg-[#E6CC98]. Secondary CTA: bg-transparent border border-[#262420] text-[#FAFAFA] hover:text-[#D2B57B] hover:border-[#D2B57B]"
+  },
+  "motion_and_interactions": {
+    "scrolling": "lenis smooth scrolling mandatory",
+    "hover_states": "hover:text-[#D2B57B] transition-colors duration-300",
+    "image_reveal": "framer-motion slow scale-up and fade-in (1.2 to 1 scale over 1.5s)"
+  },
+  "components_instructions": {
+    "marketing_pages": "Use pure HTML+Tailwind for overlapping elements. Strict asymmetry. Images must not exceed 80vh.",
+    "forms_and_dashboards": "Use customized Shadcn components. Strip default Vercel look. Sharp corners (rounded-none).",
+    "buttons": "Include data-testid on all buttons. Example: data-testid='book-appointment-btn'",
+    "inputs": "data-testid on all form fields. Minimalist borders, transparent backgrounds. Example: data-testid='login-email-input'",
+    "charts": "Use Recharts with monochrome and primary gold color palette."
+  },
+  "image_urls": {
+    "hero_background": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/66b0fe98-9b11-4172-978b-179329db2858/images/608a8819fddef5e2a5b15798e4e6f67d206852573e3d77963a6e92b2f27dbef1.png",
+      "description": "Abstract dark luxury background with soft glowing champagne gold curves"
+    },
+    "salon_interior_1": {
+      "url": "https://images.pexels.com/photos/13068357/pexels-photo-13068357.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Sleek beauty salon interior with contemporary furniture"
+    },
+    "salon_interior_2": {
+      "url": "https://images.unsplash.com/photo-1773904215697-e6c21fc27ac2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MTJ8MHwxfHNlYXJjaHwzfHxsdXh1cnklMjBzYWxvbiUyMGludGVyaW9yfGVufDB8fHx8MTc3NzA5NzY5MHww&ixlib=rb-4.1.0&q=85",
+      "description": "Luxurious barber chairs and sinks in a dimly lit salon"
+    },
+    "product_podium": {
+      "url": "https://static.prod-images.emergentagent.com/jobs/66b0fe98-9b11-4172-978b-179329db2858/images/1c5b3f480d16860c0152e64a71977be1a69ea14cc2ce1d539aa57630e2ebfcbb.png",
+      "description": "Minimalist podium made of dark porous stone, luxury product display"
+    },
+    "cosmetic_product_1": {
+      "url": "https://images.unsplash.com/photo-1764694071531-008332b61f43?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHwzfHxtaW5pbWFsJTIwY29zbWV0aWMlMjBib3R0bGUlMjBsdXh1cnl8ZW58MHx8fHwxNzc3MTAzMzAzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Clear glass perfume bottle with silver cap"
+    },
+    "cosmetic_product_2": {
+      "url": "https://images.unsplash.com/photo-1771329064159-33f758d91f4a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTV8MHwxfHNlYXJjaHw0fHxtaW5pbWFsJTIwY29zbWV0aWMlMjBib3R0bGUlMjBsdXh1cnl8ZW58MHx8fHwxNzc3MTAzMzAzfDA&ixlib=rb-4.1.0&q=85",
+      "description": "Bottles of serum arranged diagonally"
+    }
+  },
+  "dependencies": [
+    "lucide-react",
+    "framer-motion",
+    "@studio-freight/lenis",
+    "clsx",
+    "tailwind-merge"
+  ],
+  "instructions_to_main_agent": [
+    "Implement pure dark mode using the provided hex codes. No default Tailwind gray or zinc. Map Tailwind config to use these colors.",
+    "Do NOT use Inter, Roboto, Lato, or Syne. Install 'Cormorant Garamond' and 'Outfit' from Google Fonts and configure them in tailwind.config.js.",
+    "All interactive elements (buttons, inputs, links, tabs, forms) MUST have a data-testid attribute in kebab-case.",
+    "For the Landing page hero, use the 'hero_background' image with a bg-black/40 overlay to ensure text contrast. Use huge, light-font weight typography for the H1.",
+    "Dashboards (User & Admin) should not use generic Shadcn cards. Strip borders, use flat rectangular layouts with subtle 1px #262420 borders. Radius must be 0px (rounded-none).",
+    "For e-commerce pages, display products using the provided cosmetic_product images. Make product grids asymmetrical using the 'bento_grid_gap' spacing where possible.",
+    "Ensure hover states explicitly declare text colors to maintain contrast.",
+    "Implement Lenis for smooth scrolling on the marketing/storefront pages."
+  ]
+}

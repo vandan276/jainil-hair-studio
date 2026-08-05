@@ -1,0 +1,122 @@
+Retrieving project…
+Deploying vandan-panchals-projects/new-hair-saloon
+Uploading [--------------------] (0.0B/2KB)
+Uploading [====================] (2.0KB/2KB)
+Inspect: https://vercel.com/vandan-panchals-projects/new-hair-saloon/7fwmtWJVvRcmBzMMh7WbGXXbj5zZ [6s]
+Production: https://new-hair-saloon-1b2d2i39k-vandan-panchals-projects.vercel.app [6s]
+https://new-hair-saloon-1b2d2i39k-vandan-panchals-projects.vercel.appBuilding...
+Building...
+Building: Running build in Washington, D.C., USA (East) – iad1
+Building: Build machine configuration: 2 cores, 8 GB
+Building: Retrieving list of deployment files...
+Building: Downloading 197 deployment files...
+Building: Restored build cache from previous deployment (6keHEpxHuUxMRoUyEwmL2ox3pMEq)
+Building: Running "vercel build"
+Building: Vercel CLI 53.3.2
+Building: Installing dependencies...
+Building: Using CPython 3.14.3
+Building: Resolved 50 packages in 383ms
+Building: Downloading reportlab (1.9MiB)
+Building: Downloading grpcio (6.5MiB)
+Building: Downloading pillow (6.8MiB)
+Building: Downloading cryptography (4.5MiB)
+Building: Downloading pydantic-core (2.0MiB)
+Building: Downloaded pydantic-core
+Building: Downloaded grpcio
+Building: Downloaded cryptography
+Building: Downloaded pillow
+Building: Downloaded reportlab
+Building: Prepared 50 packages in 421ms
+Building: warning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.
+Building: If the cache and target directories are on different filesystems, hardlinking may not be supported.
+Building: If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.
+Building: Installed 50 packages in 197ms
+Building: + annotated-doc==0.0.4
+Building: + annotated-types==0.7.0
+Building: + anyio==4.13.0
+Building: + bcrypt==5.0.0
+Building: + cachecontrol==0.14.4
+Building: + certifi==2026.4.22
+Building: + cffi==2.0.0
+Building: + charset-normalizer==3.4.7
+Building: + click==8.4.0
+Building: + cryptography==48.0.0
+Building: + dnspython==2.8.0
+Building: + email-validator==2.3.0
+Building: + fastapi==0.136.1
+Building: + firebase-admin==7.4.0
+Building: + google-api-core==2.30.3
+Building: + google-auth==2.53.0
+Building: + google-cloud-core==2.6.0
+Building: + google-cloud-firestore==2.27.0
+Building: + google-cloud-storage==3.10.1
+Building: + google-crc32c==1.8.0
+Building: + google-resumable-media==2.9.0
+Building: + googleapis-common-protos==1.75.0
+Building: + grpcio==1.80.0
+Building: + grpcio-status==1.80.0
+Building: + h11==0.16.0
+Building: + h2==4.3.0
+Building: + hpack==4.1.0
+Building: + httpcore==1.0.9
+Building: + httpx==0.28.1
+Building: + hyperframe==6.1.0
+Building: + idna==3.15
+Building: + msgpack==1.1.2
+Building: + pillow==12.2.0
+Building: + proto-plus==1.28.0
+Building: + protobuf==6.33.6
+Building: + pyasn1==0.6.3
+Building: + pyasn1-modules==0.4.2
+Building: + pycparser==3.0
+Building: + pydantic==2.13.4
+Building: + pydantic-core==2.46.4
+Building: + pyjwt==2.12.1
+Building: + python-dotenv==1.2.2
+Building: + python-multipart==0.0.29
+Building: + reportlab==4.5.1
+Building: + requests==2.34.2
+Building: + starlette==1.0.0
+Building: + typing-extensions==4.15.0
+Building: + typing-inspection==0.4.2
+Building: + urllib3==2.7.0
+Building: + uvicorn==0.47.0
+Building: added 1 package, and audited 1505 packages in 4s
+Building: 285 packages are looking for funding
+Building: run `npm fund` for details
+Building: 31 vulnerabilities (11 low, 4 moderate, 16 high)
+Building: To address issues that do not require attention, run:
+Building: npm audit fix
+Building: To address all issues (including breaking changes), run:
+Building: npm audit fix --force
+Building: Run `npm audit` for details.
+Building: > frontend@0.1.0 build
+Building: > craco build
+Building: (node:173) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+Building: (Use `node --trace-deprecation ...` to show where the warning was created)
+Building: Creating an optimized production build...
+Building: Compiled successfully.
+Building: File sizes after gzip:
+Building: 180.2 kB  build/static/js/main.5e24e80f.js
+Building: 17.25 kB  build/static/css/main.e1bdbeaa.css
+Building: 373 B     build/static/js/821.dc85bcf7.chunk.js
+Building: The project was built assuming it is hosted at /.
+Building: You can control this with the homepage field in your package.json.
+Building: The build folder is ready to be deployed.
+Building: You may serve it with a static server:
+Building: npm install -g serve
+Building: serve -s build
+Building: Find out more about deployment here:
+Building: https://cra.link/deployment
+Building: No Python version specified in .python-version, pyproject.toml, or Pipfile.lock. Using python version: 3.12
+Building: Using uv 0.10.11
+Building: Installing required dependencies from api/requirements.txt...
+Building: Build Completed in /vercel/output [24s]
+Building: Deploying outputs...
+[2K[1A[2K[GProduction: https://new-hair-saloon-1b2d2i39k-vandan-panchals-projects.vercel.app [54s]
+Completing...
+Aliased: https://new-hair-saloon-vandan-panchals-projects.vercel.app [1m]
+
+Common next commands:
+- `vercel inspect new-hair-saloon-1b2d2i39k-vandan-panchals-projects.vercel.app --logs`
+- `vercel redeploy new-hair-saloon-1b2d2i39k-vandan-panchals-projects.vercel.app`

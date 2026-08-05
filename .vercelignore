@@ -1,0 +1,20 @@
+# Ignore local testing and build artifacts
+node_modules
+frontend/node_modules
+backend/uploads
+api/uploads
+frontend/build
+.DS_Store
+*.pyc
+__pycache__
+.env
+.env.local
+.venv
+venv
+test_reports
+scratch
+frontend/Asset
+frontend/Asset/Slider images
+frontend/Asset/Products
+frontend/Asset/After:before
+.git_backup
