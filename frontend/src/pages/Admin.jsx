@@ -5963,7 +5963,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                 <div className="flex flex-wrap gap-2 items-center text-xs">
                   <span className="text-gray-500 font-medium">Select dates :</span>
                   {renderDateRangePickerInline()}
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -6008,8 +6008,8 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
             <div className="flex flex-wrap gap-2 items-center text-xs py-3 bg-gray-50/70 p-4 rounded-xl mb-4 border border-gray-200">
               <span className="text-gray-500 font-medium">Select dates :</span>
               {renderDateRangePickerInline()}
-              <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
-                <Filter size={12} />
+              <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
+                    <Filter size={12} />
                 Filter
               </button>
               <button onClick={handleClearFilters} className="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
@@ -6078,8 +6078,8 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
             <div className="flex flex-wrap gap-2 items-center text-xs py-3 bg-gray-50/70 p-4 rounded-xl mb-4 border border-gray-200">
               <span className="text-gray-500 font-medium">Select date :</span>
               {renderDateRangePickerInline()}
-              <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
-                <Filter size={12} />
+              <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
+                    <Filter size={12} />
                 Filter
               </button>
             </div>
@@ -6192,8 +6192,8 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                 </select>
               </div>
               <div className="flex gap-2">
-                <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
-                  <Filter size={12} />
+                <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
+                    <Filter size={12} />
                   Filter
                 </button>
                 <button onClick={handleClearFilters} className="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
@@ -6294,8 +6294,8 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
             <div className="flex flex-wrap gap-2 items-center text-xs py-3 bg-gray-50/70 p-4 rounded-xl mb-4 border border-gray-200">
               <span className="text-gray-500 font-medium">Select dates :</span>
               {renderDateRangePickerInline()}
-              <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
-                <Filter size={12} />
+              <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
+                    <Filter size={12} />
                 Filter
               </button>
               <button onClick={handleClearFilters} className="bg-[#d9534f] hover:bg-[#c9302c] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
@@ -6431,7 +6431,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -6538,7 +6538,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2 self-end">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -6658,7 +6658,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2 self-end">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -6754,7 +6754,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2 self-end">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -6890,7 +6890,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2 self-end">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -7039,7 +7039,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2 self-end">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -7151,7 +7151,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                   </select>
                 </div>
                 <div className="flex gap-2 self-end">
-                  <button onClick={refresh} className="bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors">
+                  <button onClick={() => {}} className=\"bg-[#6b21a8] hover:bg-[#581c87] text-white font-bold px-4 py-1.5 rounded shadow flex items-center gap-1 transition-colors\">
                     <Filter size={12} />
                     Filter
                   </button>
@@ -8104,7 +8104,7 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
               <span className="text-gray-400 text-xs">-</span>
               <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white" />
             </div>
-            <button onClick={() => refresh()} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded text-xs font-bold flex items-center gap-1">
+            <button onClick={() => {}} className=\"bg-teal-600 hover:bg-teal-700 text-white px-4 py-1.5 rounded text-xs font-bold flex items-center gap-1\">
               <Filter size={12} /> Filter
             </button>
             <button onClick={exportCSV} className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded text-xs font-bold flex items-center gap-1">
