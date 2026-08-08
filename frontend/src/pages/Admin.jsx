@@ -5469,13 +5469,20 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
       o.items?.forEach(it => {
         const isProd = it.type === "product" || (!it.is_service && !it.is_package);
         if (isProd) {
+          let itemEmpId = it.service_provider_id;
+          if (!itemEmpId && it.service_provider) {
+            const matched = employees.find(e => e.id === it.service_provider || e.name === it.service_provider);
+            if (matched) itemEmpId = matched.id;
+          }
+          if (!itemEmpId) itemEmpId = o.employee_id || o.stylist_id || "—";
+          
           records.push({
             orderId: o.id,
             date: o.created_at ? o.created_at.split("T")[0] : "Unknown",
             clientName: o.full_name || o.user_name || "Unknown",
             contactNumber: o.phone || "—",
             productName: it.name,
-            providerId: it.service_provider || o.employee_id || "—",
+            providerId: itemEmpId,
             amount: (it.price || 0) * (it.quantity || 1),
             quantity: it.quantity || 1
           });
@@ -5579,7 +5586,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
           tax: ((it.price || 0) * (it.quantity || 1) - (it.discount || 0)) * 0.18,
           grandTotal: ((it.price || 0) * (it.quantity || 1) - (it.discount || 0)) * 1.18,
           paymentMethod: o.payment_method || "—",
-          soldBy: it.service_provider || o.employee_name || "—"
+          soldBy: (it.service_provider_id ? (employees.find(e => e.id === it.service_provider_id)?.name) : (employees.find(e => e.id === it.service_provider)?.name || it.service_provider)) || o.employee_name || o.stylist_name || "—"
         });
       });
     });
@@ -5761,39 +5768,53 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
   });
 
   filteredOrders.forEach(o => {
-    const empId = o.employee_id || o.stylist_id;
-    if (!empId) return;
-
-    if (!employeeSummary[empId]) {
-      employeeSummary[empId] = {
-        id: empId,
-        name: o.employee_name || o.stylist_name || "Unknown Stylist",
-        phone: "",
-        total_clients: 0,
-        total_services: 0,
-        service_amount: 0,
-        service_commission: 0,
-        total_products: 0,
-        product_amount: 0,
-        product_commission: 0,
-        package_commission: 0,
-        member_commission: 0,
-        total_membership: 0,
-        membership_amount: 0,
-        total_packages: 0,
-        package_amount: 0,
-        actual_amount: 0,
-        discount: 0,
-        total_amount: 0
+    const orderTopEmpId = o.employee_id || o.stylist_id;
+    const employeesOnOrder = new Set();
+    
+    // Top-level discount / total attribution fallback
+    if (orderTopEmpId && !employeeSummary[orderTopEmpId]) {
+      employeeSummary[orderTopEmpId] = {
+        id: orderTopEmpId, name: o.employee_name || o.stylist_name || "Unknown Stylist", phone: "",
+        total_clients: 0, total_services: 0, service_amount: 0, service_commission: 0,
+        total_products: 0, product_amount: 0, product_commission: 0, package_commission: 0, member_commission: 0,
+        total_membership: 0, membership_amount: 0, total_packages: 0, package_amount: 0,
+        actual_amount: 0, discount: 0, total_amount: 0
       };
     }
-
-    const summary = employeeSummary[empId];
-    summary.total_clients += 1;
-    summary.discount += (o.discount || 0);
-    summary.total_amount += (o.total || 0);
+    if (orderTopEmpId) {
+      employeeSummary[orderTopEmpId].discount += (o.discount || 0);
+      employeeSummary[orderTopEmpId].total_amount += (o.total || 0);
+    }
 
     o.items?.forEach(it => {
+      let itemEmpId = it.service_provider_id;
+      if (!itemEmpId && it.service_provider) {
+        // Fallback if ID wasn't explicitly saved
+        const matched = employees.find(e => e.id === it.service_provider || e.name === it.service_provider);
+        if (matched) itemEmpId = matched.id;
+      }
+      if (!itemEmpId) itemEmpId = orderTopEmpId;
+      if (!itemEmpId) return;
+
+      if (!employeeSummary[itemEmpId]) {
+        const empRec = employees.find(e => e.id === itemEmpId);
+        employeeSummary[itemEmpId] = {
+          id: itemEmpId,
+          name: empRec ? empRec.name : (it.service_provider || o.employee_name || o.stylist_name || "Unknown Stylist"),
+          phone: "",
+          total_clients: 0, total_services: 0, service_amount: 0, service_commission: 0,
+          total_products: 0, product_amount: 0, product_commission: 0, package_commission: 0, member_commission: 0,
+          total_membership: 0, membership_amount: 0, total_packages: 0, package_amount: 0,
+          actual_amount: 0, discount: 0, total_amount: 0
+        };
+      }
+
+      const summary = employeeSummary[itemEmpId];
+      if (!employeesOnOrder.has(itemEmpId)) {
+        summary.total_clients += 1;
+        employeesOnOrder.add(itemEmpId);
+      }
+
       const price = (it.price || 0) * (it.quantity || 1);
       if (it.type === "product") {
         summary.total_products += (it.quantity || 1);
