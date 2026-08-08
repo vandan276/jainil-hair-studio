@@ -231,15 +231,17 @@ export default function SalesPanel() {
     fetchConsultations();
   }, [fetchConsultations]);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (document.hidden) return; // Skip polling when tab is not visible/active
-      fetchLeads();
-      fetchStats();
-      fetchConsultations();
-    }, 30000); // Poll every 30s
-    return () => clearInterval(interval);
-  }, [fetchLeads, fetchStats, fetchConsultations]);
+  // Removed 30-second polling to fix excessive Firestore reads.
+  // Users will need to refresh manually or we can implement a refresh button.
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (document.hidden) return;
+  //     fetchLeads();
+  //     fetchStats();
+  //     fetchConsultations();
+  //   }, 30000); // Poll every 30s
+  //   return () => clearInterval(interval);
+  // }, [fetchLeads, fetchStats, fetchConsultations]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {

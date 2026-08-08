@@ -15834,6 +15834,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
 }
 
 function ProductTransferPanel({ products, employees, onComplete, branches = [] }) {
+  const [transferItems, setTransferItems] = useState([]);
   const [productId, setProductId] = useState("");
   const [productSearch, setProductSearch] = useState("");
   const [showProductDrop, setShowProductDrop] = useState(false);
@@ -15854,7 +15855,8 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   }, [branches]);
 
   const filteredTransferProducts = products.filter(p =>
-    p.name.toLowerCase().includes(productSearch.toLowerCase())
+    p.name.toLowerCase().includes(productSearch.toLowerCase()) && 
+    (p.branch === source || (!p.branch && source === "Main Warehouse"))
   );
 
   const handleTransferProductSelect = (p) => {
@@ -15866,11 +15868,34 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   const selectedProduct = products.find(p => p.id === productId);
   const currentStock = selectedProduct ? (selectedProduct.stock || 0) : 0;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleAddItem = () => {
     if (!productId) return toast.error("Please select a product");
     if (!quantity || Number(quantity) <= 0) return toast.error("Please enter a valid quantity");
     if (Number(quantity) > currentStock) return toast.error("Insufficient stock available");
+    
+    // Check if item already exists in transferItems
+    if (transferItems.some(i => i.product_id === productId)) {
+      return toast.error("Product already added to transfer list");
+    }
+
+    setTransferItems([...transferItems, {
+      product_id: productId,
+      name: selectedProduct.name,
+      quantity: Number(quantity)
+    }]);
+
+    setProductId("");
+    setProductSearch("");
+    setQuantity("");
+  };
+
+  const handleRemoveItem = (id) => {
+    setTransferItems(transferItems.filter(i => i.product_id !== id));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (transferItems.length === 0) return toast.error("Please add at least one product to transfer");
     if (!employeeId) return toast.error("Please select an employee");
     if (source === destination) return toast.error("Source and destination must be different");
 
@@ -15878,17 +15903,15 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
     try {
       const emp = employees.find(e => e.id === employeeId);
       await api.post("/admin/products/transfer", {
-        product_id: productId,
-        quantity: Number(quantity),
+        items: transferItems.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
         source,
         destination,
         employee_id: employeeId,
         employee_name: emp ? emp.name : "Unknown",
         remarks
       });
-      toast.success("Product transferred successfully!");
-      setProductId("");
-      setQuantity("");
+      toast.success("Products transferred successfully!");
+      setTransferItems([]);
       setRemarks("");
       onComplete();
     } catch (err) {
@@ -15899,85 +15922,24 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
+    <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
       <div>
         <h2 className="font-serif text-2xl text-gray-800">Transfer Products</h2>
         <p className="text-xs text-eminence-muted">Transfer inventory stock between branches or hand over products to staff.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="relative">
-          <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Select Product</label>
-          <input
-            type="text"
-            placeholder="Search product by name..."
-            value={productSearch}
-            onChange={e => { setProductSearch(e.target.value); setProductId(""); setShowProductDrop(true); }}
-            onFocus={() => setShowProductDrop(true)}
-            onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
-            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
-            autoComplete="off"
-          />
-          {showProductDrop && filteredTransferProducts.length > 0 && (
-            <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
-              {filteredTransferProducts.map(p => (
-                <div
-                  key={p.id}
-                  onMouseDown={() => handleTransferProductSelect(p)}
-                  className="px-4 py-2.5 hover:bg-eminence-gold/10 cursor-pointer text-sm flex justify-between items-center"
-                >
-                  <span className="font-medium text-gray-900">{p.name}</span>
-                  <span className="text-xs text-gray-400 ml-2">Stock: {p.stock || 0}</span>
-                </div>
-              ))}
-            </div>
-          )}
-          {showProductDrop && productSearch && filteredTransferProducts.length === 0 && (
-            <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-3 text-xs text-gray-400 italic">
-              No products match "{productSearch}"
-            </div>
-          )}
-        </div>
-
-        {productId && (
-          <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-xs text-amber-800">
-            Current Stock: <strong>{currentStock}</strong> items available in Main stock.
-          </div>
-        )}
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Quantity to Transfer</label>
-            <input
-              type="number"
-              min="1"
-              max={currentStock}
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Handed Over To (Staff)</label>
-            <select
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
-            >
-              <option value="">-- Choose Staff --</option>
-              {employees.map(e => (
-                <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
+      <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase mb-2">From Location</label>
             <select
               value={source}
-              onChange={(e) => setSource(e.target.value)}
+              onChange={(e) => {
+                setSource(e.target.value);
+                setProductId("");
+                setProductSearch("");
+                setTransferItems([]); // Reset items if source changes
+              }}
               className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
             >
               <option value="Main Warehouse">Main Warehouse</option>
@@ -16003,25 +15965,129 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Remarks / Notes</label>
-          <textarea
-            rows="3"
-            value={remarks}
-            onChange={(e) => setRemarks(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
-            placeholder="Reason for transfer..."
-          />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50 p-4 rounded-xl border border-gray-100">
+          <div className="md:col-span-6 relative">
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Select Product</label>
+            <input
+              type="text"
+              placeholder="Search product..."
+              value={productSearch}
+              onChange={e => { setProductSearch(e.target.value); setProductId(""); setShowProductDrop(true); }}
+              onFocus={() => setShowProductDrop(true)}
+              onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
+              autoComplete="off"
+            />
+            {showProductDrop && filteredTransferProducts.length > 0 && (
+              <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
+                {filteredTransferProducts.map(p => (
+                  <div
+                    key={p.id}
+                    onMouseDown={() => handleTransferProductSelect(p)}
+                    className="px-4 py-2.5 hover:bg-eminence-gold/10 cursor-pointer text-sm flex justify-between items-center"
+                  >
+                    <span className="font-medium text-gray-900">{p.name}</span>
+                    <span className="text-xs text-gray-400 ml-2">Stock: {p.stock || 0}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {showProductDrop && productSearch && filteredTransferProducts.length === 0 && (
+              <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-3 text-xs text-gray-400 italic">
+                No products match "{productSearch}" in {source}
+              </div>
+            )}
+          </div>
+          
+          <div className="md:col-span-3">
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Qty</label>
+            <input
+              type="number"
+              min="1"
+              max={currentStock || 1000}
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
+              placeholder={productId ? `Max: ${currentStock}` : "Qty"}
+            />
+          </div>
+          <div className="md:col-span-3">
+            <button 
+              type="button" 
+              onClick={handleAddItem}
+              className="w-full py-3 bg-eminence-gold hover:bg-eminence-gold/90 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all"
+            >
+              Add Item
+            </button>
+          </div>
+        </div>
+        
+        {transferItems.length > 0 && (
+          <div className="border border-gray-200 rounded-xl overflow-hidden">
+            <table className="w-full text-sm text-left">
+              <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-bold">
+                <tr>
+                  <th className="px-4 py-3">Product Name</th>
+                  <th className="px-4 py-3">Qty</th>
+                  <th className="px-4 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {transferItems.map((item, idx) => (
+                  <tr key={idx} className="bg-white">
+                    <td className="px-4 py-3 font-medium">{item.name}</td>
+                    <td className="px-4 py-3">{item.quantity}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button 
+                        type="button" 
+                        onClick={() => handleRemoveItem(item.product_id)} 
+                        className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider"
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Handed Over To (Staff)</label>
+            <select
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            >
+              <option value="">-- Choose Staff --</option>
+              {employees.filter(e => e.is_active !== false).map(e => (
+                <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Remarks / Notes</label>
+            <input
+              type="text"
+              value={remarks}
+              onChange={(e) => setRemarks(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+              placeholder="Reason for transfer..."
+            />
+          </div>
         </div>
 
         <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all disabled:opacity-50"
+          onClick={handleSubmit}
+          type="button"
+          disabled={loading || transferItems.length === 0}
+          className="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all disabled:opacity-50 mt-4"
         >
-          {loading ? "Processing..." : "Execute Stock Transfer"}
+          {loading ? "Processing..." : `Execute Stock Transfer (${transferItems.length} items)`}
         </button>
-      </form>
+      </div>
     </div>
   );
 }

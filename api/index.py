@@ -112,8 +112,9 @@ def get_fb_config():
         "webhook_secret": os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
     }
 
-def get_next_salesperson():
-    sales_docs = db.collection("users").where("role", "==", "sales").get()
+@firestore.transactional
+def get_next_salesperson_tx(transaction, db):
+    sales_docs = db.collection("users").where("role", "==", "sales").get(transaction=transaction)
     sales_users = [d.to_dict() for d in sales_docs]
     
     # Get current IST date
@@ -136,7 +137,7 @@ def get_next_salesperson():
     available_sales.sort(key=lambda u: u["id"])
     
     routing_ref = db.collection("settings").document("lead_routing")
-    routing_doc = routing_ref.get()
+    routing_doc = routing_ref.get(transaction=transaction)
     
     next_idx = 0
     if routing_doc.exists:
@@ -157,12 +158,16 @@ def get_next_salesperson():
                         break
                         
     next_sales = available_sales[next_idx]
-    routing_ref.set({
+    transaction.set(routing_ref, {
         "last_assigned_uid": next_sales["id"],
         "last_assigned_name": next_sales["name"],
         "updated_at": now_iso()
-    })
+    }, merge=True)
     return next_sales
+
+def get_next_salesperson():
+    tx = db.transaction()
+    return get_next_salesperson_tx(tx, db)
 
 @app.get("/webhooks/facebook", response_class=PlainTextResponse)
 def facebook_verify(hub_mode: str = Query(None, alias="hub.mode"), 
@@ -4220,9 +4225,12 @@ def admin_delete_vendor(vid: str, _: dict = Depends(require_admin)):
 
 
 # Admin: Product transfers
-class ProductTransferIn(BaseModel):
+class TransferItemIn(BaseModel):
     product_id: str
     quantity: int
+
+class ProductTransferIn(BaseModel):
+    items: List[TransferItemIn]
     source: str
     destination: str
     employee_id: str
@@ -4238,46 +4246,56 @@ def admin_list_transfers(_: dict = Depends(require_admin)):
 
 @api.post("/admin/products/transfer")
 def admin_transfer_product(data: ProductTransferIn, _: dict = Depends(require_admin)):
-    # 1. Deduct stock from source branch product
-    prod_ref = db.collection("products").document(data.product_id)
-    prod_snap = prod_ref.get()
-    if not prod_snap.exists:
-        raise HTTPException(404, "Source product not found")
-    prod = prod_snap.to_dict()
-    current_stock = prod.get("stock", 0)
-    if current_stock < data.quantity:
-        raise HTTPException(400, f"Insufficient stock at source branch. Available: {current_stock}")
-    
-    prod_ref.update({"stock": current_stock - data.quantity})
-    
-    # 2. Add stock to destination branch product
-    dest_query = db.collection("products").where("name", "==", prod.get("name")).where("branch", "==", data.destination).limit(1).get()
-    if dest_query:
-        dest_prod_ref = dest_query[0].reference
-        dest_prod = dest_query[0].to_dict()
-        dest_prod_ref.update({"stock": dest_prod.get("stock", 0) + data.quantity})
-    else:
-        new_pid = new_id()
-        new_prod = {
-            **prod,
-            "id": new_pid,
-            "stock": data.quantity,
-            "branch": data.destination,
+    results = []
+    for item in data.items:
+        # 1. Deduct stock from source branch product
+        prod_ref = db.collection("products").document(item.product_id)
+        prod_snap = prod_ref.get()
+        if not prod_snap.exists:
+            raise HTTPException(404, f"Source product {item.product_id} not found")
+        prod = prod_snap.to_dict()
+        current_stock = prod.get("stock", 0)
+        if current_stock < item.quantity:
+            raise HTTPException(400, f"Insufficient stock for {prod.get('name')}. Available: {current_stock}")
+        
+        prod_ref.update({"stock": current_stock - item.quantity})
+        
+        # 2. Add stock to destination branch product
+        dest_query = db.collection("products").where("name", "==", prod.get("name")).where("branch", "==", data.destination).limit(1).get()
+        if dest_query:
+            dest_prod_ref = dest_query[0].reference
+            dest_prod = dest_query[0].to_dict()
+            dest_prod_ref.update({"stock": dest_prod.get("stock", 0) + item.quantity})
+        else:
+            new_pid = new_id()
+            new_prod = {
+                **prod,
+                "id": new_pid,
+                "stock": item.quantity,
+                "branch": data.destination,
+                "created_at": now_iso()
+            }
+            db.collection("products").document(new_pid).set(new_prod)
+            
+        # 3. Log transfer
+        tid = new_id()
+        doc = {
+            "id": tid,
+            "product_id": item.product_id,
+            "quantity": item.quantity,
+            "source": data.source,
+            "destination": data.destination,
+            "employee_id": data.employee_id,
+            "employee_name": data.employee_name,
+            "remarks": data.remarks,
+            "product_name": prod.get("name", "Unknown Product"),
             "created_at": now_iso()
         }
-        db.collection("products").document(new_pid).set(new_prod)
+        db.collection("product_transfers").document(tid).set(doc)
+        results.append(doc)
         
-    # 3. Log transfer
-    tid = new_id()
-    doc = {
-        "id": tid,
-        **data.model_dump(),
-        "product_name": prod.get("name", "Unknown Product"),
-        "created_at": now_iso()
-    }
-    db.collection("product_transfers").document(tid).set(doc)
     cache_bust("raw_products")
-    return doc
+    return {"ok": True, "transfers": results}
 
 
 # Admin: Product stock additions
