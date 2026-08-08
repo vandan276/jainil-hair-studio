@@ -1082,14 +1082,22 @@ async def list_products(request: Request, category: Optional[str] = None, search
 
     items = [fix_urls(item) for item in cached_products]
     
+    filtered_items = []
     for i in items:
         b_stock_dict = i.get("branch_stock", {})
         if branch:
+            orig_branch = i.get("branch", "Baroda")
             if b_stock_dict:
                 i["stock"] = b_stock_dict.get(branch, 0)
+                if orig_branch == branch or branch in b_stock_dict:
+                    filtered_items.append(i)
             else:
-                orig_branch = i.get("branch", "Baroda")
-                i["stock"] = i.get("stock", 0) if orig_branch == branch else 0
+                if orig_branch == branch:
+                    i["stock"] = i.get("stock", 0)
+                    filtered_items.append(i)
+        else:
+            filtered_items.append(i)
+    items = filtered_items
     if category:
         items = [i for i in items if i.get("category") == category]
     if search:

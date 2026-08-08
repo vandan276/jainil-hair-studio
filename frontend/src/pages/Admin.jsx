@@ -1196,7 +1196,7 @@ export default function Admin() {
         promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
         promises.push(api.get("/admin/product-categories")); keys.push("productCategories");
       } else if (tab === "products-transfer" || tab === "add-transfers") {
-        promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
+        promises.push(api.get("/products?all_products=true")); keys.push("products");
         promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
       } else if (tab === "products-transferred") {
         promises.push(api.get(addParam("/admin/products/transfers", branchQuery))); keys.push("transfers");
