@@ -208,19 +208,19 @@ async def get_optional_user(request: Request) -> Optional[dict]:
 
 
 async def require_admin(user: dict = Depends(get_current_user)) -> dict:
-    if user.get("role") != "admin":
+    if user.get("role") not in ["admin", "super_admin"]:
         raise HTTPException(403, "Admin access required")
     return user
 
 
 async def require_receptionist(user: dict = Depends(get_current_user)) -> dict:
-    if user.get("role") not in ["admin", "receptionist"]:
+    if user.get("role") not in ["admin", "super_admin", "receptionist"]:
         raise HTTPException(403, "Receptionist or Admin access required")
     return user
 
 
 async def require_employee(user: dict = Depends(get_current_user)) -> dict:
-    if user.get("role") not in ["admin", "employee", "sales", "service", "receptionist"]:
+    if user.get("role") not in ["admin", "super_admin", "employee", "sales", "service", "receptionist"]:
         raise HTTPException(403, "Staff or Admin access required")
     return user
 
