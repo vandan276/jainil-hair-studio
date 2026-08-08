@@ -1165,6 +1165,7 @@ export default function Admin() {
         promises.push(api.get(addParam("/admin/stats", branchQuery))); keys.push("stats");
         promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
         promises.push(api.get(addParam("/leads?all=true", branchQuery))); keys.push("leads");
+        promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
         if (tab === "dashboard") {
           promises.push(api.get("/services")); keys.push("services");
           promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
@@ -16062,7 +16063,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
               className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose Staff --</option>
-              {employees.filter(e => e.is_active !== false).map(e => (
+              {employees.filter(e => e.is_active !== false && String(e.is_active) !== "false").map(e => (
                 <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
               ))}
             </select>
