@@ -1077,7 +1077,8 @@ async def list_products(request: Request, category: Optional[str] = None, search
     # Scoping branch-wise
     user = await get_optional_user(request)
     if user and user.get("role") == "admin" and user.get("email", "").lower() != "superadmin@eminence.com":
-        branch = user.get("branch")
+        if not branch:
+            branch = user.get("branch")
 
     items = [fix_urls(item) for item in cached_products]
     
@@ -4261,10 +4262,17 @@ def admin_transfer_product(data: ProductTransferIn, _: dict = Depends(require_ad
         prod_ref.update({"stock": current_stock - item.quantity})
         
         # 2. Add stock to destination branch product
-        dest_query = db.collection("products").where("name", "==", prod.get("name")).where("branch", "==", data.destination).limit(1).get()
-        if dest_query:
-            dest_prod_ref = dest_query[0].reference
-            dest_prod = dest_query[0].to_dict()
+        prod_name_clean = prod.get("name", "").strip().lower()
+        all_dest_prods = db.collection("products").where("branch", "==", data.destination).stream()
+        match_dest_prod = None
+        for dp in all_dest_prods:
+            dp_dict = dp.to_dict()
+            if dp_dict.get("name", "").strip().lower() == prod_name_clean:
+                match_dest_prod = (dp.reference, dp_dict)
+                break
+                
+        if match_dest_prod:
+            dest_prod_ref, dest_prod = match_dest_prod
             dest_prod_ref.update({"stock": dest_prod.get("stock", 0) + item.quantity})
         else:
             new_pid = new_id()

@@ -6,6 +6,9 @@ cred = credentials.Certificate("api/firebase-adminsdk.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-docs = db.collection("users").where("name", "==", "Chandan Bhai").get()
-for d in docs:
-    print(d.to_dict())
+all_prods = db.collection("products").stream()
+for p in all_prods:
+    d = p.to_dict()
+    name = d.get("name", "")
+    if "4 No" in name or "3 No" in name or "GP 4" in name or "GP 3" in name:
+        print(f"DocID: {p.id}, ID: {d.get('id')}, Name: repr({repr(name)}), Branch: repr({repr(d.get('branch'))}), Stock: {d.get('stock')}")
