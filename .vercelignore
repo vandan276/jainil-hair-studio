@@ -6,17 +6,23 @@ backend/**
 backend/uploads
 backend/venv
 api/uploads
+api/uploads/**
 frontend/build
+frontend/build/**
 .DS_Store
 *.pyc
 __pycache__
+api/__pycache__
 .env
 .env.local
 .venv
 venv
 test_reports
 scratch
+scratch/**
 frontend/Asset
 frontend/Asset/**
+frontend/public/assets
 .git_backup
+
 
