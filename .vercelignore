@@ -1,7 +1,10 @@
 # Ignore local testing and build artifacts
 node_modules
 frontend/node_modules
+backend
+backend/**
 backend/uploads
+backend/venv
 api/uploads
 frontend/build
 .DS_Store
@@ -14,7 +17,6 @@ venv
 test_reports
 scratch
 frontend/Asset
-frontend/Asset/Slider images
-frontend/Asset/Products
-frontend/Asset/After:before
+frontend/Asset/**
 .git_backup
+
