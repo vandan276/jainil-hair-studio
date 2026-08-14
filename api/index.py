@@ -64,7 +64,17 @@ EMAIL_FROM = os.environ.get("EMAIL_FROM", "Eminence Salon <noreply@eminence.com>
 firebase_creds_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
 try:
     if firebase_creds_json:
-        creds_dict = json.loads(firebase_creds_json)
+        if isinstance(firebase_creds_json, str):
+            # Clean possible double stringification / escaped newlines
+            try:
+                creds_dict = json.loads(firebase_creds_json)
+                if isinstance(creds_dict, str):
+                    creds_dict = json.loads(creds_dict)
+            except Exception:
+                creds_dict = json.loads(firebase_creds_json.replace('\\n', '\n'))
+        else:
+            creds_dict = firebase_creds_json
+            
         cred = credentials.Certificate(creds_dict)
         if not firebase_admin._apps:
             firebase_admin.initialize_app(cred, {'storageBucket': STORAGE_BUCKET})
@@ -72,7 +82,6 @@ try:
         # Prefer the local file in the api/ directory
         json_file = ROOT_DIR / 'firebase-adminsdk.json'
         if not json_file.exists():
-            # Fallback to other possible locations
             possible_paths = [
                 ROOT_DIR.parent / 'firebase-adminsdk.json',
                 ROOT_DIR.parent / 'backend' / 'firebase-adminsdk.json'
@@ -92,7 +101,11 @@ try:
 except Exception as e:
     logger.error(f"Firebase Init Error: {e}")
 
-db = firestore.client()
+try:
+    db = firestore.client()
+except Exception as e:
+    logger.error(f"Firestore Client Init Error: {e}")
+    db = None
 
 # ----- App Setup -----
 app = FastAPI(title="Eminence Salon API")
