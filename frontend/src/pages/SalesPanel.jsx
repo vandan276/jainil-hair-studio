@@ -231,17 +231,15 @@ export default function SalesPanel() {
     fetchConsultations();
   }, [fetchConsultations]);
 
-  // Removed 30-second polling to fix excessive Firestore reads.
-  // Users will need to refresh manually or we can implement a refresh button.
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (document.hidden) return;
-  //     fetchLeads();
-  //     fetchStats();
-  //     fetchConsultations();
-  //   }, 30000); // Poll every 30s
-  //   return () => clearInterval(interval);
-  // }, [fetchLeads, fetchStats, fetchConsultations]);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (document.hidden) return; // Skip polling when tab is not visible/active
+      fetchLeads();
+      fetchStats();
+      fetchConsultations();
+    }, 30000); // Poll every 30s
+    return () => clearInterval(interval);
+  }, [fetchLeads, fetchStats, fetchConsultations]);
 
   useEffect(() => {
     const handleVisibilityChange = () => {
@@ -1505,6 +1503,7 @@ export default function SalesPanel() {
                             <option value="Visit Scheduled">Visit Scheduled</option>
                             <option value="Visited">Visited</option>
                             <option value="Token Received">Token Received</option>
+                            <option value="Converted">Converted</option>
                             <option value="Not Picked Up">Not Picked Up / Busy</option>
                             <option value="Said No">Said No / Not Interested</option>
                           </select>
@@ -2543,14 +2542,9 @@ function ConsultationsPanel({ consultations, refresh }) {
 
                 <div>
                   <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Status</p>
-                  <span className="text-xs uppercase tracking-wider font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100 block">
+                  <span className="text-xs uppercase tracking-wider font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">
                     {c.status || "New"}
                   </span>
-                  {c.token_received && (
-                    <span className="text-[9px] uppercase font-bold tracking-widest text-violet-600 bg-violet-100 px-2 py-0.5 rounded-full mt-1 inline-block border border-violet-200">
-                      Token Rcvd
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -2629,10 +2623,6 @@ function ConsultationsPanel({ consultations, refresh }) {
                         <div className="flex justify-between">
                           <span className="text-xs text-gray-400">Size / Color:</span>
                           <span className="text-xs font-bold">{c.size_color || "N/A"}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-xs text-gray-400">Token Received:</span>
-                          <span className="text-xs font-bold text-violet-600">{c.token_received ? `Yes (₹${c.token_amount || 0})` : "No"}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-xs text-gray-400">Follow Up:</span>

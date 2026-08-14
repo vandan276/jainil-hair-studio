@@ -28,10 +28,7 @@ const PRODUCT_CATEGORIES = [
 ];
 
 // ─── Admin Appointments Page ─────────────────────────────────────────────────
-const PAYMENT_METHODS = [
-  "Cash", "Credit/Debit Card", "Bank Transfer",
-  "UPI", "E-wallet", "Reward Points", "Razorpay"
-];
+const PAYMENT_METHODS = ["Cash", "Card", "UPI / GPay", "Razorpay", "Advance"];
 const APPOINTMENT_STATUSES = ["Pending", "Confirmed", "Billed", "Cancelled"];
 const TIMES_HALF = [];
 for (let h = 9; h <= 21; h++) {
@@ -50,7 +47,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
   // Form state
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [apptTime, setApptTime] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
   const [date, setDate] = useState(today);
   const [apptStatus, setApptStatus] = useState("Confirmed");
   const [notes, setNotes] = useState("");
@@ -63,31 +60,8 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
   const [loading, setLoading] = useState(false);
 
   // Service rows
-  const emptyRow = () => ({ id: Date.now() + Math.random(), service_id: "", service_name_input: "", stylist_id: "", start_time: "", end_time: "", discount: 0, price: 0 });
+  const emptyRow = () => ({ id: Date.now() + Math.random(), service_id: "", stylist_id: "", start_time: "", end_time: "", discount: 0, price: 0 });
   const [rows, setRows] = useState([emptyRow()]);
-  const [focusedServiceRow, setFocusedServiceRow] = useState(null);
-
-  // Clients
-  const [clients, setClients] = useState([]);
-  const [showNameDrop, setShowNameDrop] = useState(false);
-  const [showPhoneDrop, setShowPhoneDrop] = useState(false);
-  useEffect(() => {
-    api.get("/leads?all=true").then(res => setClients(res.data)).catch(console.error);
-  }, []);
-
-  const handleNameChange = (e) => {
-    const val = e.target.value;
-    setCustomerName(val);
-    const found = clients.find(c => c.name === val);
-    if (found && !customerPhone) setCustomerPhone(found.phone);
-  };
-
-  const handlePhoneChange = (e) => {
-    const val = e.target.value;
-    setCustomerPhone(val);
-    const found = clients.find(c => c.phone === val);
-    if (found && !customerName) setCustomerName(found.name);
-  };
 
   // List filters
   const [listSearch, setListSearch] = useState("");
@@ -98,13 +72,9 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
   const updateRow = (id, field, val) => setRows(r => r.map(x => x.id === id ? { ...x, [field]: val } : x));
 
   // When a service is picked, auto-fill price
-  const pickService = (id, name) => {
-    const svc = services.find(s => s.name === name);
-    if (svc) {
-      setRows(r => r.map(x => x.id === id ? { ...x, service_id: svc.id, service_name_input: name, price: Number(svc.price) } : x));
-    } else {
-      setRows(r => r.map(x => x.id === id ? { ...x, service_id: "", service_name_input: name } : x));
-    }
+  const pickService = (id, svcId) => {
+    const svc = services.find(s => s.id === svcId);
+    setRows(r => r.map(x => x.id === id ? { ...x, service_id: svcId, price: svc ? Number(svc.price) : 0 } : x));
   };
 
   const subtotal = rows.reduce((sum, r) => sum + (Number(r.price) - Number(r.discount || 0)), 0);
@@ -112,35 +82,8 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
   const total = subtotal - Number(discount || 0) + taxAmt;
   const pending = Math.max(0, total - Number(advance || 0));
 
-  const parseTimeStr = (tstr) => {
-    if (!tstr) return null;
-    if (typeof tstr !== 'string') return null;
-    const [h, m] = tstr.split(":");
-    return parseInt(h, 10) + parseInt(m, 10) / 60;
-  };
-
-  const getUnavailableTimes = (stylistId, dateStr) => {
-    if (!stylistId || !dateStr) return [];
-    const dayAppts = appointments.filter(a => a.date === dateStr && (a.status || "").toLowerCase() !== "cancelled");
-    let busySlots = [];
-    dayAppts.forEach(a => {
-      const svcs = a.services || [{ stylist_id: a.stylist_id, start_time: a.time, end_time: a.end_time || a.time }];
-      svcs.forEach(s => {
-        if (s.stylist_id === stylistId && s.start_time) {
-          const start = parseTimeStr(s.start_time);
-          const end = parseTimeStr(s.end_time) || (start + 0.5);
-          for (let h = start; h < end; h += 0.5) {
-             const hString = `${String(Math.floor(h)).padStart(2, '0')}:${h % 1 === 0 ? '00' : '30'}`;
-             busySlots.push(hString);
-          }
-        }
-      });
-    });
-    return busySlots;
-  };
-
   const resetForm = () => {
-    setCustomerName(""); setCustomerPhone(""); setApptTime("");
+    setCustomerName(""); setCustomerPhone(""); setCustomerEmail("");
     setDate(today); setApptStatus("Confirmed"); setNotes("");
     setSendSms(false); setSendWa(false); setAdvance(""); setDiscount(0); setTax(0);
     setPaymentMethod("Cash");
@@ -156,7 +99,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
     const payload = {
       customer_name: customerName,
       customer_phone: customerPhone,
-      time: apptTime,
+      customer_email: customerEmail,
       date,
       service_rows: validRows.map(r => {
         const svc = services.find(s => s.id === r.service_id);
@@ -190,15 +133,6 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
       setLoading(true);
       await api.post("/admin/appointments", payload);
       toast.success("Appointment created successfully!");
-      
-      if (sendWa && customerPhone) {
-        const cleanPhone = String(customerPhone).replace(/\D/g, '');
-        const servicesStr = validRows.map(r => services.find(s => s.id === r.service_id)?.name || "Service").join(", ");
-        const msg = `Hello ${customerName},\n\nYour appointment at Eminence Hair Salon is confirmed!\n\nDate: ${date}\nTime: ${apptTime || validRows[0]?.start_time || 'TBD'}\nServices: ${servicesStr}\n\nWe look forward to seeing you!`;
-        const waUrl = `https://wa.me/${cleanPhone.length <= 10 ? '91' : ''}${cleanPhone}?text=${encodeURIComponent(msg)}`;
-        window.open(waUrl, "_blank");
-      }
-      
       resetForm();
       onRefresh();
     } catch (err) {
@@ -211,7 +145,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
   const filteredAppts = appointments.filter(a => {
     const matchDate = listDate ? a.date === listDate : true;
     const q = listSearch.toLowerCase();
-    const matchSearch = !q || String(a.user_name || "").toLowerCase().includes(q) || String(a.user_phone || "").toLowerCase().includes(q) || String(a.service_name || "").toLowerCase().includes(q);
+    const matchSearch = !q || (a.user_name || "").toLowerCase().includes(q) || (a.user_phone || "").toLowerCase().includes(q) || (a.service_name || "").toLowerCase().includes(q);
     return matchDate && matchSearch;
   });
 
@@ -239,38 +173,17 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
         <div className="p-6 space-y-5">
           {/* Client Info */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="relative">
+            <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Client Name *</label>
-              <input value={customerName} onChange={handleNameChange} onFocus={() => setShowNameDrop(true)} onBlur={() => setTimeout(() => setShowNameDrop(false), 200)} required placeholder="Full name" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
-              {showNameDrop && customerName && clients.filter(c => (c.name||'').toLowerCase().includes(customerName.toLowerCase())).length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-40 overflow-y-auto">
-                  {clients.filter(c => (c.name||'').toLowerCase().includes(customerName.toLowerCase())).slice(0, 8).map(c => (
-                    <div key={c.id} onMouseDown={(e) => { e.preventDefault(); setCustomerName(c.name); setCustomerPhone(c.phone); setShowNameDrop(false); }} className="px-3 py-2 hover:bg-eminence-surface cursor-pointer text-sm flex justify-between">
-                      <span className="font-medium">{c.name}</span><span className="text-eminence-muted text-xs">{c.phone}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="relative">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Phone *</label>
-              <input value={customerPhone} onChange={handlePhoneChange} onFocus={() => setShowPhoneDrop(true)} onBlur={() => setTimeout(() => setShowPhoneDrop(false), 200)} required placeholder="+91 99999 99999" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
-              {showPhoneDrop && customerPhone && clients.filter(c => (c.phone||'').toLowerCase().includes(customerPhone.toLowerCase())).length > 0 && (
-                <div className="absolute z-50 w-full mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-40 overflow-y-auto">
-                  {clients.filter(c => (c.phone||'').toLowerCase().includes(customerPhone.toLowerCase())).slice(0, 8).map(c => (
-                    <div key={c.id} onMouseDown={(e) => { e.preventDefault(); setCustomerPhone(c.phone); setCustomerName(c.name); setShowPhoneDrop(false); }} className="px-3 py-2 hover:bg-eminence-surface cursor-pointer text-sm flex justify-between">
-                      <span className="font-medium">{c.phone}</span><span className="text-eminence-muted text-xs">{c.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <input value={customerName} onChange={e => setCustomerName(e.target.value)} required placeholder="Full name" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Time *</label>
-              <select value={apptTime} onChange={e => setApptTime(e.target.value)} required className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold">
-                <option value="">--:--</option>
-                {TIMES_HALF.map(t => <option key={t} value={t}>{t}</option>)}
-              </select>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Phone *</label>
+              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} required placeholder="+91 99999 99999" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+            </div>
+            <div>
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Email (optional)</label>
+              <input value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="client@email.com" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
             </div>
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Date *</label>
@@ -281,7 +194,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
           {/* Services Table */}
           <div>
             <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-2">Services</label>
-            <div className="border border-eminence-border rounded-xl overflow-visible">
+            <div className="border border-eminence-border rounded-xl overflow-hidden">
               {/* Table Header */}
               <div className="grid grid-cols-[1.8fr_1.4fr_0.9fr_0.9fr_0.7fr_0.8fr_auto] gap-1 bg-eminence-surface px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-eminence-muted border-b border-eminence-border">
                 <span>Service</span>
@@ -296,27 +209,14 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
               <div className="divide-y divide-eminence-border/50">
                 {rows.map((row) => (
                   <div key={row.id} className="grid grid-cols-[1.8fr_1.4fr_0.9fr_0.9fr_0.7fr_0.8fr_auto] gap-1 items-center px-3 py-2">
-                    <div className="relative w-full">
-                      <input
-                        type="text"
-                        placeholder="-- Search Service --"
-                        value={services.find(s => s.id === row.service_id)?.name || row.service_name_input || ""}
-                        onChange={e => pickService(row.id, e.target.value)}
-                        onFocus={() => setFocusedServiceRow(row.id)}
-                        onBlur={() => setTimeout(() => setFocusedServiceRow(null), 200)}
-                        className="w-full bg-white border border-eminence-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
-                      />
-                      {focusedServiceRow === row.id && (
-                        <div className="absolute z-50 w-[300px] mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                          {services.filter(s => (s.name||'').toLowerCase().includes((row.service_name_input||'').toLowerCase())).map(s => (
-                            <div key={s.id} onMouseDown={(e) => { e.preventDefault(); pickService(row.id, s.name); setFocusedServiceRow(null); }} className="px-3 py-2 hover:bg-eminence-surface cursor-pointer text-left flex flex-col">
-                              <span className="font-bold text-xs">{s.name}</span>
-                              <span className="text-[9px] text-gray-500 uppercase">{s.category} - ₹{s.price}</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <select
+                      value={row.service_id}
+                      onChange={e => pickService(row.id, e.target.value)}
+                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                    >
+                      <option value="">-- Service --</option>
+                      {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                    </select>
                     <select
                       value={row.stylist_id}
                       onChange={e => updateRow(row.id, "stylist_id", e.target.value)}
@@ -328,24 +228,18 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                     <select
                       value={row.start_time}
                       onChange={e => updateRow(row.id, "start_time", e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-1.5 py-1.5 text-[10px] focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-1.5 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
                     >
                       <option value="">--:--</option>
-                      {TIMES_HALF.map(t => {
-                         const isBusy = row.stylist_id && getUnavailableTimes(row.stylist_id, date).includes(t) && row.start_time !== t;
-                         return <option key={t} value={t} disabled={isBusy}>{t}{isBusy ? " (Busy)" : ""}</option>;
-                      })}
+                      {TIMES_HALF.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                     <select
                       value={row.end_time}
                       onChange={e => updateRow(row.id, "end_time", e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-1.5 py-1.5 text-[10px] focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-1.5 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
                     >
                       <option value="">--:--</option>
-                      {TIMES_HALF.map(t => {
-                         const isBusy = row.stylist_id && getUnavailableTimes(row.stylist_id, date).includes(t) && row.end_time !== t;
-                         return <option key={t} value={t} disabled={isBusy}>{t}{isBusy ? " (Busy)" : ""}</option>;
-                      })}
+                      {TIMES_HALF.map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                     <input
                       type="number"
@@ -449,7 +343,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
 // ─── End AdminAppointmentsPage ────────────────────────────────────────────────
 
 // ─── Dashboard Scheduler ───────────────────────────────────────────────────────
-function DashboardScheduler({ appointments, employees, stats, orders = [], leads = [], selectedBranch, onRefresh }) {
+function DashboardScheduler({ appointments, employees, stats, orders = [], leads = [], selectedBranch }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [activeCard, setActiveCard] = useState(null);
   const [salesSearch, setSalesSearch] = useState("");
@@ -520,21 +414,12 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
     return parseInt(h, 10) + parseInt(m, 10) / 60;
   };
 
-  const formatAmPm = (tstr) => {
-    if (!tstr) return "—";
-    const parts = tstr.split(":");
-    if (parts.length < 2) return tstr;
-    let hr = parseInt(parts[0], 10);
-    const ampm = hr >= 12 ? 'PM' : 'AM';
-    hr = hr % 12 || 12;
-    return `${String(hr).padStart(2, '0')}:${parts[1]} ${ampm}`;
-  };
-
   const getStatusColor = (status) => {
     const s = (status || "").toLowerCase();
-    if (s === "billed" || s === "completed" || s === "visited") return "bg-purple-600 border-purple-700";
-    if (s === "cancelled") return "bg-red-500 border-red-600";
-    return "bg-yellow-500 border-yellow-600 text-white"; // booked/confirmed/pending
+    if (s === "pending") return "bg-yellow-400";
+    if (s === "billed" || s === "completed") return "bg-emerald-600";
+    if (s === "cancelled") return "bg-red-600";
+    return "bg-blue-600"; // confirmed/checked-in
   };
 
   return (
@@ -796,9 +681,6 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
                 {emp.name}
               </div>
             ))}
-            <div className="flex-1 min-w-[120px] p-2 text-[10px] font-bold text-gray-400 text-center border-r border-gray-200 truncate bg-gray-50/50">
-              Unassigned
-            </div>
             <div className="flex-1 min-w-[120px] p-2 text-[10px] font-bold text-amber-800 text-center border-r border-gray-200 truncate bg-amber-50/50">
               Consultancy (Leads)
             </div>
@@ -816,7 +698,6 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
                     {/* Background grid lines for half hours could go here */}
                   </div>
                 ))}
-                <div className="flex-1 border-r border-gray-100 bg-gray-50/5 relative"></div>
                 <div className="flex-1 border-r border-gray-100 bg-amber-50/5 relative"></div>
               </div>
             ))}
@@ -824,13 +705,11 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
             {/* Plotted Appointments Overlay */}
             {todaysAppts.map(appt => {
               return (appt.services || [{ stylist_id: appt.stylist_id, start_time: appt.time, service_name: appt.service_name, status: appt.status }]).map((svc, sIdx) => {
-                if (!svc.start_time && !appt.time) return null;
-                const startTime = svc.start_time || appt.time;
-                let empIdx = serviceStaff.findIndex(e => e.id === svc.stylist_id);
-                if (empIdx === -1) empIdx = serviceStaff.length; // Unassigned column
-                const emp = empIdx < serviceStaff.length ? serviceStaff[empIdx] : { name: "Unassigned", id: null };
+                if (!svc.stylist_id || !svc.start_time) return null;
+                const empIdx = serviceStaff.findIndex(e => e.id === svc.stylist_id);
+                if (empIdx === -1) return null; // Stylist not found in current list
 
-                const startH = parseTime(startTime);
+                const startH = parseTime(svc.start_time);
                 let endH = parseTime(svc.end_time);
                 if (startH === null) return null;
 
@@ -848,7 +727,7 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
 
                 const topOffset = (renderStartH - gridStart) * 64; // 64px per hour (h-16 class)
                 const height = durationH * 64;
-                const totalCols = serviceStaff.length + 2; // serviceStaff + unassigned + consultancy
+                const totalCols = serviceStaff.length + 1;
                 const colWidth = `calc((100% - 64px) / ${totalCols})`;
                 const leftOffset = `calc(64px + (${colWidth} * ${empIdx}))`;
 
@@ -999,7 +878,7 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
               </div>
               <div className="flex border-b pb-2 border-gray-100">
                 <span className="w-1/3 text-gray-400 font-bold">Appointment Time</span>
-                <span className="w-2/3 text-gray-700 font-bold">{formatAmPm(selectedApptDetails.svc.start_time)} To {formatAmPm(selectedApptDetails.svc.end_time)}</span>
+                <span className="w-2/3 text-gray-700 font-bold">{selectedApptDetails.svc.start_time} To {selectedApptDetails.svc.end_time || "—"}</span>
               </div>
               <div className="flex border-b pb-2 border-gray-100">
                 <span className="w-1/3 text-gray-400 font-bold">Service</span>
@@ -1023,18 +902,11 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
 
             <div className="flex gap-2 mt-6 justify-end">
               <button
-                onClick={async () => {
-                  try {
-                    await api.put(`/admin/appointments/${selectedApptDetails.appt.id}/status`, { status: "Visited" });
-                    toast.success("Checked in successfully");
-                    setSelectedApptDetails(null);
-                    onRefresh();
-                  } catch (e) {
-                    const msg = e?.response?.data?.detail || e.message || "Failed to check in";
-                    toast.error(`Check In Failed: ${msg}`);
-                  }
+                onClick={() => {
+                  toast.success("Checked in successfully");
+                  setSelectedApptDetails(null);
                 }}
-                className="bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px] px-3.5 py-2 rounded shadow transition-all active:scale-95 flex items-center gap-1"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] px-3.5 py-2 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-1"
               >
                 ✓ Check In
               </button>
@@ -1146,7 +1018,6 @@ const getReportTitle = (tabKey) => {
     { k: "reports-summary", label: "Day Summary", desc: "Consolidated register summary of payment methods, service sales, and product sales." },
     { k: "reports-billing", label: "Billing Reports", desc: "Track, audit, print, and manage generated salon invoices." },
     { k: "reports-enquiry", label: "Enquiry Reports", desc: "Review customer consultations, treatments, and recommendations." },
-    { k: "reports-tokens", label: "Token Reports", desc: "Track all token amounts received from consultations." },
     { k: "reports-provider", label: "Service Provider Reports", desc: "Performance, sales volume, commission, and services per stylist." },
     { k: "reports-sales-employee", label: "Sales Employee Reports", desc: "Detailed sales performance and metrics for consulting/sales team." },
     { k: "reports-pending", label: "Received Pending Payments", desc: "Track and confirm pending split payments or post-dated bills." },
@@ -1248,11 +1119,6 @@ export default function Admin() {
   const [attendanceLogs, setAttendanceLogs] = useState([]);
   const [branches, setBranches] = useState(["Surat", "Baroda"]);
   const [adminPermissions, setAdminPermissions] = useState("__ALL__"); // "__ALL__" or array of tab keys
-
-  // Reminders state
-  const [activeReminders, setActiveReminders] = useState([]);
-  const [showRemindersPopup, setShowRemindersPopup] = useState(false);
-  const hasSeenReminders = useRef(false);
   const [offers, setOffers] = useState([
     { id: "o1", title: "Summer Hair Extension Special", discount: "20% OFF", description: "Get premium extensions at discount", expires: "2026-07-31", active: true },
     { id: "o2", title: "Weekday Pampering", discount: "Flat ₹500 OFF", description: "Applicable on any hair spa session", expires: "2026-06-30", active: true }
@@ -1299,13 +1165,11 @@ export default function Admin() {
         promises.push(api.get(addParam("/admin/stats", branchQuery))); keys.push("stats");
         promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
         promises.push(api.get(addParam("/leads?all=true", branchQuery))); keys.push("leads");
-        promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
         if (tab === "dashboard") {
           promises.push(api.get("/services")); keys.push("services");
           promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
           promises.push(api.get("/admin/appointments")); keys.push("appointments");
           promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.push("orders");
-          promises.push(api.get(addParam("/admin/active-service-reminders", branchQuery))); keys.push("activeReminders");
         }
         promises.push(api.get("/maintenance")); keys.push("maintenance");
         // Fetch leave requests on overview so the notification popup can detect pending requests
@@ -1331,7 +1195,7 @@ export default function Admin() {
         promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
         promises.push(api.get("/admin/product-categories")); keys.push("productCategories");
       } else if (tab === "products-transfer" || tab === "add-transfers") {
-        promises.push(api.get("/products?all_products=true")); keys.push("products");
+        promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
         promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
       } else if (tab === "products-transferred") {
         promises.push(api.get(addParam("/admin/products/transfers", branchQuery))); keys.push("transfers");
@@ -1344,13 +1208,13 @@ export default function Admin() {
         promises.push(api.get(addParam("/products?all_products=true", branchQuery))); keys.push("products");
         promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
         promises.push(api.get(addParam("/admin/products/usages", branchQuery))); keys.push("usages");
-      } else if (tab === "consultations" || tab === "reports-enquiry" || tab === "add-assessment" || tab === "reports-tokens") {
+      } else if (tab === "consultations" || tab === "reports-enquiry" || tab === "add-assessment") {
         promises.push(api.get("/admin/consultations")); keys.push("consultations");
       } else if (tab === "users") {
         promises.push(api.get("/admin/users")); keys.push("users");
       } else if (tab === "employees" || tab === "add-staff" || tab === "add-salary" || tab === "add-providers" || tab === "add-branches") {
         promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
-      } else if (tab === "services" || tab === "add-services" || tab === "add-reminders") {
+      } else if (tab === "services" || tab === "add-services") {
         promises.push(api.get("/services")); keys.push("services");
       } else if (tab === "memberships" || tab === "add-membership") {
         promises.push(api.get("/memberships")); keys.push("memberships");
@@ -1366,8 +1230,7 @@ export default function Admin() {
         promises.push(api.get("/admin/attendance")); keys.push("attendanceLogs");
       } else if (tab === "clients") {
         promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
-promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.push("orders");
-        promises.push(api.get(addParam("/admin/active-service-reminders", branchQuery))); keys.push("activeReminders");
+        promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.push("orders");
       } else if (tab === "appointments") {
         promises.push(api.get("/services")); keys.push("services");
         promises.push(api.get(addParam("/admin/employees", branchQuery))); keys.push("employees");
@@ -1400,13 +1263,6 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
               }))
             }));
             setOrders(mappedOrders);
-          }
-          else if (key === "activeReminders") {
-            setActiveReminders(val);
-            if (val?.length > 0 && !hasSeenReminders.current) {
-              setShowRemindersPopup(true);
-              hasSeenReminders.current = true;
-            }
           }
           else if (key === "consultations") setConsultations(val);
           else if (key === "users") setUsers(val);
@@ -1643,7 +1499,7 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
         {/* REPORTS DROPDOWN */}
         {(isSuperAdmin || [
           "reports-finance", "reports-daily", "reports-summary", "reports-billing",
-          "reports-enquiry", "reports-tokens", "reports-provider", "reports-sales-employee",
+          "reports-enquiry", "reports-provider", "reports-sales-employee",
           "reports-pending", "reports-history", "reports-balance", "reports-advance",
           "reports-attendance", "reports-sms"
         ].some(k => canAccess(k))) && (
@@ -1668,7 +1524,6 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
                       { k: "reports-summary", label: "Day Summary" },
                       { k: "reports-billing", label: "Billing Reports" },
                       { k: "reports-enquiry", label: "Enquiry Reports" },
-                      { k: "reports-tokens", label: "Token Reports" },
                       { k: "reports-provider", label: "Service Provider Reports" },
                       { k: "reports-sales-employee", label: "Sales Employee Reports" },
                       { k: "reports-pending", label: "Received Pending Payments" },
@@ -1876,7 +1731,7 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
       />
 
       {tab === "dashboard" && (
-        <DashboardScheduler appointments={appointments} employees={employees} stats={stats} orders={orders} leads={leads} selectedBranch={selectedBranch} onRefresh={refresh} />
+        <DashboardScheduler appointments={appointments} employees={employees} stats={stats} orders={orders} leads={leads} selectedBranch={selectedBranch} />
       )}
 
 
@@ -2154,11 +2009,11 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
       )}
 
       {tab === "consultations" && (
-        <ConsultationsPanel consultations={consultations} orders={orders} refresh={refresh} t={t} />
+        <ConsultationsPanel consultations={consultations} orders={orders} refresh={refresh} t={t} branches={branches} />
       )}
 
       {tab === "clients" && (
-        <ClientsSegmentationPanel employees={employees} appointments={appointments} refreshAll={refresh} t={t} />
+        <ClientsSegmentationPanel employees={employees} appointments={appointments} refreshAll={refresh} t={t} branches={branches} />
       )}
 
       {tab === "users" && (
@@ -2207,7 +2062,7 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
       ) : (
         <>
           {tab === "reports-finance" && (
-            <FinanceReportsPanel consultations={consultations} orders={orders} expenses={expenses} leads={leads} stats={stats} t={t} />
+            <FinanceReportsPanel orders={orders} expenses={expenses} leads={leads} stats={stats} t={t} />
           )}
           {tab === "reports-daily" && (
             <DailyReportsPanel stats={stats} orders={orders} reportsData={reportsData} expenses={expenses} t={t} />
@@ -2220,9 +2075,6 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
           )}
           {tab === "reports-enquiry" && (
             <EnquiryReportsPanel consultations={consultations} t={t} />
-          )}
-          {tab === "reports-tokens" && (
-            <TokenReportsPanel consultations={consultations} />
           )}
           {tab === "reports-provider" && (
             <ServiceProviderReportsPanel reportsData={reportsData} employees={employees} orders={orders} t={t} />
@@ -2452,80 +2304,6 @@ promises.push(api.get(addParam("/admin/orders?limit=1000", branchQuery))); keys.
           </div>
         </div>
       )}
-      
-      {/* Active Reminders Modal */}
-      {showRemindersPopup && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[100] backdrop-blur-sm p-4 animate-fade-in">
-          <div className="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-lg">
-                  🔔
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 text-lg">Active Service Reminders</h3>
-                  <p className="text-xs text-gray-500">Clients due for their next service based on interval.</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => setShowRemindersPopup(false)}
-                className="text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 transition-colors"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto bg-gray-50/30 flex-1">
-              <div className="space-y-4">
-                {activeReminders.map((rem, idx) => {
-                  const filledMessage = rem.message_template
-                    .replace(/{name}/g, rem.client_name || "Client")
-                    .replace(/{salon_name}/g, selectedBranch || "Eminence");
-                  const whatsappUrl = `https://wa.me/${rem.client_phone || ""}?text=${encodeURIComponent(filledMessage)}`;
-                  
-                  return (
-                    <div key={idx} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-start gap-4">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-bold text-gray-900">{rem.client_name}</span>
-                            {rem.client_phone && (
-                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">{rem.client_phone}</span>
-                            )}
-                          </div>
-                          <div className="text-sm text-gray-600 mb-2">
-                            Due for <span className="font-semibold text-eminence-gold">{rem.service_name}</span> 
-                            <span className="text-gray-400 text-xs ml-2">({rem.interval_days} days since {rem.target_date})</span>
-                          </div>
-                          <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded border border-gray-100 italic">
-                            "{filledMessage}"
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => window.open(whatsappUrl, '_blank')}
-                          className="shrink-0 bg-green-500 hover:bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2 transition-transform active:scale-95 shadow-sm shadow-green-500/20"
-                        >
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg>
-                          Share WhatsApp
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            
-            <div className="p-4 border-t border-gray-100 bg-white flex justify-end">
-              <button 
-                onClick={() => setShowRemindersPopup(false)}
-                className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-6 py-2.5 rounded-xl transition-colors"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -2568,7 +2346,6 @@ const ALL_CONTROLLABLE_TABS = [
       { k: "reports-summary", label: "Day Summary" },
       { k: "reports-billing", label: "Billing Reports" },
       { k: "reports-enquiry", label: "Enquiry Reports" },
-      { k: "reports-tokens", label: "Token Reports" },
       { k: "reports-provider", label: "Service Provider Reports" },
       { k: "reports-sales-employee", label: "Sales Employee Reports" },
       { k: "reports-pending", label: "Received Pending Payments" },
@@ -4452,68 +4229,6 @@ function EnquiryReportsPanel({ consultations }) {
   );
 }
 
-function TokenReportsPanel({ consultations }) {
-  const activeTokens = consultations.filter(c => c.token_received);
-  const totalTokensReceived = activeTokens.length;
-  const totalTokenAmount = activeTokens.reduce((sum, c) => sum + (Number(c.token_amount) || 0), 0);
-
-  const closedTokens = activeTokens.filter(c => c.status === "Closed");
-  const convertedTokensValue = closedTokens.reduce((sum, c) => sum + (Number(c.token_amount) || 0), 0);
-  const pendingTokensValue = totalTokenAmount - convertedTokensValue;
-
-  return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard icon={MessageSquare} label="Total Token Receipts" value={totalTokensReceived} />
-        <StatCard icon={TrendingUp} label="Total Token Value" value={`₹${totalTokenAmount.toLocaleString("en-IN")}`} />
-        <StatCard icon={Check} label="Tokens Converted (Closed)" value={`₹${convertedTokensValue.toLocaleString("en-IN")}`} />
-        <StatCard icon={Clock} label="Pending Tokens" value={`₹${pendingTokensValue.toLocaleString("en-IN")}`} />
-      </div>
-
-      <div className="eminence-card p-6">
-        <h3 className="font-serif text-xl mb-6">Token History</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-eminence-border py-2 text-left overline text-eminence-muted">
-                <th className="py-3">Date</th>
-                <th>Client</th>
-                <th>Phone</th>
-                <th>Service</th>
-                <th>Consulted By</th>
-                <th>Token Value</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeTokens.sort((a, b) => new Date(b.created_at || b.timestamp) - new Date(a.created_at || a.timestamp)).map((c) => (
-                <tr key={c.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
-                  <td className="py-3">{c.created_at?.split("T")[0] || new Date(c.timestamp).toISOString().split("T")[0]}</td>
-                  <td className="font-bold">{c.name}</td>
-                  <td>{c.phone || "—"}</td>
-                  <td className="text-gray-600">{c.recommended_service || "—"}</td>
-                  <td className="text-gray-600 font-medium uppercase text-xs">{c.consulted_by || "—"}</td>
-                  <td className="text-eminence-gold font-bold">₹{(Number(c.token_amount) || 0).toLocaleString("en-IN")}</td>
-                  <td>
-                    <span className={`uppercase text-[9px] font-bold tracking-widest border px-2 py-0.5 rounded ${c.status === "Closed" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-violet-50 text-violet-700 border-violet-200"}`}>
-                      {c.status || "Open"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {activeTokens.length === 0 && (
-                <tr>
-                  <td colSpan="7" className="text-center py-10 text-eminence-muted italic">No tokens recorded yet.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -4897,19 +4612,7 @@ function SalesEmployeeReportsPanel({ reportsData, employees }) {
 }
 
 function PendingPaymentsPanel({ orders, refresh }) {
-  const pendingOrders = orders
-    .filter(o => o.status === "placed" || o.status === "pending")
-    .map(o => {
-      const total = Number(o.total || 0);
-      const discount = Number(o.discount || 0);
-      const netPayable = Math.max(0, total - discount);
-      const paid = o.split_payments?.length
-        ? o.split_payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
-        : 0;
-      const pendingAmount = Math.max(0, netPayable - paid);
-      return { ...o, pendingAmount };
-    })
-    .filter(o => o.pendingAmount > 0);
+  const pendingOrders = orders.filter(o => o.status === "placed" || o.status === "pending");
 
   const markPaid = async (id) => {
     try {
@@ -4935,8 +4638,7 @@ function PendingPaymentsPanel({ orders, refresh }) {
               <th className="px-6 py-4">Order ID</th>
               <th>Customer</th>
               <th>Contact</th>
-              <th>Total Bill</th>
-              <th>Pending Amount</th>
+              <th>Total Amount</th>
               <th>Date Placed</th>
               <th className="text-right px-6">Action</th>
             </tr>
@@ -4947,8 +4649,7 @@ function PendingPaymentsPanel({ orders, refresh }) {
                 <td className="px-6 py-4 font-mono text-xs">#{o.id.slice(0, 8)}</td>
                 <td className="font-bold">{o.full_name || o.user_name}</td>
                 <td>{o.phone || "—"}</td>
-                <td className="text-gray-500">₹{Number(o.total || 0).toLocaleString("en-IN")}</td>
-                <td className="font-semibold text-rose-600">₹{o.pendingAmount.toLocaleString("en-IN")}</td>
+                <td className="font-semibold text-rose-600">₹{o.total.toLocaleString("en-IN")}</td>
                 <td>{o.created_at?.split("T")[0]}</td>
                 <td className="text-right px-6">
                   <button onClick={() => markPaid(o.id)} className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors">
@@ -4959,7 +4660,7 @@ function PendingPaymentsPanel({ orders, refresh }) {
             ))}
             {pendingOrders.length === 0 && (
               <tr>
-                <td colSpan="7" className="text-center py-12 text-eminence-muted italic">All accounts are settled! No pending payments.</td>
+                <td colSpan="6" className="text-center py-12 text-eminence-muted italic">All accounts are settled! No pending payments.</td>
               </tr>
             )}
           </tbody>
@@ -5015,7 +4716,7 @@ function HistoryReportsPanel({ orders, expenses }) {
   );
 }
 
-function FinanceReportsPanel({ consultations = [], orders = [], expenses = [], leads = [], stats = null, t }) {
+function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = null, t }) {
   const [filterPeriod, setFilterPeriod] = useState("THIS_MONTH");
   const [customFromDate, setCustomFromDate] = useState(() => {
     const d = new Date();
@@ -5078,10 +4779,8 @@ function FinanceReportsPanel({ consultations = [], orders = [], expenses = [], l
 
   const filteredOrders = orders.filter(o => o.status !== "cancelled" && isWithinFilterRange(o.created_at));
   const filteredExpenses = expenses.filter(e => isWithinFilterRange(e.date || e.created_at));
-  const activeTokens = consultations.filter(c => c.token_received && c.status !== "Closed" && c.status !== "Dead" && isWithinFilterRange(c.created_at));
-  const tokenRevenue = activeTokens.reduce((sum, c) => sum + (Number(c.token_amount) || 0), 0);
 
-  const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.total || 0), 0) + tokenRevenue;
+  const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.total || 0), 0);
   const totalExpense = filteredExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
   const netProfit = totalRevenue - totalExpense;
   const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0;
@@ -5138,8 +4837,6 @@ function FinanceReportsPanel({ consultations = [], orders = [], expenses = [], l
       }
     }
   });
-
-  serviceRevenue += tokenRevenue; // Tokens are considered service revenue
 
   // Group expenses by category
   const expenseByCat = {};
@@ -5203,11 +4900,6 @@ function FinanceReportsPanel({ consultations = [], orders = [], expenses = [], l
       const mObj = months.find(m => m.yearMonth === yMonth);
       if (mObj) mObj.revenue += o.total || 0;
     });
-    activeTokens.forEach(c => {
-      const yMonth = c.created_at?.slice(0, 7) || new Date().toISOString().slice(0, 7);
-      const mObj = months.find(m => m.yearMonth === yMonth);
-      if (mObj) mObj.revenue += Number(c.token_amount) || 0;
-    });
     expenses.forEach(e => {
       const yMonth = (e.date || e.created_at)?.slice(0, 7);
       const mObj = months.find(m => m.yearMonth === yMonth);
@@ -5245,15 +4937,6 @@ function FinanceReportsPanel({ consultations = [], orders = [], expenses = [], l
         amount: o.total || 0
       };
     }),
-    ...activeTokens.map(c => ({
-      id: c.id,
-      date: c.created_at?.slice(0, 10) || new Date().toISOString().slice(0, 10),
-      timestamp: c.created_at || new Date().toISOString(),
-      type: "Revenue",
-      subType: "Consultation Token",
-      description: `Token received from ${c.name || "Client"}`,
-      amount: Number(c.token_amount) || 0
-    })),
     ...filteredExpenses.map(e => ({
       id: e.id,
       date: e.date || e.created_at?.slice(0, 10) || "",
@@ -6155,21 +5838,19 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
   });
 
   // 3. JOB CARD REPORT
+  const jobCardOrders = filteredOrders.filter(o => {
+    if (!jobCardProviderId) return true;
+    return (o.employee_id === jobCardProviderId) || (o.stylist_id === jobCardProviderId);
+  });
+
   let jServicesQty = 0; let jServicesPrice = 0;
   let jProductsQty = 0; let jProductsPrice = 0;
   let jPackagesQty = 0; let jPackagesPrice = 0;
   let jMembershipsQty = 0; let jMembershipsPrice = 0;
 
   const serviceListItems = [];
-  filteredOrders.forEach(o => {
+  jobCardOrders.forEach(o => {
     o.items?.forEach(it => {
-      if (jobCardProviderId) {
-        const isMain = it.service_provider === jobCardProviderId;
-        const isExtra = Array.isArray(it.extra_providers) && it.extra_providers.includes(jobCardProviderId);
-        const isOrderLevel = o.employee_id === jobCardProviderId || o.stylist_id === jobCardProviderId;
-        if (!isMain && !isExtra && !isOrderLevel) return;
-      }
-
       const price = (it.price || 0) * (it.quantity || 1);
       if (it.type === "product") {
         jProductsQty += (it.quantity || 1);
@@ -9115,49 +8796,204 @@ function OffersPanel({ offers, setOffers }) {
 }
 
 function GalleryPanel() {
-  const [photos, setPhotos] = useState([
-    "https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=400",
-    "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=400",
-    "https://images.unsplash.com/photo-1605497746444-05dacd19ec7a?q=80&w=400"
-  ]);
+  const [gallery, setGallery] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [uploadType, setUploadType] = useState("before");
+  const [uploadGender, setUploadGender] = useState("men");
+  const [activeFilter, setActiveFilter] = useState("all");
 
-  const addPhoto = (url) => {
+  useEffect(() => {
+    api.get("/consultation-media")
+      .then(res => {
+        setGallery(res.data.gallery || []);
+      })
+      .catch(() => setGallery([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const addPhoto = async (url) => {
     if (!url) return;
-    setPhotos([url, ...photos]);
-    toast.success("Showcase photo added to live gallery feed!");
+    const relativeUrl = url.replace(/http:\/\/localhost:\d+/i, "").replace(/https?:\/\/[^\/]+/i, "");
+    const newItem = { url: relativeUrl, type: uploadType, gender: uploadGender, media_type: "image" };
+    const updated = [newItem, ...gallery];
+    setGallery(updated);
+    setSaving(true);
+    try {
+      await api.post("/admin/consultation-media", { gallery: updated });
+      toast.success("Photo added to gallery!");
+    } catch (err) {
+      toast.error("Failed to save: " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const removePhoto = (url) => {
-    setPhotos(photos.filter(p => p !== url));
-    toast.success("Showcase photo removed.");
+  const removePhoto = async (idx) => {
+    const updated = gallery.filter((_, i) => i !== idx);
+    setGallery(updated);
+    setSaving(true);
+    try {
+      await api.post("/admin/consultation-media", { gallery: updated });
+      toast.success("Photo removed.");
+    } catch (err) {
+      toast.error("Failed to save: " + err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const CATEGORIES = [
+    { key: "all", label: "All Photos" },
+    { key: "before_men", label: "Before — Men" },
+    { key: "after_men", label: "After — Men" },
+    { key: "before_women", label: "Before — Women" },
+    { key: "after_women", label: "After — Women" },
+    { key: "review_men", label: "Reviews — Men" },
+    { key: "review_women", label: "Reviews — Women" },
+    { key: "before_unisex", label: "Before — Unisex" },
+    { key: "after_unisex", label: "After — Unisex" },
+  ];
+
+  const TYPE_LABELS = { before: "Before", after: "After", review: "Review" };
+  const GENDER_LABELS = { men: "Men", women: "Women", unisex: "Unisex" };
+  const TYPE_COLORS = { before: "bg-blue-100 text-blue-700", after: "bg-emerald-100 text-emerald-700", review: "bg-amber-100 text-amber-700" };
+  const GENDER_COLORS = { men: "bg-indigo-100 text-indigo-700", women: "bg-pink-100 text-pink-700", unisex: "bg-gray-100 text-gray-700" };
+
+  const filteredGallery = activeFilter === "all"
+    ? gallery
+    : gallery.filter(item => {
+        const [type, gender] = activeFilter.split("_");
+        return item.type === type && item.gender === gender;
+      });
+
+  const resolveUrl = (src) => {
+    if (!src) return "";
+    if (src.startsWith("http") || src.startsWith("blob:") || src.startsWith("data:")) return src;
+    return `${api.defaults.baseURL?.replace(/\/api$/, "") || ""}${src.startsWith("/") ? "" : "/"}${src}`;
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="eminence-card p-6 max-w-xl">
-        <p className="overline text-eminence-gold">Upload Showcase Photo</p>
-        <div className="mt-2">
+      {/* Upload Card */}
+      <div className="eminence-card p-6">
+        <p className="overline text-eminence-gold mb-4">Upload Photo to Consultation Gallery</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-xs font-bold text-eminence-muted uppercase tracking-widest mb-1.5">Image Type</label>
+            <select
+              value={uploadType}
+              onChange={e => setUploadType(e.target.value)}
+              className="w-full border border-eminence-border bg-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-eminence-gold"
+            >
+              <option value="before">Before Image</option>
+              <option value="after">After Image</option>
+              <option value="review">Client Review</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-eminence-muted uppercase tracking-widest mb-1.5">Gender</label>
+            <select
+              value={uploadGender}
+              onChange={e => setUploadGender(e.target.value)}
+              className="w-full border border-eminence-border bg-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-eminence-gold"
+            >
+              <option value="men">Men</option>
+              <option value="women">Women</option>
+              <option value="unisex">Unisex</option>
+            </select>
+          </div>
+        </div>
+        <div className="bg-gray-50 border border-dashed border-eminence-border/60 rounded-xl p-4">
+          <p className="text-[10px] text-eminence-muted uppercase font-bold mb-2">
+            Adding as: <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mr-1 ${TYPE_COLORS[uploadType]}`}>{TYPE_LABELS[uploadType]}</span>
+            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${GENDER_COLORS[uploadGender]}`}>{GENDER_LABELS[uploadGender]}</span>
+          </p>
           <ImageUpload value="" onChange={addPhoto} testId="gallery-uploader" />
+        </div>
+        {saving && <p className="text-xs text-eminence-gold mt-2 animate-pulse">Saving...</p>}
+      </div>
+
+      {/* Filter Tabs */}
+      <div className="bg-white p-4 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="font-serif text-xl text-gray-800">Consultation Photo Gallery</h3>
+            <p className="text-xs text-eminence-muted">Photos shown to clients in the consultation form, organized by category.</p>
+          </div>
+          <span className="text-xs font-bold text-eminence-muted bg-gray-100 px-3 py-1 rounded-full">{gallery.length} photos</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.key}
+              onClick={() => setActiveFilter(cat.key)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
+                activeFilter === cat.key
+                  ? "bg-eminence-gold text-white shadow"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              {cat.label}
+              {cat.key !== "all" && (
+                <span className="ml-1 opacity-70">
+                  ({gallery.filter(item => {
+                    const [t, g] = cat.key.split("_");
+                    return item.type === t && item.gender === g;
+                  }).length})
+                </span>
+              )}
+            </button>
+          ))}
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
-        <h3 className="font-serif text-2xl text-gray-800">Atelier Lookbook Feed</h3>
-        <p className="text-xs text-eminence-muted">Images published to client showcase feeds for aesthetic inspiration.</p>
-      </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {photos.map(url => (
-          <div key={url} className="relative group rounded-xl overflow-hidden shadow border border-gray-100 aspect-square">
-            <img src={url} alt="Atelier look" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-              <button onClick={() => removePhoto(url)} className="p-3 bg-red-600 text-white rounded-full hover:bg-red-700 shadow transition-colors">
-                <Trash2 size={16} />
-              </button>
-            </div>
+      {/* Gallery Grid */}
+      {loading ? (
+        <div className="text-center py-12 text-eminence-muted text-sm">Loading gallery...</div>
+      ) : filteredGallery.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
+          <div className="w-14 h-14 rounded-2xl bg-eminence-gold/10 flex items-center justify-center text-eminence-gold mx-auto mb-4">
+            <Camera size={24} />
           </div>
-        ))}
-      </div>
+          <p className="text-sm font-bold text-gray-700 mb-1">No photos in this category</p>
+          <p className="text-xs text-eminence-muted">Upload a photo above and assign it to this category.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {filteredGallery.map((item, idx) => {
+            const origIdx = gallery.findIndex((g, i) => g.url === item.url && gallery.indexOf(g) === (activeFilter === "all" ? idx : gallery.findIndex(x => x.url === item.url && x.type === item.type && x.gender === item.gender)));
+            const realIdx = gallery.indexOf(item);
+            return (
+              <div key={`${item.url}-${realIdx}`} className="relative group rounded-xl overflow-hidden shadow border border-gray-100 aspect-square bg-gray-50">
+                <img
+                  src={resolveUrl(item.url)}
+                  alt={`${item.type} ${item.gender}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                {/* Badges */}
+                <div className="absolute top-2 left-2 flex flex-col gap-1">
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm ${TYPE_COLORS[item.type] || "bg-gray-100 text-gray-700"}`}>
+                    {TYPE_LABELS[item.type] || item.type}
+                  </span>
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full shadow-sm ${GENDER_COLORS[item.gender] || "bg-gray-100 text-gray-700"}`}>
+                    {GENDER_LABELS[item.gender] || item.gender}
+                  </span>
+                </div>
+                {/* Remove button */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-end justify-center pb-3 transition-opacity">
+                  <button
+                    onClick={() => removePhoto(realIdx)}
+                    className="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 shadow transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -10399,7 +10235,7 @@ function SalesTeamOverview({ leads = [], employees = [], todayDateStr, selectedB
 }
 
 
-function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAll, t }) {
+function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAll, t, branches = [] }) {
   const [segments, setSegments] = useState({
     all: [],
     clients: [],
@@ -10760,9 +10596,9 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
 
     // Apply client-side filters
     list = list.filter(c => {
-      const matchId = !searchParams.id || String(c.id || "").toLowerCase().includes(String(searchParams.id).toLowerCase());
+      const matchId = !searchParams.id || (c.id || "").toLowerCase().includes(searchParams.id.toLowerCase());
       const matchName = !searchParams.name || (c.name || "").toLowerCase().includes(searchParams.name.toLowerCase());
-      const matchPhone = !searchParams.phone || String(c.phone || "").replace(/[^0-9]/g, "").includes(String(searchParams.phone).replace(/[^0-9]/g, ""));
+      const matchPhone = !searchParams.phone || (c.phone || "").replace(/[^0-9]/g, "").includes(searchParams.phone.replace(/[^0-9]/g, ""));
       const matchEmail = !searchParams.email || (c.email || "").toLowerCase().includes(searchParams.email.toLowerCase());
       const matchService = !searchParams.service || (c.last_service || "").toLowerCase().includes(searchParams.service.toLowerCase());
       const matchGender = searchParams.gender === "All" || (c.gender || "—") === searchParams.gender;
@@ -10802,24 +10638,24 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
     if (!isoStr) return "—";
     try {
       const d = new Date(isoStr);
-      if (isNaN(d.getTime())) return String(isoStr).slice(0, 10);
+      if (isNaN(d.getTime())) return isoStr.slice(0, 10);
       const day = String(d.getDate()).padStart(2, '0');
       const month = String(d.getMonth() + 1).padStart(2, '0');
       const year = d.getFullYear();
       return `${day}-${month}-${year}`;
     } catch {
-      return String(isoStr).slice(0, 10);
+      return isoStr.slice(0, 10);
     }
   };
 
   const clientAppointments = React.useMemo(() => {
     if (!selectedProfileClient) return [];
-    const phone = String(selectedProfileClient.phone || "");
+    const phone = selectedProfileClient.phone || "";
     const cleanPhone = phone.replace(/[^0-9]/g, "");
     if (!cleanPhone) return [];
     const phoneKey = cleanPhone.slice(-10);
     return (appointments || []).filter(a => {
-      const aPhone = String(a.customer_phone || a.user_phone || "");
+      const aPhone = a.customer_phone || a.user_phone || "";
       const aClean = aPhone.replace(/[^0-9]/g, "");
       return aClean.slice(-10) === phoneKey;
     });
@@ -10993,8 +10829,10 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                   onChange={e => setProfileEditForm({ ...profileEditForm, branch: e.target.value })}
                   className="w-full border border-gray-200 bg-white rounded-xl p-3 text-xs focus:ring-1 focus:ring-gray-900 focus:outline-none"
                 >
-                  <option value="Baroda">Baroda</option>
-                  <option value="Surat">Surat</option>
+                  {branches.map(b => {
+                    const bName = typeof b === "string" ? b : (b?.name || "Unknown");
+                    return <option key={bName} value={bName}>{bName}</option>;
+                  })}
                 </select>
               </div>
 
@@ -11058,7 +10896,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                     <tr key={appt.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 font-semibold">{appt.date} {appt.time}</td>
                       <td className="px-4 py-3">{appt.branch || "—"}</td>
-                      <td className="px-4 py-3 font-mono">{appt.id ? String(appt.id).slice(-8).toUpperCase() : "—"}</td>
+                      <td className="px-4 py-3 font-mono">{appt.id ? appt.id.slice(-8).toUpperCase() : "—"}</td>
                       <td className="px-4 py-3">{appt.source || "Manual"}</td>
                       <td className="px-4 py-3 font-bold">₹{appt.service_price || appt.total || 0}</td>
                       <td className="px-4 py-3">₹{appt.advance_paid || 0}</td>
@@ -11083,16 +10921,8 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
       );
     }
 
-    // Derive client orders either from selectedProfileClient.orders or by filtering global orders by client phone
-    const clientPhoneClean = String(selectedProfileClient.phone || "").replace(/\D/g, "").slice(-10);
-    const ordersList = (selectedProfileClient.orders && selectedProfileClient.orders.length > 0)
-      ? selectedProfileClient.orders
-      : (orders || []).filter(o => {
-          const p = String(o.phone || "").replace(/\D/g, "").slice(-10);
-          return p && clientPhoneClean && p === clientPhoneClean;
-        });
-
     if (activeProfileTab === "billing") {
+      const ordersList = selectedProfileClient.orders || [];
       return (
         <div className="space-y-4 animate-fade-in">
           <div className="flex justify-between items-center">
@@ -11123,33 +10953,24 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                   </tr>
                 ) : (
                   ordersList.map(order => {
-                    if (!order) return null;
                     const services = (order.items || []).filter(it => it.is_service || it.type === "service").map(it => it.name).join(", ");
                     const providers = (order.items || []).map(it => it.service_provider).filter(Boolean).join(", ");
                     const earnedPoints = order.earned_points ?? Math.round((order.total || 0) / 2);
-                    const netTotal = Math.max(0, (order.total || 0) - (order.discount || 0));
-                    const totalPaid = (order.split_payments && order.split_payments.length > 0)
-                      ? order.split_payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
-                      : (order.status === "delivered" ? netTotal : 0);
-                    const pendingAmt = Math.max(0, netTotal - totalPaid);
-
                     return (
                       <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-semibold">{order.created_at ? getLocalDateString(order.created_at) : "—"}</td>
                         <td className="px-4 py-3">{order.branch || "—"}</td>
-                        <td className="px-4 py-3 font-mono">#{order.id ? String(order.id).slice(-8).toUpperCase() : "—"}</td>
+                        <td className="px-4 py-3 font-mono">#{order.id ? order.id.slice(-8).toUpperCase() : "—"}</td>
                         <td className="px-4 py-3 font-bold">₹{(order.total || 0).toLocaleString("en-IN")}</td>
                         <td className="px-4 py-3">₹0.00</td>
-                        <td className="px-4 py-3 text-emerald-600 font-semibold">₹{totalPaid.toLocaleString("en-IN")}</td>
-                        <td className="px-4 py-3 text-rose-600 font-semibold">₹{pendingAmt.toLocaleString("en-IN")}</td>
+                        <td className="px-4 py-3">₹{(order.total || 0).toLocaleString("en-IN")}</td>
+                        <td className="px-4 py-3">₹{(order.pending || 0).toLocaleString("en-IN")}</td>
                         <td className="px-4 py-3">₹0.00</td>
                         <td className="px-4 py-3 text-emerald-600 font-bold">+{earnedPoints}</td>
                         <td className="px-4 py-3 max-w-[150px] truncate">{services || "—"}</td>
                         <td className="px-4 py-3 max-w-[150px] truncate">{providers || "—"}</td>
                         <td className="px-4 py-3">
-                          <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase ${pendingAmt === 0 ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
-                            {pendingAmt === 0 ? "Paid" : "Pending"}
-                          </span>
+                          <span className="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold uppercase">Paid</span>
                         </td>
                       </tr>
                     );
@@ -11163,6 +10984,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
     }
 
     if (activeProfileTab === "points") {
+      const ordersList = selectedProfileClient.orders || [];
       return (
         <div className="space-y-4 animate-fade-in">
           <div className="flex justify-between items-center">
@@ -11191,14 +11013,13 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                   </tr>
                 ) : (
                   ordersList.map(order => {
-                    if (!order) return null;
                     const services = (order.items || []).map(it => it.name).join(", ");
                     const earnedPoints = order.earned_points ?? Math.round((order.total || 0) / 2);
                     return (
                       <tr key={order.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-semibold">{order.created_at ? getLocalDateString(order.created_at) : "—"}</td>
                         <td className="px-4 py-3">{order.branch || "—"}</td>
-                        <td className="px-4 py-3 font-mono">#{order.id ? String(order.id).slice(-8).toUpperCase() : "—"}</td>
+                        <td className="px-4 py-3 font-mono">#{order.id ? order.id.slice(-8).toUpperCase() : "—"}</td>
                         <td className="px-4 py-3 max-w-[200px] truncate">{services || "—"}</td>
                         <td className="px-4 py-3 text-emerald-600 font-semibold">Credit</td>
                         <td className="px-4 py-3 font-bold text-emerald-700">+{earnedPoints}</td>
@@ -11215,6 +11036,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
     }
 
     if (activeProfileTab === "payments") {
+      const ordersList = selectedProfileClient.orders || [];
       return (
         <div className="space-y-4 animate-fade-in">
           <div className="flex justify-between items-center">
@@ -11243,33 +11065,21 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                     <td colSpan="11" className="px-4 py-8 text-center text-gray-400 italic">No data available in table</td>
                   </tr>
                 ) : (
-                  ordersList.map(order => {
-                    if (!order) return null;
-                    const netTotal = Math.max(0, (order.total || 0) - (order.discount || 0));
-                    const totalPaid = (order.split_payments && order.split_payments.length > 0)
-                      ? order.split_payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
-                      : (order.status === "delivered" ? netTotal : 0);
-                    const pendingAmt = Math.max(0, netTotal - totalPaid);
-                    const pMethod = (order.split_payments && order.split_payments.length > 0)
-                      ? order.split_payments.map(p => `${p.method}: ₹${p.amount}`).join(", ")
-                      : (order.payment_method || "Cash");
-
-                    return (
-                      <tr key={order.id} className="hover:bg-gray-50">
-                        <td className="px-4 py-3 font-semibold">{order.created_at ? getLocalDateString(order.created_at) : "—"}</td>
-                        <td className="px-4 py-3">{order.branch || "—"}</td>
-                        <td className="px-4 py-3 font-mono">#{order.id ? String(order.id).slice(-8).toUpperCase() : "—"}</td>
-                        <td className="px-4 py-3 font-bold">₹{(order.total || 0).toLocaleString("en-IN")}</td>
-                        <td className="px-4 py-3">₹0.00</td>
-                        <td className="px-4 py-3 text-emerald-600 font-bold">₹{totalPaid.toLocaleString("en-IN")}</td>
-                        <td className="px-4 py-3 text-rose-600 font-bold">₹{pendingAmt.toLocaleString("en-IN")}</td>
-                        <td className="px-4 py-3">—</td>
-                        <td className="px-4 py-3">{pMethod}</td>
-                        <td className="px-4 py-3">Bill</td>
-                        <td className="px-4 py-3">{order.branch || "—"}</td>
-                      </tr>
-                    );
-                  })
+                  ordersList.map(order => (
+                    <tr key={order.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 font-semibold">{order.created_at ? getLocalDateString(order.created_at) : "—"}</td>
+                      <td className="px-4 py-3">{order.branch || "—"}</td>
+                      <td className="px-4 py-3 font-mono">#{order.id ? order.id.slice(-8).toUpperCase() : "—"}</td>
+                      <td className="px-4 py-3 font-bold">₹{order.total || 0}</td>
+                      <td className="px-4 py-3">₹0.00</td>
+                      <td className="px-4 py-3">₹{order.total || 0}</td>
+                      <td className="px-4 py-3">₹0.00</td>
+                      <td className="px-4 py-3">—</td>
+                      <td className="px-4 py-3">{order.payment_method || "Cash"}</td>
+                      <td className="px-4 py-3">Bill</td>
+                      <td className="px-4 py-3">{order.branch || "—"}</td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>
@@ -11279,15 +11089,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
     }
 
     if (activeProfileTab === "packages") {
-      let packageList = [];
-      if (Array.isArray(selectedProfileClient.packages)) {
-        packageList = selectedProfileClient.packages;
-      } else if (selectedProfileClient.packages && typeof selectedProfileClient.packages === "object") {
-        packageList = Object.values(selectedProfileClient.packages);
-      } else if (typeof selectedProfileClient.packages === "string") {
-        try { packageList = JSON.parse(selectedProfileClient.packages); } catch(e) {}
-        if (!Array.isArray(packageList)) packageList = [];
-      }
+      const packageList = selectedProfileClient.packages || [];
       return (
         <div className="space-y-4 animate-fade-in">
           <div className="flex justify-between items-center">
@@ -11313,37 +11115,15 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                   </tr>
                 ) : (
                   packageList.map((pkg, idx) => {
-                    if (!pkg) return null;
-                    let servicesList = [];
-                    if (Array.isArray(pkg.services)) {
-                      servicesList = pkg.services;
-                    } else if (pkg.services && typeof pkg.services === "object") {
-                      servicesList = Object.values(pkg.services);
-                    } else if (typeof pkg.services === "string") {
-                      try {
-                        const parsed = JSON.parse(pkg.services);
-                        if (Array.isArray(parsed)) servicesList = parsed;
-                        else if (parsed && typeof parsed === "object") servicesList = Object.values(parsed);
-                      } catch(e) {}
-                    }
-                    if (!Array.isArray(servicesList)) servicesList = [];
-                    const totalServices = servicesList.length;
-                    const availedCount = servicesList.reduce((sum, s) => sum + ((s.total_quantity || 1) - (s.remaining_quantity ?? 0)), 0);
-                    const totalQuantity = servicesList.reduce((sum, s) => sum + (s.total_quantity || 1), 0);
-                    
-                    let validUptoRaw = pkg.expires_at || pkg.valid_upto || pkg.expires_date || "—";
-                    const validUpto = typeof validUptoRaw === "object" ? (validUptoRaw?.toDate ? validUptoRaw.toDate().toISOString().split("T")[0] : JSON.stringify(validUptoRaw)) : String(validUptoRaw);
-
-                    const pkgTemplate = (packages || []).find(p => p.id === pkg.package_id || p.name === pkg.name);
-                    const priceVal = pkg.price ?? pkg.package_price ?? pkgTemplate?.price;
-                    const displayPrice = priceVal !== undefined && priceVal !== null ? `₹${Number(priceVal).toLocaleString("en-IN")}` : "—";
-
+                    const totalServices = pkg.services?.length || 0;
+                    const availedCount = (pkg.services || []).reduce((sum, s) => sum + ((s.total_quantity || 1) - (s.remaining_quantity ?? 0)), 0);
+                    const totalQuantity = (pkg.services || []).reduce((sum, s) => sum + (s.total_quantity || 1), 0);
                     return (
                       <tr key={idx} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-bold">{pkg.name}</td>
                         <td className="px-4 py-3">{selectedProfileClient.branch || "Baroda"}</td>
-                        <td className="px-4 py-3 font-semibold text-gray-700">{validUpto}</td>
-                        <td className="px-4 py-3 font-bold text-gray-900">{displayPrice}</td>
+                        <td className="px-4 py-3">{pkg.valid_upto || "—"}</td>
+                        <td className="px-4 py-3">₹{pkg.price || "—"}</td>
                         <td className="px-4 py-3">{totalServices} services</td>
                         <td className="px-4 py-3 font-semibold text-indigo-600">{availedCount} / {totalQuantity}</td>
                         <td className="px-4 py-3">
@@ -11392,54 +11172,6 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
     }
 
     if (activeProfileTab === "wallet") {
-      const walletList = [];
-      if (Array.isArray(selectedProfileClient.wallet_history)) {
-        walletList.push(...selectedProfileClient.wallet_history);
-      }
-      
-      ordersList.forEach(o => {
-        const dateStr = o.created_at ? getLocalDateString(o.created_at) : "—";
-        if (Array.isArray(o.split_payments)) {
-          o.split_payments.forEach(sp => {
-            if (sp.method === "E-wallet" && Number(sp.amount) > 0) {
-              walletList.push({
-                id: `w-debit-${o.id}`,
-                date: dateStr,
-                branch: o.branch || "Baroda",
-                type: "Debit",
-                amount_paid: Number(sp.amount),
-                wallet_amount: Number(sp.amount),
-                method: "E-wallet",
-                from: selectedProfileClient.name,
-                description: "Bill Payment via E-wallet",
-                bill_id: o.id ? `#${String(o.id).slice(-8).toUpperCase()}` : "—"
-              });
-            }
-          });
-        }
-        if (o.add_to_wallet) {
-          const netPayable = Math.max(0, Number(o.total || 0) - Number(o.discount || 0));
-          const totalPaid = Array.isArray(o.split_payments)
-            ? o.split_payments.reduce((s, p) => s + (Number(p.amount) || 0), 0)
-            : Number(o.total || 0);
-          const change = Math.max(0, totalPaid - netPayable);
-          if (change > 0) {
-            walletList.push({
-              id: `w-credit-${o.id}`,
-              date: dateStr,
-              branch: o.branch || "Baroda",
-              type: "Credit",
-              amount_paid: 0,
-              wallet_amount: change,
-              method: "Change from Bill",
-              from: "Billing Change",
-              description: "Bill change credited to wallet",
-              bill_id: o.id ? `#${String(o.id).slice(-8).toUpperCase()}` : "—"
-            });
-          }
-        }
-      });
-
       return (
         <div className="space-y-4 animate-fade-in">
           <div className="flex justify-between items-center">
@@ -11464,32 +11196,9 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-150">
-                {walletList.length === 0 ? (
-                  <tr>
-                    <td colSpan="9" className="px-4 py-8 text-center text-gray-400 italic">No data available in table</td>
-                  </tr>
-                ) : (
-                  walletList.map((w, idx) => {
-                    if (!w) return null;
-                    return (
-                    <tr key={w.id || idx} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 font-semibold">{w.date}</td>
-                      <td className="px-4 py-3">{w.branch || "Baroda"}</td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${w.type === "Credit" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>
-                          {w.type}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">₹{(w.amount_paid || 0).toLocaleString("en-IN")}</td>
-                      <td className="px-4 py-3 font-bold text-gray-900">₹{(w.wallet_amount || 0).toLocaleString("en-IN")}</td>
-                      <td className="px-4 py-3">{w.method || "—"}</td>
-                      <td className="px-4 py-3">{w.from || "—"}</td>
-                      <td className="px-4 py-3">{w.description || "—"}</td>
-                      <td className="px-4 py-3 font-mono">{w.bill_id || "—"}</td>
-                    </tr>
-                    );
-                  })
-                )}
+                <tr>
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-400 italic">No data available in table</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -11956,7 +11665,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                           View Profile
                         </button>
                         <a
-                          href={`https://wa.me/91${String(client.phone || "").replace(/[^0-9]/g, "")}`}
+                          href={`https://wa.me/91${(client.phone || "").replace(/[^0-9]/g, "")}`}
                           target="_blank"
                           rel="noreferrer"
                           className="w-8 h-8 rounded-lg bg-emerald-50 hover:bg-emerald-600 hover:text-white flex items-center justify-center text-emerald-600 transition-all border border-emerald-100"
@@ -12072,8 +11781,10 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                     onChange={e => setNewClientForm({ ...newClientForm, branch: e.target.value })}
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   >
-                    <option value="Surat">Surat</option>
-                    <option value="Baroda">Baroda</option>
+                    {branches.map(b => {
+                      const bName = typeof b === "string" ? b : (b?.name || "Unknown");
+                      return <option key={bName} value={bName}>{bName}</option>;
+                    })}
                   </select>
                 </div>
                 <div>
@@ -12326,78 +12037,49 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                   {activeProfileTab === "packages" && (
                     <div className="space-y-6">
                       <h4 className="font-serif text-lg text-gray-900 border-b border-gray-100 pb-3">Active Purchased Packages</h4>
-                      {(() => {
-                        let pkgList = [];
-                        if (Array.isArray(selectedProfileClient.packages)) pkgList = selectedProfileClient.packages;
-                        else if (selectedProfileClient.packages && typeof selectedProfileClient.packages === "object") pkgList = Object.values(selectedProfileClient.packages);
-                        else if (typeof selectedProfileClient.packages === "string") {
-                          try { pkgList = JSON.parse(selectedProfileClient.packages); } catch(e) {}
-                          if (!Array.isArray(pkgList)) pkgList = [];
-                        }
-
-                        if (pkgList.length === 0) {
-                          return (
-                            <div className="text-center py-10 text-eminence-muted italic text-sm">
-                              No active package purchases registered on this client profile.
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <div className="space-y-4">
-                            {pkgList.map((pkg, idx) => {
-                              if (!pkg) return null;
-                              let srvList = [];
-                              if (Array.isArray(pkg.services)) srvList = pkg.services;
-                              else if (pkg.services && typeof pkg.services === "object") srvList = Object.values(pkg.services);
-                              else if (typeof pkg.services === "string") {
-                                try {
-                                  const parsed = JSON.parse(pkg.services);
-                                  if (Array.isArray(parsed)) srvList = parsed;
-                                  else if (parsed && typeof parsed === "object") srvList = Object.values(parsed);
-                                } catch(e) {}
-                              }
-                              
-                              return (
-                              <div key={idx} className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100 space-y-4">
-                                <div className="flex justify-between items-center">
-                                  <h5 className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-                                    <span className="w-2.5 h-2.5 rounded-full bg-eminence-gold" />
-                                    {pkg.name}
-                                  </h5>
-                                  <span className="text-[10px] font-mono text-gray-400 bg-white border px-2 py-0.5 rounded">ID: {pkg.id || "—"}</span>
-                                </div>
-
-                                <div className="space-y-3">
-                                  {srvList.map((s, sIdx) => {
-                                    if (!s) return null;
-                                    const total = s.total_quantity || 1;
-                                    const rem = s.remaining_quantity ?? 0;
-                                    const used = total - rem;
-                                    const pct = (rem / total) * 100;
-                                    return (
-                                      <div key={sIdx} className="space-y-1">
-                                        <div className="flex justify-between text-xs font-medium">
-                                          <span className="text-gray-800">{s.service_name}</span>
-                                          <span className="font-bold text-gray-950">{rem} / {total} remaining</span>
-                                        </div>
-                                        <div className="w-full bg-gray-200/50 h-2.5 rounded-full overflow-hidden border">
-                                          <div
-                                            className={`h-full transition-all duration-500 rounded-full ${pct > 50 ? "bg-emerald-600" : pct > 20 ? "bg-amber-500" : "bg-rose-500"
-                                              }`}
-                                            style={{ width: `${pct}%` }}
-                                          />
-                                        </div>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
+                      {!selectedProfileClient.packages || selectedProfileClient.packages.length === 0 ? (
+                        <div className="text-center py-10 text-eminence-muted italic text-sm">
+                          No active package purchases registered on this client profile.
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {selectedProfileClient.packages.map((pkg, idx) => (
+                            <div key={idx} className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100 space-y-4">
+                              <div className="flex justify-between items-center">
+                                <h5 className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
+                                  <span className="w-2.5 h-2.5 rounded-full bg-eminence-gold" />
+                                  {pkg.name}
+                                </h5>
+                                <span className="text-[10px] font-mono text-gray-400 bg-white border px-2 py-0.5 rounded">ID: {pkg.id || "—"}</span>
                               </div>
-                              );
-                            })}
-                          </div>
-                        );
-                      })()}
+
+                              <div className="space-y-3">
+                                {pkg.services?.map((s, sIdx) => {
+                                  const total = s.total_quantity || 1;
+                                  const rem = s.remaining_quantity ?? 0;
+                                  const used = total - rem;
+                                  const pct = (rem / total) * 100;
+                                  return (
+                                    <div key={sIdx} className="space-y-1">
+                                      <div className="flex justify-between text-xs font-medium">
+                                        <span className="text-gray-800">{s.service_name}</span>
+                                        <span className="font-bold text-gray-950">{rem} / {total} remaining</span>
+                                      </div>
+                                      <div className="w-full bg-gray-200/50 h-2.5 rounded-full overflow-hidden border">
+                                        <div
+                                          className={`h-full transition-all duration-500 rounded-full ${pct > 50 ? "bg-emerald-600" : pct > 20 ? "bg-amber-500" : "bg-rose-500"
+                                            }`}
+                                          style={{ width: `${pct}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -12410,8 +12092,8 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                         ) : selectedProfileClient.orders.map((o) => (
                           <div key={o.id} className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center">
                             <div>
-                              <p className="text-xs font-bold text-gray-950">{String(o.created_at || "—").replace("T", " ").slice(0, 16)}</p>
-                              <p className="text-[10px] text-gray-500 mt-0.5">Order ID: <span className="font-mono">#{String(o.id).slice(-8).toUpperCase()}</span></p>
+                              <p className="text-xs font-bold text-gray-950">{(o.created_at || "—").replace("T", " ").slice(0, 16)}</p>
+                              <p className="text-[10px] text-gray-500 mt-0.5">Order ID: <span className="font-mono">#{o.id.slice(-8).toUpperCase()}</span></p>
                               <div className="flex flex-wrap gap-1.5 mt-2">
                                 {o.items?.map((it, itIdx) => (
                                   <span key={itIdx} className="text-[10px] bg-white border border-gray-200/80 px-2 py-0.5 rounded-md font-medium text-gray-700">
@@ -12461,7 +12143,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                             <div className="flex items-center gap-2 text-[10px] text-gray-400">
                               <span className="font-bold text-gray-600">{n.author || "System"}</span>
                               <span>·</span>
-                              <span>{String(n.timestamp || "").replace("T", " ").slice(0, 16)}</span>
+                              <span>{(n.timestamp || "").replace("T", " ").slice(0, 16)}</span>
                             </div>
                             <p className="text-xs text-gray-700 font-medium leading-relaxed">{n.text}</p>
                           </div>
@@ -12876,7 +12558,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                                           <option>UPI</option>
                                           <option>Card</option>
                                           <option>Bank Transfer</option>
-                                          <option>Bank Transfer</option>
+                                          <option>Cheque</option>
                                           <option>Credit</option>
                                         </select>
                                       ) : (
@@ -12961,7 +12643,6 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
           </div>
         </div>
       </div>
-
     </div>
   );
 }
@@ -13144,7 +12825,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees, refresh, t,
       )}
 
       {subTab === "sales staff" && (
-        <SalesStaffPanel employees={employees} refresh={refresh} t={t} />
+        <SalesStaffPanel employees={employees} refresh={refresh} t={t} branches={branches} />
       )}
 
       {subTab === "attendance" && (() => {
@@ -13626,7 +13307,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees, refresh, t,
       })()}
 
       {subTab === "service providers" && (
-        <ServiceProviderPanel employees={employees} refresh={refresh} t={t} />
+        <ServiceProviderPanel employees={employees} refresh={refresh} t={t} branches={branches} />
       )}
 
       {subTab === "payroll" && (
@@ -14637,7 +14318,7 @@ const SALES_STAFF_TYPES = [
   "Other"
 ];
 
-function ServiceProviderPanel({ employees, refresh, t }) {
+function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
   const emptyForm = {
     name: "", email: "", username: "", password: "", confirmPassword: "",
     phone: "", phones: [""],
@@ -15042,8 +14723,10 @@ function ServiceProviderPanel({ employees, refresh, t }) {
           <div>
             <label className="text-xs text-eminence-muted block mb-1">Branch <span className="text-rose-500">*</span></label>
             <select required value={form.branch} onChange={e => set("branch", e.target.value)} className={inputCls}>
-              <option value="Surat">Surat</option>
-              <option value="Baroda">Baroda</option>
+              {branches.map(b => {
+                const bName = typeof b === "string" ? b : (b?.name || "Unknown");
+                return <option key={bName} value={bName}>{bName}</option>;
+              })}
             </select>
           </div>
         </div>
@@ -15372,7 +15055,7 @@ function AttendanceKiosk({ employees, refresh }) {
   );
 }
 
-function SalesStaffPanel({ employees, refresh, t }) {
+function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
   const emptyForm = {
     name: "", email: "", username: "", password: "", confirmPassword: "",
     phone: "", phones: [""],
@@ -15582,8 +15265,10 @@ function SalesStaffPanel({ employees, refresh, t }) {
           <div className="md:col-span-2 lg:col-span-2">
             <label className="text-xs text-eminence-muted block mb-1">Branch <span className="text-rose-500">*</span></label>
             <select required value={form.branch} onChange={e => set("branch", e.target.value)} className={inputCls}>
-              <option value="Surat">Surat</option>
-              <option value="Baroda">Baroda</option>
+              {branches.map(b => {
+                const bName = typeof b === "string" ? b : (b?.name || "Unknown");
+                return <option key={bName} value={bName}>{bName}</option>;
+              })}
             </select>
           </div>
           <div className="md:col-span-2 lg:col-span-2">
@@ -15772,7 +15457,7 @@ function SalesStaffPanel({ employees, refresh, t }) {
 
 
 
-function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
+function ConsultationsPanel({ consultations, orders = [], refresh, t, branches = [] }) {
   const [expandedId, setExpandedId] = useState(null);
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
@@ -15789,7 +15474,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
     if (!orders || orders.length === 0) return null;
     const normalizePhone = (p) => {
       if (!p) return "";
-      return String(p).replace(/[^0-9]/g, "").slice(-10);
+      return p.replace(/[^0-9]/g, "").slice(-10);
     };
     const cPhone = normalizePhone(consultation.phone);
     if (!cPhone) return null;
@@ -15818,14 +15503,11 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
     }
   };
 
-  const [clientReviewsCache, setClientReviewsCache] = useState({ images: [], videos: [] });
-
   useEffect(() => {
     api.get("/consultation-media")
       .then(res => {
-        setImages(res.data.before_after?.images || []);
-        setVideos(res.data.before_after?.videos || []);
-        setClientReviewsCache(res.data.client_reviews || { images: [], videos: [] });
+        setImages(res.data.images || []);
+        setVideos(res.data.videos || []);
       })
       .catch(err => console.error("Failed to load consultation gallery media:", err));
   }, []);
@@ -15833,10 +15515,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.post("/admin/consultation-media", {
-        before_after: { images, videos },
-        client_reviews: clientReviewsCache
-      });
+      await api.post("/admin/consultation-media", { images, videos });
       toast.success("Consultation gallery updated successfully!");
     } catch (err) {
       toast.error("Failed to update consultation gallery: " + err.message);
@@ -16033,11 +15712,6 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
                     }`}>
                     {c.status || "New"}
                   </span>
-                  {c.token_received && (
-                    <span className="text-[9px] uppercase font-bold tracking-widest text-violet-600 bg-violet-100 px-2 py-0.5 rounded-full mt-1 inline-block border border-violet-200">
-                      Token Rcvd
-                    </span>
-                  )}
                 </div>
               </div>
 
@@ -16156,10 +15830,6 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
                           <span className="text-xs font-bold">{c.size_color || "N/A"}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-xs text-eminence-muted">Token Received:</span>
-                          <span className="text-xs font-bold text-violet-600">{c.token_received ? `Yes (₹${c.token_amount || 0})` : "No"}</span>
-                        </div>
-                        <div className="flex justify-between">
                           <span className="text-xs text-eminence-muted">Follow Up:</span>
                           <span className="text-xs font-bold text-eminence-gold">{c.follow_up_date || "None"}</span>
                         </div>
@@ -16214,8 +15884,10 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Location</label>
                   <select value={editForm.location || "Baroda"} onChange={e => setEditForm({ ...editForm, location: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
-                    <option value="Baroda">Baroda</option>
-                    <option value="Surat">Surat</option>
+                    {branches.map(b => {
+                      const bName = typeof b === "string" ? b : (b?.name || "Unknown");
+                      return <option key={bName} value={bName}>{bName}</option>;
+                    })}
                   </select>
                 </div>
                 <div>
@@ -16327,7 +15999,6 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t }) {
 }
 
 function ProductTransferPanel({ products, employees, onComplete, branches = [] }) {
-  const [transferItems, setTransferItems] = useState([]);
   const [productId, setProductId] = useState("");
   const [productSearch, setProductSearch] = useState("");
   const [showProductDrop, setShowProductDrop] = useState(false);
@@ -16348,8 +16019,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   }, [branches]);
 
   const filteredTransferProducts = products.filter(p =>
-    p.name.toLowerCase().includes(productSearch.toLowerCase()) &&
-    (p.branch === source || (!p.branch && source === "Main Warehouse"))
+    p.name.toLowerCase().includes(productSearch.toLowerCase())
   );
 
   const handleTransferProductSelect = (p) => {
@@ -16361,34 +16031,11 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   const selectedProduct = products.find(p => p.id === productId);
   const currentStock = selectedProduct ? (selectedProduct.stock || 0) : 0;
 
-  const handleAddItem = () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!productId) return toast.error("Please select a product");
     if (!quantity || Number(quantity) <= 0) return toast.error("Please enter a valid quantity");
     if (Number(quantity) > currentStock) return toast.error("Insufficient stock available");
-
-    // Check if item already exists in transferItems
-    if (transferItems.some(i => i.product_id === productId)) {
-      return toast.error("Product already added to transfer list");
-    }
-
-    setTransferItems([...transferItems, {
-      product_id: productId,
-      name: selectedProduct.name,
-      quantity: Number(quantity)
-    }]);
-
-    setProductId("");
-    setProductSearch("");
-    setQuantity("");
-  };
-
-  const handleRemoveItem = (id) => {
-    setTransferItems(transferItems.filter(i => i.product_id !== id));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (transferItems.length === 0) return toast.error("Please add at least one product to transfer");
     if (!employeeId) return toast.error("Please select an employee");
     if (source === destination) return toast.error("Source and destination must be different");
 
@@ -16396,15 +16043,17 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
     try {
       const emp = employees.find(e => e.id === employeeId);
       await api.post("/admin/products/transfer", {
-        items: transferItems.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+        product_id: productId,
+        quantity: Number(quantity),
         source,
         destination,
         employee_id: employeeId,
         employee_name: emp ? emp.name : "Unknown",
         remarks
       });
-      toast.success("Products transferred successfully!");
-      setTransferItems([]);
+      toast.success("Product transferred successfully!");
+      setProductId("");
+      setQuantity("");
       setRemarks("");
       onComplete();
     } catch (err) {
@@ -16415,24 +16064,85 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
+    <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
       <div>
         <h2 className="font-serif text-2xl text-gray-800">Transfer Products</h2>
         <p className="text-xs text-eminence-muted">Transfer inventory stock between branches or hand over products to staff.</p>
       </div>
 
-      <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="relative">
+          <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Select Product</label>
+          <input
+            type="text"
+            placeholder="Search product by name..."
+            value={productSearch}
+            onChange={e => { setProductSearch(e.target.value); setProductId(""); setShowProductDrop(true); }}
+            onFocus={() => setShowProductDrop(true)}
+            onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
+            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            autoComplete="off"
+          />
+          {showProductDrop && filteredTransferProducts.length > 0 && (
+            <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
+              {filteredTransferProducts.map(p => (
+                <div
+                  key={p.id}
+                  onMouseDown={() => handleTransferProductSelect(p)}
+                  className="px-4 py-2.5 hover:bg-eminence-gold/10 cursor-pointer text-sm flex justify-between items-center"
+                >
+                  <span className="font-medium text-gray-900">{p.name}</span>
+                  <span className="text-xs text-gray-400 ml-2">Stock: {p.stock || 0}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {showProductDrop && productSearch && filteredTransferProducts.length === 0 && (
+            <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-3 text-xs text-gray-400 italic">
+              No products match "{productSearch}"
+            </div>
+          )}
+        </div>
+
+        {productId && (
+          <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 text-xs text-amber-800">
+            Current Stock: <strong>{currentStock}</strong> items available in Main stock.
+          </div>
+        )}
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Quantity to Transfer</label>
+            <input
+              type="number"
+              min="1"
+              max={currentStock}
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Handed Over To (Staff)</label>
+            <select
+              value={employeeId}
+              onChange={(e) => setEmployeeId(e.target.value)}
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            >
+              <option value="">-- Choose Staff --</option>
+              {employees.map(e => (
+                <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-gray-400 uppercase mb-2">From Location</label>
             <select
               value={source}
-              onChange={(e) => {
-                setSource(e.target.value);
-                setProductId("");
-                setProductSearch("");
-                setTransferItems([]); // Reset items if source changes
-              }}
+              onChange={(e) => setSource(e.target.value)}
               className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
             >
               <option value="Main Warehouse">Main Warehouse</option>
@@ -16458,129 +16168,25 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end bg-gray-50 p-4 rounded-xl border border-gray-100">
-          <div className="md:col-span-6 relative">
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Select Product</label>
-            <input
-              type="text"
-              placeholder="Search product..."
-              value={productSearch}
-              onChange={e => { setProductSearch(e.target.value); setProductId(""); setShowProductDrop(true); }}
-              onFocus={() => setShowProductDrop(true)}
-              onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
-              autoComplete="off"
-            />
-            {showProductDrop && filteredTransferProducts.length > 0 && (
-              <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-56 overflow-y-auto">
-                {filteredTransferProducts.map(p => (
-                  <div
-                    key={p.id}
-                    onMouseDown={() => handleTransferProductSelect(p)}
-                    className="px-4 py-2.5 hover:bg-eminence-gold/10 cursor-pointer text-sm flex justify-between items-center"
-                  >
-                    <span className="font-medium text-gray-900">{p.name}</span>
-                    <span className="text-xs text-gray-400 ml-2">Stock: {p.stock || 0}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-            {showProductDrop && productSearch && filteredTransferProducts.length === 0 && (
-              <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-3 text-xs text-gray-400 italic">
-                No products match "{productSearch}" in {source}
-              </div>
-            )}
-          </div>
-
-          <div className="md:col-span-3">
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Qty</label>
-            <input
-              type="number"
-              min="1"
-              max={currentStock || 1000}
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
-              placeholder={productId ? `Max: ${currentStock}` : "Qty"}
-            />
-          </div>
-          <div className="md:col-span-3">
-            <button
-              type="button"
-              onClick={handleAddItem}
-              className="w-full py-3 bg-eminence-gold hover:bg-eminence-gold/90 text-white font-bold text-xs uppercase tracking-widest rounded-lg transition-all"
-            >
-              Add Item
-            </button>
-          </div>
-        </div>
-
-        {transferItems.length > 0 && (
-          <div className="border border-gray-200 rounded-xl overflow-hidden">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 border-b border-gray-200 text-xs uppercase text-gray-500 font-bold">
-                <tr>
-                  <th className="px-4 py-3">Product Name</th>
-                  <th className="px-4 py-3">Qty</th>
-                  <th className="px-4 py-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {transferItems.map((item, idx) => (
-                  <tr key={idx} className="bg-white">
-                    <td className="px-4 py-3 font-medium">{item.name}</td>
-                    <td className="px-4 py-3">{item.quantity}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(item.product_id)}
-                        className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider"
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Handed Over To (Staff)</label>
-            <select
-              value={employeeId}
-              onChange={(e) => setEmployeeId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
-            >
-              <option value="">-- Choose Staff --</option>
-              {employees.filter(e => e.is_active !== false && String(e.is_active) !== "false").map(e => (
-                <option key={e.id} value={e.id}>{e.name} ({e.role})</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Remarks / Notes</label>
-            <input
-              type="text"
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
-              placeholder="Reason for transfer..."
-            />
-          </div>
+        <div>
+          <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Remarks / Notes</label>
+          <textarea
+            rows="3"
+            value={remarks}
+            onChange={(e) => setRemarks(e.target.value)}
+            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            placeholder="Reason for transfer..."
+          />
         </div>
 
         <button
-          onClick={handleSubmit}
-          type="button"
-          disabled={loading || transferItems.length === 0}
-          className="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all disabled:opacity-50 mt-4"
+          type="submit"
+          disabled={loading}
+          className="w-full py-4 bg-gray-900 hover:bg-black text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all disabled:opacity-50"
         >
-          {loading ? "Processing..." : `Execute Stock Transfer (${transferItems.length} items)`}
+          {loading ? "Processing..." : "Execute Stock Transfer"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
@@ -16830,7 +16436,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
               <option>UPI</option>
               <option>Card</option>
               <option>Bank Transfer</option>
-              <option>Bank Transfer</option>
+              <option>Cheque</option>
               <option>Credit</option>
             </select>
           </div>
@@ -17669,9 +17275,6 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
   const [showAddModal, setShowAddModal] = useState(false);
   const [newLeaveEmp, setNewLeaveEmp] = useState("");
   const [newLeaveDate, setNewLeaveDate] = useState("");
-  const [editingLeave, setEditingLeave] = useState(null);
-  const [editLeaveDate, setEditLeaveDate] = useState("");
-  const [editLeaveStatus, setEditLeaveStatus] = useState("");
 
   const handleAddRequest = async (e) => {
     e.preventDefault();
@@ -17688,21 +17291,6 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
       refresh();
     } catch (err) {
       toast.error(err.response?.data?.detail || "Failed to create leave request");
-    }
-  };
-
-  const handleEditRequest = async (e) => {
-    e.preventDefault();
-    if (!editLeaveDate) return toast.error("Please provide a date");
-    try {
-      await api.put(`/admin/leaves/${editingLeave.id}`, { date: editLeaveDate, status: editLeaveStatus || editingLeave.status });
-      toast.success("Leave request updated successfully");
-      setEditingLeave(null);
-      setEditLeaveDate("");
-      setEditLeaveStatus("");
-      refresh();
-    } catch (err) {
-      toast.error(err.response?.data?.detail || "Failed to update leave request");
     }
   };
 
@@ -17837,17 +17425,6 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => {
-                            setEditingLeave(req);
-                            setEditLeaveDate(req.date);
-                            setEditLeaveStatus(req.status);
-                          }}
-                          disabled={actioning !== null}
-                          className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg disabled:opacity-50 transition-colors"
-                        >
-                          Edit
-                        </button>
                         {isSuperAdmin ? (
                           <>
                             {isBranchApproved && (
@@ -17971,75 +17548,6 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
           </div>
         </div>
       )}
-
-      {editingLeave && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl w-full max-w-md p-8 shadow-2xl relative animate-in zoom-in-95 duration-200">
-            <button
-              onClick={() => {
-                setEditingLeave(null);
-                setEditLeaveDate("");
-              }}
-              className="absolute top-6 right-6 text-gray-400 hover:text-gray-800 transition-colors"
-            >
-              <X size={24} />
-            </button>
-            <h3 className="font-serif text-2xl text-gray-900 mb-6">Edit Leave Request</h3>
-
-            <form onSubmit={handleEditRequest} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Employee</label>
-                <div className="w-full border border-gray-200 rounded-xl p-3 text-sm bg-gray-100 text-gray-500">
-                  {editingLeave.user_name}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">New Date *</label>
-                <input
-                  type="date"
-                  value={editLeaveDate}
-                  onChange={(e) => setEditLeaveDate(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:border-eminence-gold transition-shadow bg-gray-50"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Status</label>
-                <select
-                  value={editLeaveStatus}
-                  onChange={(e) => setEditLeaveStatus(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:border-eminence-gold transition-shadow bg-gray-50"
-                >
-                  <option value="pending">Pending Branch</option>
-                  <option value="branch_approved">Pending Super</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingLeave(null);
-                    setEditLeaveDate("");
-                    setEditLeaveStatus("");
-                  }}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl transition-colors"
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="w-full bg-eminence-gold hover:bg-yellow-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md">
-                  Update Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
-

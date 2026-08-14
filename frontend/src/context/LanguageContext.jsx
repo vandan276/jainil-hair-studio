@@ -10,10 +10,10 @@ export const LANGUAGES = [
 ];
 
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState(() => localStorage.getItem("jainil_lang") || "en");
+  const [lang, setLang] = useState(() => localStorage.getItem("eminence_lang") || "en");
 
   useEffect(() => {
-    localStorage.setItem("jainil_lang", lang);
+    localStorage.setItem("eminence_lang", lang);
     document.documentElement.lang = lang;
   }, [lang]);
 
