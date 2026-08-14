@@ -22,7 +22,6 @@ scratch
 scratch/**
 frontend/Asset
 frontend/Asset/**
-frontend/public/assets
 .git_backup
 
 
