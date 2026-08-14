@@ -71,18 +71,20 @@ function AppContent() {
   const [checkingMaintenance, setCheckingMaintenance] = useState(true);
 
   useEffect(() => {
+    const timer = setTimeout(() => setCheckingMaintenance(false), 800);
     api.get("/maintenance")
       .then(res => {
         setMaintenanceEnabled(!!res.data?.enabled);
       })
       .catch(() => {})
       .finally(() => setCheckingMaintenance(false));
+    return () => clearTimeout(timer);
   }, []);
 
-  if (checkingMaintenance || loading) {
+  if ((checkingMaintenance && loading)) {
     return (
       <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-eminence-gold border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-12 h-12 border-4 border-[#0F5A3B] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
