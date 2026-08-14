@@ -18,8 +18,8 @@
   ],
   "functions": {
     "api/index.py": {
-      "includeFiles": "api/**",
-      "excludeFiles": "{frontend,backend,Asset,scratch,test_reports}/**"
+      "includeFiles": "api/index.py",
+      "excludeFiles": "{frontend,backend,Asset,scratch,test_reports,public,uploads}/**"
     }
   }
 }
