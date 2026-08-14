@@ -5,11 +5,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api"
+      "destination": "/api/index.py"
     },
     {
       "source": "/webhooks/(.*)",
-      "destination": "/api"
+      "destination": "/api/index.py"
     },
     {
       "source": "/(.*)",
@@ -18,8 +18,8 @@
   ],
   "functions": {
     "api/index.py": {
-      "includeFiles": "api/index.py",
-      "excludeFiles": "{frontend,backend,Asset,scratch,test_reports,public,uploads}/**"
+      "includeFiles": "api/**",
+      "excludeFiles": "{frontend,backend,Asset,scratch,test_reports}/**"
     }
   }
 }
