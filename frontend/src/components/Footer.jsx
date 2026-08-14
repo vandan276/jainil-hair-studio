@@ -36,7 +36,7 @@ export default function Footer() {
               <span>Shreenath Complex, GF6, High Tension Rd,<br />Subhanpura, Vadodara, Gujarat 390023</span>
             </li>
             <li className="flex gap-2"><Phone size={14} className="mt-0.5 text-eminence-gold shrink-0" /> +91 87992 88809</li>
-            <li className="flex gap-2"><Mail size={14} className="mt-0.5 text-eminence-gold shrink-0" /> eminencehairstudio@gmail.com</li>
+            <li className="flex gap-2"><Mail size={14} className="mt-0.5 text-eminence-gold shrink-0" /> jainilhairstudio@gmail.com</li>
           </ul>
         </div>
 

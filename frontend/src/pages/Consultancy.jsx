@@ -53,6 +53,9 @@ export default function Consultancy() {
     follow_up_date: "",
     source: "Direct",
     size_color: "",
+    token_received: false,
+    token_amount: "",
+    payment_mode: "",
     notes: ""
   });
 
@@ -496,6 +499,25 @@ export default function Consultancy() {
               <div>
                 <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Size & Color (e.g., 9x7 | Natural Black)</label>
                 <input type="text" name="size_color" value={formData.size_color} onChange={handleChange} className={inputCls} placeholder="Size x Size | Color" />
+              </div>
+
+              <div className="flex flex-col pt-4 gap-3 justify-center">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" name="token_received" checked={formData.token_received} onChange={(e) => setFormData(prev => ({...prev, token_received: e.target.checked}))} className="accent-eminence-gold w-5 h-5" />
+                  <span className="text-sm uppercase tracking-widest font-bold text-eminence-muted hover:text-eminence-gold transition-colors">Token Received</span>
+                </label>
+                {formData.token_received && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="number" name="token_amount" value={formData.token_amount} onChange={handleChange} className={inputCls} placeholder="Token Amount (₹)" />
+                    <select name="payment_mode" value={formData.payment_mode || ""} onChange={handleChange} className={`${inputCls} appearance-none`}>
+                      <option value="">Payment Method</option>
+                      <option value="Cash">Cash</option>
+                      <option value="UPI">UPI</option>
+                      <option value="Card">Card</option>
+                      <option value="Bank Transfer">Bank Transfer</option>
+                    </select>
+                  </div>
+                )}
               </div>
 
               <div className="md:col-span-2">

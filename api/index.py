@@ -533,6 +533,7 @@ class LeadUpdate(BaseModel):
     address: Optional[str] = None
     email: Optional[str] = None
     points: Optional[int] = None
+    pending_payment: Optional[float] = None
 
 class LeadVisitUpdate(BaseModel):
     visit_date: Optional[str] = None
@@ -752,6 +753,65 @@ def cancel_my_leave(data: dict, user: dict = Depends(get_current_user)):
 class AdminLeaveRequestIn(BaseModel):
     employee_id: str
     date: str
+
+class AdminLeaveRequestEditIn(BaseModel):
+    date: str
+    status: str | None = None
+
+@api.put("/admin/leaves/{rid}")
+def admin_edit_leave_request(rid: str, data: AdminLeaveRequestEditIn, admin: dict = Depends(require_admin)):
+    try:
+        datetime.strptime(data.date, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(400, "Invalid date format. Expected YYYY-MM-DD")
+
+    doc_ref = db.collection("leave_requests").document(rid)
+    doc = doc_ref.get()
+    if not doc.exists:
+        raise HTTPException(404, "Leave request not found")
+    
+    r = doc.to_dict()
+    if r.get("date") != data.date:
+        existing = list(db.collection("leave_requests").where("user_id", "==", r.get("user_id")).where("date", "==", data.date).stream())
+        if existing:
+            raise HTTPException(400, "A leave request or approved leave already exists for this date")
+
+    old_status = r.get("status")
+    new_status = data.status if data.status else old_status
+
+    uid = r.get("user_id")
+    old_date = r.get("date")
+    new_date = data.date
+
+    user_ref = db.collection("users").document(uid)
+    u_doc = user_ref.get()
+    
+    # Handle user's official 'leaves' array
+    if u_doc.exists:
+        leaves = u_doc.to_dict().get("leaves", [])
+        leaves_updated = False
+        
+        # If it was approved, and now it's not approved or the date changed, remove the old date
+        if old_status == "approved" and (new_status != "approved" or old_date != new_date):
+            if old_date in leaves:
+                leaves.remove(old_date)
+                leaves_updated = True
+                
+        # If the new status is approved, add the new date
+        if new_status == "approved":
+            if new_date not in leaves:
+                leaves.append(new_date)
+                leaves_updated = True
+                
+        if leaves_updated:
+            user_ref.update({"leaves": leaves})
+            
+    updates = {"date": new_date}
+    if data.status:
+        updates["status"] = data.status
+        
+    doc_ref.update(updates)
+    return {"ok": True, "date": new_date, "status": new_status}
 
 @api.post("/admin/leaves/request")
 def admin_create_leave_request(data: AdminLeaveRequestIn, admin: dict = Depends(require_admin)):
@@ -1405,7 +1465,6 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
         if wallet_delta != 0:
             new_wallet = round(current_wallet + wallet_delta, 2)
             lead_data["wallet"] = new_wallet
-            lead_ref.update({"wallet": new_wallet})
     
     # Update Stock & Check for Low Stock
     low_stock_items = []
@@ -1433,6 +1492,13 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
     # Determine order branch: explicit payload branch -> creator user's branch -> default Baroda
     order_branch = data.branch or user.get("branch") or "Baroda"
 
+    # Compute amount due: total - form+item discount - paid
+    # final_total is gross (before form-level discount); data.discount includes all discounts
+    form_discount = float(data.discount or 0.0)
+    net_payable = max(0.0, final_total - form_discount)
+    amount_due = max(0.0, net_payable - total_paid)
+    order_status = "placed" if amount_due > 0 else "delivered"
+
     oid = new_id()
     order = {
         "id": oid, 
@@ -1445,7 +1511,7 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
         "discount_from_points": discount,
         "points_used": points_used,
         "points_earned": points_earned,
-        "status": "placed", 
+        "status": order_status, 
         "created_at": data.created_at or now_iso()
     }
     
@@ -1470,12 +1536,20 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
     # Update Lead Packages, visit count, total spendings, and last visit date
     if lead_ref and lead_data:
         from google.cloud.firestore import Increment as FSIncrement
-        lead_ref.update({
+        order_date = (data.created_at or now_iso())[:10]
+        lead_update_payload = {
             "packages": lead_data.get("packages", []),
             "visit_count": FSIncrement(1),
-            "total_sale_amount": FSIncrement(final_total),
-            "last_visit_date": now_iso()[:10]
-        })
+            "total_sale_amount": FSIncrement(final_total - form_discount),
+            "last_visit_date": order_date,
+            "last_visit": order_date,
+            "status": "converted"
+        }
+        if "wallet" in lead_data:
+            lead_update_payload["wallet"] = lead_data["wallet"]
+        if amount_due > 0:
+            lead_update_payload["pending_payment"] = FSIncrement(amount_due)
+        lead_ref.update(lead_update_payload)
 
     return {**order, "new_points_balance": new_points}
 
@@ -2430,6 +2504,7 @@ def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employe
     if data.dob is not None: update_data["dob"] = data.dob
     if data.anniversary is not None: update_data["anniversary"] = data.anniversary
     if data.address is not None: update_data["address"] = data.address
+    if data.pending_payment is not None: update_data["pending_payment"] = data.pending_payment
     
     doc_ref.update(update_data)
     return doc_ref.get().to_dict()
@@ -3208,6 +3283,207 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
     cache_set(cache_key, result, ttl=60)  # Cache for 60 seconds — keeps dashboard fresh
     return result
 
+
+
+@api.get("/leads/{lead_id}/pending-orders")
+def get_lead_pending_orders(lead_id: str, user: dict = Depends(get_current_user)):
+    lead_snap = db.collection("leads").document(lead_id).get()
+    if not lead_snap.exists:
+        raise HTTPException(404, "Lead not found")
+        
+    lead_data = lead_snap.to_dict()
+    phone = lead_data.get("phone", "")
+    
+    if not phone:
+        return []
+    
+    # Normalize phone to last 10 digits for comparison
+    phone_clean = phone.strip().replace(" ", "").replace("-", "")
+    if phone_clean.startswith("+91"):
+        phone_clean = phone_clean[3:]
+    elif phone_clean.startswith("91") and len(phone_clean) > 10:
+        phone_clean = phone_clean[2:]
+    
+    # Get all orders and filter by phone match
+    all_orders = db.collection("orders").stream()
+    pending_orders = []
+    
+    for o_doc in all_orders:
+        o = o_doc.to_dict()
+        order_phone = o.get("phone", "").strip().replace(" ", "").replace("-", "")
+        if order_phone.startswith("+91"):
+            order_phone = order_phone[3:]
+        elif order_phone.startswith("91") and len(order_phone) > 10:
+            order_phone = order_phone[2:]
+        
+        if order_phone != phone_clean:
+            continue
+            
+        status = o.get("status", "")
+        if status not in ["placed", "pending"]:
+            continue
+            
+        # Calculate unpaid amount: order.total is gross (before form discount)
+        # order.discount stores all applied discounts (form + item level)
+        total = float(o.get("total", 0.0))
+        form_discount = float(o.get("discount", 0.0))
+        net_payable = max(0.0, total - form_discount)
+        paid = 0.0
+        
+        if o.get("split_payments"):
+            paid = sum(float(p.get("amount", 0.0)) for p in o.get("split_payments"))
+        # If no split_payments and status is placed/pending, full amount is unpaid
+        
+        unpaid = max(0.0, net_payable - paid)
+        
+        if unpaid > 0:
+            o["unpaid_amount"] = round(unpaid, 2)
+            pending_orders.append(o)
+            
+    # Sort by date descending
+    pending_orders.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    return pending_orders
+
+@api.get("/leads/{lead_id}/360-stats")
+def get_lead_360_stats(lead_id: str, user: dict = Depends(get_current_user)):
+    lead_snap = db.collection("leads").document(lead_id).get()
+    if not lead_snap.exists:
+        raise HTTPException(404, "Lead not found")
+        
+    lead_data = lead_snap.to_dict()
+    phone = lead_data.get("phone", "")
+    
+    phone_clean = phone.strip().replace(" ", "").replace("-", "") if phone else ""
+    if phone_clean.startswith("+91"):
+        phone_clean = phone_clean[3:]
+    elif phone_clean.startswith("91") and len(phone_clean) > 10:
+        phone_clean = phone_clean[2:]
+        
+    client_orders = []
+    if phone_clean:
+        all_orders = db.collection("orders").stream()
+        for o_doc in all_orders:
+            o = o_doc.to_dict()
+            order_phone = o.get("phone", "").strip().replace(" ", "").replace("-", "")
+            if order_phone.startswith("+91"):
+                order_phone = order_phone[3:]
+            elif order_phone.startswith("91") and len(order_phone) > 10:
+                order_phone = order_phone[2:]
+            if order_phone == phone_clean:
+                client_orders.append(o)
+                
+    client_orders.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    
+    total_visits = len(client_orders) if client_orders else int(lead_data.get("visit_count", 0) or 0)
+    
+    last_visit = "—"
+    if client_orders:
+        raw_date = client_orders[0].get("created_at", "")
+        last_visit = raw_date[:10] if raw_date else "—"
+    else:
+        last_visit = lead_data.get("last_visit") or lead_data.get("last_visit_date") or "—"
+        
+    total_spendings = sum(max(0.0, float(o.get("total", 0.0)) - float(o.get("discount", 0.0))) for o in client_orders) if client_orders else float(lead_data.get("total_sale_amount", 0.0) or 0.0)
+    
+    return {
+        "total_visits": total_visits,
+        "last_visit": last_visit,
+        "total_spendings": total_spendings
+    }
+
+
+@api.post("/orders/{order_id}/pay-pending")
+def pay_pending_order(order_id: str, payload: dict, user: dict = Depends(get_current_user)):
+    amount = float(payload.get("amount", 0.0))
+    payment_method = payload.get("payment_method", "Cash")
+    lead_id = payload.get("lead_id")
+    
+    if amount <= 0:
+        raise HTTPException(400, "Amount must be greater than 0")
+        
+    order_ref = db.collection("orders").document(order_id)
+    order_snap = order_ref.get()
+    if not order_snap.exists:
+        raise HTTPException(404, "Order not found")
+        
+    order = order_snap.to_dict()
+    
+    split_payments = order.get("split_payments", [])
+    split_payments.append({
+        "method": payment_method,
+        "amount": amount
+    })
+    
+    total = float(order.get("total", 0.0))
+    discount = float(order.get("discount", 0.0))
+    paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+    
+    update_data = {"split_payments": split_payments}
+    
+    if paid >= (total - discount):
+        update_data["status"] = "delivered"
+        
+    order_ref.update(update_data)
+    
+    # Deduct from lead's global pending payment if lead_id is provided
+    if lead_id:
+        lead_ref = db.collection("leads").document(lead_id)
+        lead_snap = lead_ref.get()
+        if lead_snap.exists:
+            lead_data = lead_snap.to_dict()
+            current_pending = float(lead_data.get("pending_payment", 0.0))
+            new_pending = max(0.0, current_pending - amount)
+            lead_ref.update({"pending_payment": new_pending})
+            
+    return {"message": "Payment recorded successfully", "order_id": order_id}
+
+@api.post("/leads/{lead_id}/receive-pending-payment")
+def receive_pending_payment(lead_id: str, payload: dict, user: dict = Depends(get_current_user)):
+    amount = float(payload.get("amount", 0.0))
+    payment_method = payload.get("payment_method", "Cash")
+    
+    if amount <= 0:
+        raise HTTPException(400, "Amount must be greater than 0")
+        
+    lead_ref = db.collection("leads").document(lead_id)
+    lead_snap = lead_ref.get()
+    if not lead_snap.exists:
+        raise HTTPException(404, "Client not found")
+        
+    lead_data = lead_snap.to_dict()
+    current_pending = float(lead_data.get("pending_payment", 0.0))
+    new_pending = max(0.0, current_pending - amount)
+    
+    # 1. Update Lead
+    lead_ref.update({"pending_payment": new_pending})
+    
+    # 2. Create a payment collection record (using orders collection so it flows into Admin reports)
+    dt_now = datetime.now(timezone.utc)
+    order_id = str(uuid.uuid4())
+    order_data = {
+        "id": order_id,
+        "employee_id": user.get("id"),
+        "user_name": lead_data.get("name", "Unknown Client"),
+        "phone": lead_data.get("phone", ""),
+        "total": amount,
+        "items": [{
+            "name": "Pending Payment Collection",
+            "price": amount,
+            "quantity": 1,
+            "line_total": amount,
+            "category": "Payment"
+        }],
+        "payment_method": payment_method,
+        "split_payments": [{"method": payment_method, "amount": amount}],
+        "status": "delivered", # Delivered status is used in reports for pending_received
+        "is_pending_collection": True,
+        "notes": f"Pending Payment Collected via {payment_method}",
+        "created_at": dt_now.isoformat()
+    }
+    db.collection("orders").document(order_id).set(order_data)
+    
+    return {"message": "Payment collected successfully", "new_pending": new_pending, "order_id": order_id}
+
 @api.get("/admin/orders")
 def admin_orders(limit: int = 200, branch: Optional[str] = None, user: dict = Depends(require_admin)):
     is_super = user.get("email", "").lower() == "superadmin@eminence.com"
@@ -3228,7 +3504,33 @@ def admin_orders(limit: int = 200, branch: Optional[str] = None, user: dict = De
 
 @api.patch("/admin/orders/{oid}")
 def admin_update_order(oid: str, data: dict, _: dict = Depends(require_admin)):
-    db.collection("orders").document(oid).update(data); return {"ok": True}
+    doc_ref = db.collection("orders").document(oid)
+    old_order = doc_ref.get()
+    if old_order.exists:
+        old_data = old_order.to_dict()
+        old_total = sum((float(i.get("price", 0)) * int(i.get("quantity", 1))) - (float(i.get("discount", 0)) if i.get("discount_type") == "INR" else (float(i.get("price", 0)) * int(i.get("quantity", 1)) * float(i.get("discount", 0)) / 100)) for i in old_data.get("items", []))
+        old_total -= float(old_data.get("discount", 0.0))
+        old_paid = sum(float(p.get("amount", 0.0)) for p in old_data.get("split_payments", [])) if old_data.get("split_payments") else old_total
+        old_due = max(0.0, old_total - old_paid)
+        
+        new_items = data.get("items", old_data.get("items", []))
+        new_discount = data.get("discount", old_data.get("discount", 0.0))
+        new_total = sum((float(i.get("price", 0)) * int(i.get("quantity", 1))) - (float(i.get("discount", 0)) if i.get("discount_type") == "INR" else (float(i.get("price", 0)) * int(i.get("quantity", 1)) * float(i.get("discount", 0)) / 100)) for i in new_items)
+        new_total -= float(new_discount)
+        new_split = data.get("split_payments", old_data.get("split_payments", []))
+        new_paid = sum(float(p.get("amount", 0.0)) for p in new_split) if new_split else new_total
+        new_due = max(0.0, new_total - new_paid)
+        
+        due_diff = new_due - old_due
+        
+        if due_diff != 0 and old_data.get("phone"):
+            leads = list(db.collection("leads").where("phone", "==", old_data["phone"]).limit(1).stream())
+            if leads:
+                from google.cloud.firestore import Increment as FSIncrement
+                leads[0].reference.update({"pending_payment": FSIncrement(due_diff)})
+
+    doc_ref.update(data)
+    return {"ok": True}
 
 @api.delete("/admin/orders/{oid}")
 def admin_delete_order(oid: str, _: dict = Depends(require_admin)):
@@ -4847,6 +5149,53 @@ def update_service_reminder(rid: str, data: ServiceReminderIn, _: dict = Depends
     db.collection("service_reminders").document(rid).update(update_data)
     return {"ok": True, "id": rid}
 
+@api.get("/admin/active-service-reminders")
+def get_active_service_reminders(admin: dict = Depends(require_admin)):
+    docs = db.collection("service_reminders").where("status", "==", "active").stream()
+    reminders = [d.to_dict() for d in docs]
+    
+    if not reminders:
+        return []
+        
+    branch = admin.get("branch")
+    if branch == "All Branches":
+        branch = None
+        
+    active_notifications = []
+    
+    for rem in reminders:
+        svc_name = rem.get("service_name")
+        interval = rem.get("interval_days", 0)
+        msg_template = rem.get("message", "")
+        
+        target_date = (datetime.now() - timedelta(days=interval)).strftime("%Y-%m-%d")
+        
+        orders_query = db.collection("orders").where("date", "==", target_date)
+        if branch:
+            orders_query = orders_query.where("branch", "==", branch)
+            
+        orders = orders_query.stream()
+        
+        for order_doc in orders:
+            order = order_doc.to_dict()
+            items = order.get("items", [])
+            has_service = any(item.get("name") == svc_name for item in items)
+            
+            if has_service:
+                active_notifications.append({
+                    "order_id": order_doc.id,
+                    "client_name": order.get("user_name") or "Walk-in",
+                    "client_phone": order.get("user_phone") or "",
+                    "service_name": svc_name,
+                    "target_date": target_date,
+                    "interval_days": interval,
+                    "message_template": msg_template
+                })
+                
+    # Optional: deduplicate by client phone + service name in case they had multiple orders that day
+    # Or just return all matching orders
+    return active_notifications
+
 @api.delete("/admin/service-reminders/{rid}")
 def delete_service_reminder(rid: str, _: dict = Depends(require_admin)):
     db.collection("service_reminders").document(rid).delete()
@@ -5252,7 +5601,7 @@ class AdminServiceRowIn(BaseModel):
 class AdminAppointmentIn(BaseModel):
     customer_name: str
     customer_phone: str
-    customer_email: Optional[str] = ""
+    time: Optional[str] = ""
     user_id: Optional[str] = None
     date: str
     service_rows: List[AdminServiceRowIn]
@@ -5276,6 +5625,7 @@ def admin_list_appointments(admin: dict = Depends(require_admin)):
     items = []
     for d in docs:
         bk = d.to_dict()
+        bk["id"] = d.id
         # Show all if super-admin (no branch), otherwise filter by branch
         if branch and bk.get("branch") and bk.get("branch") != branch:
             continue
@@ -5304,7 +5654,6 @@ def admin_create_appointment(data: AdminAppointmentIn, admin: dict = Depends(req
         "id": bid,
         "user_id": data.user_id or f"walkin_{new_id()[:8]}",
         "user_name": data.customer_name,
-        "user_email": data.customer_email or "",
         "user_phone": data.customer_phone,
         "date": data.date,
         "services": rows,
@@ -5314,7 +5663,7 @@ def admin_create_appointment(data: AdminAppointmentIn, admin: dict = Depends(req
         "service_price": data.total,
         "stylist_id": rows[0]["stylist_id"] if rows else None,
         "stylist_name": rows[0]["stylist_name"] if rows else "Any available",
-        "time": rows[0]["start_time"] if rows else "",
+        "time": data.time or (rows[0]["start_time"] if rows else ""),
         "subtotal": data.subtotal,
         "discount": data.discount,
         "tax": data.tax,
@@ -5331,6 +5680,23 @@ def admin_create_appointment(data: AdminAppointmentIn, admin: dict = Depends(req
     }
     db.collection("bookings").document(bid).set(booking)
     return booking
+
+class AppointmentStatusUpdate(BaseModel):
+    status: str
+
+@api.put("/admin/appointments/{bid}/status")
+def update_appointment_status(bid: str, data: AppointmentStatusUpdate, admin: dict = Depends(require_admin)):
+    logging.info(f"Checking in appointment bid={bid} status={data.status}")
+    doc = db.collection("bookings").document(bid).get()
+    if not doc.exists:
+        logging.error(f"Appointment {bid} not found in bookings collection!")
+        raise HTTPException(404, "Appointment not found")
+    
+    db.collection("bookings").document(bid).update({
+        "status": data.status
+    })
+    logging.info(f"Successfully checked in appointment {bid}")
+    return {"status": "ok"}
 
 @api.get("/")
 def root(): return {"app": "Eminence Salon API", "vercel": IS_VERCEL}

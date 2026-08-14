@@ -5,6 +5,6 @@ cred = credentials.Certificate("api/firebase-adminsdk.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-docs = db.collection("products").where("branch", "==", "Surat").where("name", "==", "GP 3 No").stream()
-for d in docs:
-    print(d.id, d.to_dict())
+docs = db.collection("product_transfers").get()
+for doc in docs:
+    print(doc.id, doc.to_dict())

@@ -7,7 +7,7 @@ import { Search, Plus, Trash2, IndianRupee, FileText, Clock, User, Gift, CreditC
 import { downloadOrderInvoice, printOrderInvoice } from "@/lib/utils";
 
 const PAYMENT_METHODS = [
-  "Cash", "Credit/Debit Card", "Cheque", "Online Payment",
+  "Cash", "Credit/Debit Card", "Bank Transfer",
   "UPI", "E-wallet", "Reward Points", "Razorpay"
 ];
 
@@ -79,6 +79,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
   // Client 360
   const [clientData, setClientData] = useState(null);
   const [addToWallet, setAddToWallet] = useState(false);
+  const [showPendingPopup, setShowPendingPopup] = useState(false);
+  const [pendingOrders, setPendingOrders] = useState([]);
+  const [payAmounts, setPayAmounts] = useState({});
+  const [payModes, setPayModes] = useState({});
+  const [loadingOrders, setLoadingOrders] = useState(false);
+
+
   const [lastOrderId, setLastOrderId] = useState(null);
   const [lastOrderPhone, setLastOrderPhone] = useState("");
   const [lastOrderClientName, setLastOrderClientName] = useState("");
@@ -96,7 +103,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       api.get("/services"),
       api.get("/packages").catch(() => ({ data: [] }))
     ]).then(([p, s, pkg]) => {
-      setProducts((p.data || []).filter(prod => prod.is_retail !== false));
+      setProducts(p.data || []);
       setServices(s.data || []);
       setAvailablePackages(pkg.data || []);
     }).catch(() => toast.error("Failed to load catalog"));
@@ -195,6 +202,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           setClientData({
             name: found.name, phone: found.phone,
             branch: found.branch || "—",
+            last_visit: found.last_visit || found.last_visit_date || "—",
             total_visits: found.visit_count || 0,
             total_spendings: found.total_sale_amount || 0,
             membership: "—", reward_points: 0,
@@ -202,12 +210,81 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             source: found.source || "—",
             city: found.city || "—",
             packages: found.packages || [],
-            wallet: found.wallet || 0
+            wallet: found.wallet || 0,
+            pending_payment: found.pending_payment || 0
           });
+          // Always fetch real pending orders; only show popup if orders actually exist
+          fetchPendingOrders(found.id, true);
         }
       }
     } catch (e) {
       console.error(e);
+    }
+  };
+
+  const fetchPendingOrders = async (leadId, showPopupIfFound = false) => {
+    setLoadingOrders(true);
+    try {
+      const [res, statsRes] = await Promise.all([
+        api.get(`/leads/${leadId}/pending-orders`),
+        api.get(`/leads/${leadId}/360-stats`).catch(() => null)
+      ]);
+      const orders = res.data || [];
+      setPendingOrders(orders);
+      const initAmounts = {};
+      const initModes = {};
+      orders.forEach(o => {
+        initAmounts[o.id] = o.unpaid_amount;
+        initModes[o.id] = "Cash";
+      });
+      setPayAmounts(initAmounts);
+      setPayModes(initModes);
+
+      if (statsRes && statsRes.data) {
+        setClientData(prev => prev ? {
+          ...prev,
+          total_visits: statsRes.data.total_visits,
+          last_visit: statsRes.data.last_visit,
+          total_spendings: statsRes.data.total_spendings
+        } : prev);
+      }
+
+      // Only show popup if there are real pending orders
+      if (showPopupIfFound && orders.length > 0) {
+        setShowPendingPopup(true);
+      }
+    } catch (e) {
+      toast.error("Failed to load pending bills");
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const handlePayOrder = async (orderId) => {
+    if (!clientData) return;
+    const lead = localLeads.find(l => l.phone?.includes(contactNumber));
+    if (!lead) return;
+    
+    const amount = payAmounts[orderId];
+    const mode = payModes[orderId];
+    
+    if (!amount || amount <= 0) {
+      toast.error("Enter a valid amount");
+      return;
+    }
+    
+    try {
+      await api.post(`/orders/${orderId}/pay-pending`, {
+        amount: amount,
+        payment_method: mode,
+        lead_id: lead.id
+      });
+      toast.success("Payment collected successfully!");
+      // Re-fetch to update table
+      fetchPendingOrders(lead.id);
+      refreshLeads();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to collect payment");
     }
   };
 
@@ -233,6 +310,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
         id: Math.random().toString(36).substring(2, 9),
         package_id: pkgTemplate.id,
         name: pkgTemplate.name,
+        price: Number(pkgTemplate.price) || 0,
+        valid_upto: expiresAt.toISOString().split("T")[0],
         purchased_at: new Date().toISOString().split("T")[0],
         expires_at: expiresAt.toISOString().split("T")[0],
         services: pkgServices,
@@ -240,10 +319,16 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       };
       const currentPkgs = selectedLead.packages || [];
       const updatedPkgs = [...currentPkgs, newActivePkg];
-      await api.patch(`/leads/${selectedLead.id}`, { packages: updatedPkgs });
+      const resp = await api.patch(`/leads/${selectedLead.id}`, { packages: updatedPkgs });
       toast.success("Package assigned successfully");
       setPkgToAssign("");
-      await refreshLeads();
+      
+      if (resp.data) {
+        setClientData(prev => ({ ...prev, packages: resp.data.packages || [] }));
+        setLocalLeads(prev => prev.map(l => l.id === selectedLead.id ? { ...l, packages: resp.data.packages } : l));
+      } else {
+        await refreshLeads();
+      }
     } catch (err) {
       toast.error("Failed to assign package");
     }
@@ -265,7 +350,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           source: found.source || "—",
           city: found.city || "—",
           packages: found.packages || [],
-          wallet: found.wallet || 0
+          wallet: found.wallet || 0,
+          pending_payment: found.pending_payment || 0
         });
         if (found.assigned_to) setSelectedEmployee(found.assigned_to);
       } else {
@@ -288,6 +374,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
     setClientData({
       name: lead.name, phone: lead.phone,
       branch: lead.branch || "—",
+      last_visit: lead.last_visit || lead.last_visit_date || "—",
       total_visits: lead.visit_count || 0,
       total_spendings: lead.total_sale_amount || 0,
       membership: "—", reward_points: 0,
@@ -295,10 +382,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       source: lead.source || "—",
       city: lead.city || "—",
       packages: lead.packages || [],
-      wallet: lead.wallet || 0
+      wallet: lead.wallet || 0,
+      pending_payment: lead.pending_payment || 0
     });
     setAddToWallet(false);
     setAppliedPackageId("");
+    // Always fetch real pending orders; only show popup if orders actually exist
+    fetchPendingOrders(lead.id, true);
   };
 
   // Line item management
@@ -587,24 +677,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           created_at: billDate ? (editOrder?.created_at ? (billDate + editOrder.created_at.slice(10)) : (billDate + "T12:00:00+05:30")) : undefined
         };
 
-        let orderResp;
-        if (editOrder) {
-          orderResp = await api.patch(`/admin/orders/${editOrder.id}`, payload);
-          const updatedOrderId = editOrder.id;
-          setLastOrderId(updatedOrderId);
-          setLastOrderPhone(contactNumber);
-          setLastOrderClientName(clientName || clientData?.name || "Client");
-          toast.success("Bill updated successfully!");
-        } else {
-          orderResp = await api.post("/orders", payload);
-          const newOrderId = orderResp.data?.id || orderResp.data?.order_id || null;
-          setLastOrderId(newOrderId);
-          setLastOrderPhone(contactNumber);
-          setLastOrderClientName(clientName || clientData?.name || "Client");
-          toast.success("Bill generated successfully!");
-        }
-
-        // Auto-save new customer to leads if not already in system
+        // Auto-save new customer to leads BEFORE order creation so backend can assign packages to it
         if (!clientData && clientName && contactNumber) {
           try {
             await api.post("/leads", {
@@ -623,6 +696,24 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             // silently ignore — don't block the bill success flow
           }
         }
+
+        let orderResp;
+        if (editOrder) {
+          orderResp = await api.patch(`/admin/orders/${editOrder.id}`, payload);
+          const updatedOrderId = editOrder.id;
+          setLastOrderId(updatedOrderId);
+          setLastOrderPhone(contactNumber);
+          setLastOrderClientName(clientName || clientData?.name || "Client");
+          toast.success("Bill updated successfully!");
+        } else {
+          orderResp = await api.post("/orders", payload);
+          const newOrderId = orderResp.data?.id || orderResp.data?.order_id || null;
+          setLastOrderId(newOrderId);
+          setLastOrderPhone(contactNumber);
+          setLastOrderClientName(clientName || clientData?.name || "Client");
+          toast.success("Bill generated successfully!");
+        }
+
 
         // Refresh leads to fetch newly added packages and stats
         await refreshLeads();
@@ -1211,7 +1302,19 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   ₹{amountDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
               </div>
+              {amountDue > 0 && (
+                <div className="md:col-span-2 flex justify-between items-center bg-rose-50 border border-rose-200 rounded-xl px-4 py-3 mt-1">
+                  <div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-rose-600">Pending Payment</span>
+                    <p className="text-[10px] text-rose-400 mt-0.5">This amount will be recorded as pending for the client</p>
+                  </div>
+                  <span className="font-serif text-xl font-bold text-rose-600">
+                    ₹{amountDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              )}
             </div>
+
 
             {excessAmount > 0 && (
               <div className="bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl space-y-3">
@@ -1326,8 +1429,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
               <div className="space-y-2.5 text-xs">
                 {[
                   { label: "Branch", value: clientData.branch },
-                  { label: "Last Visit On", value: "—" },
-                  { label: "Total Visits", value: clientData.total_visits },
+                  { label: "Last Visit On", value: clientData.last_visit || "—" },
+                  { label: "Total Visits", value: clientData.total_visits ?? 0 },
                   { label: "Total Spendings", value: `₹${Number(clientData.total_spendings || 0).toLocaleString("en-IN")}` },
                   { label: "Membership", value: clientData.membership },
                   {
@@ -1363,6 +1466,20 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   },
                   { label: "Last Feedback", value: "—" },
                   { label: "My Wallet", value: `₹${Number(clientData.wallet || 0).toLocaleString("en-IN")}` },
+                  { 
+                    label: "Pending Payment", 
+                    value: `₹${Number(clientData.pending_payment || 0).toLocaleString("en-IN")}`,
+                    isCustom: true,
+                    render: () => {
+                      const amount = Number(clientData.pending_payment || 0);
+                      return (
+                        <div className="flex justify-between items-center py-1.5 border-b border-eminence-border/10">
+                          <span className="text-eminence-muted font-medium">Pending Payment:</span>
+                          <span className={`font-bold text-right max-w-[55%] truncate ${amount > 0 ? 'text-red-600' : 'text-eminence-text'}`}>₹{amount.toLocaleString("en-IN")}</span>
+                        </div>
+                      );
+                    }
+                  },
                   { label: "Reward Points", value: clientData.reward_points },
                   { label: "Gender", value: clientData.gender },
                   { label: "Date of Birth", value: "—" },
@@ -1408,6 +1525,96 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           </div>
         </div>
       </div>
+
+      {/* Pending Payment Collection Modal */}
+      {showPendingPopup && clientData && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="bg-white shadow-2xl w-full max-w-5xl rounded overflow-hidden animate-slide-up flex flex-col max-h-[90vh]">
+            <div className="bg-gray-100 px-4 py-3 border-b border-gray-200">
+              <h3 className="text-gray-700 font-medium">Pending payments</h3>
+            </div>
+            
+            <div className="p-4 overflow-auto flex-1 bg-white">
+              {loadingOrders ? (
+                <div className="text-center py-8 text-gray-500">Loading bills...</div>
+              ) : pendingOrders.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">No pending bills found.</div>
+              ) : (
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-gray-100 text-left text-gray-600">
+                      <th className="pb-3 px-2 font-bold">Branch</th>
+                      <th className="pb-3 px-2 font-bold">Id</th>
+                      <th className="pb-3 px-2 font-bold">Date</th>
+                      <th className="pb-3 px-2 font-bold">Type</th>
+                      <th className="pb-3 px-2 font-bold">Pending amount</th>
+                      <th className="pb-3 px-2 font-bold">Pay amount</th>
+                      <th className="pb-3 px-2 font-bold">Pay mode</th>
+                      <th className="pb-3 px-2 font-bold">Send As</th>
+                      <th className="pb-3 px-2 font-bold">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingOrders.map(o => (
+                      <tr key={o.id} className="border-b border-gray-100 hover:bg-gray-50/50">
+                        <td className="py-4 px-2">{o.branch || "Subhanpura"}</td>
+                        <td className="py-4 px-2 text-gray-600">{o.id.substring(0, 8)}</td>
+                        <td className="py-4 px-2">{o.created_at ? o.created_at.substring(0, 10).split('-').reverse().join('-') : "—"}</td>
+                        <td className="py-4 px-2">Bill</td>
+                        <td className="py-4 px-2">{o.unpaid_amount.toFixed(2)}</td>
+                        <td className="py-4 px-2">
+                          <input 
+                            type="number"
+                            className="border border-gray-300 rounded px-2 py-1 w-24 text-sm focus:outline-none focus:border-blue-400"
+                            value={payAmounts[o.id] || ""}
+                            onChange={(e) => setPayAmounts(prev => ({ ...prev, [o.id]: Number(e.target.value) }))}
+                          />
+                        </td>
+                        <td className="py-4 px-2">
+                          <select 
+                            className="border border-gray-300 rounded px-2 py-1 w-24 text-sm focus:outline-none focus:border-blue-400 bg-white"
+                            value={payModes[o.id] || "Cash"}
+                            onChange={(e) => setPayModes(prev => ({ ...prev, [o.id]: e.target.value }))}
+                          >
+                            <option value="Cash">Cash</option>
+                            <option value="Card">Card</option>
+                            <option value="UPI">UPI</option>
+                          </select>
+                        </td>
+                        <td className="py-4 px-2">
+                          <div className="flex flex-col gap-1 text-[11px] text-gray-600">
+                            <label className="flex items-center gap-1 cursor-pointer"><input type="checkbox" /> SMS</label>
+                            <label className="flex items-center gap-1 cursor-pointer"><input type="checkbox" /> WhatsApp</label>
+                          </div>
+                        </td>
+                        <td className="py-4 px-2">
+                          <button 
+                            onClick={() => handlePayOrder(o.id)}
+                            className="bg-[#00c853] hover:bg-[#00b04a] text-white font-bold py-1.5 px-3 rounded text-xs flex items-center gap-1 shadow-sm transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                            Pay now
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+            
+            <div className="bg-gray-100 p-4 border-t border-gray-200 flex justify-end">
+              <button 
+                onClick={() => setShowPendingPopup(false)}
+                className="bg-[#ff1744] hover:bg-[#e0143c] text-white font-bold py-2 px-5 rounded shadow-sm flex items-center gap-1 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
