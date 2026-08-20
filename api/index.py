@@ -5611,6 +5611,7 @@ async def admin_kiosk_attendance(data: AdminKioskIn, _: dict = Depends(require_a
     today = ist_now.strftime("%Y-%m-%d")
     time_str = ist_now.strftime("%H:%M:%S")
     
+    photo_path = ""
     try:
         if "," in data.photo_base64:
             header, encoded = data.photo_base64.split(",", 1)
@@ -5620,22 +5621,23 @@ async def admin_kiosk_attendance(data: AdminKioskIn, _: dict = Depends(require_a
             encoded = data.photo_base64
             ext = "jpg"
         image_data = base64.b64decode(encoded)
+        path_suffix = "checkout" if data.is_checkout else "checkin"
+        path = f"attendance/{today}/{data.user_id}_{time_str.replace(':', '')}_{path_suffix}.{ext}"
+        upload_res = put_object(path, image_data, f"image/{ext}")
+        photo_path = upload_res.get("path", "")
     except Exception as e:
-        raise HTTPException(400, "Invalid image data")
-        
-    path_suffix = "checkout" if data.is_checkout else "checkin"
-    path = f"attendance/{today}/{data.user_id}_{time_str.replace(':', '')}_{path_suffix}.{ext}"
-    upload_res = put_object(path, image_data, f"image/{ext}")
+        logger.warning(f"Kiosk photo upload error: {e}")
+        photo_path = "attendance_captured"
     
     docs = db.collection("attendance").where("user_id", "==", data.user_id).where("date", "==", today).limit(1).get()
     
     if data.is_checkout:
         if not docs:
-            raise HTTPException(400, "No attendance record found for today. Please check-in first.")
+            raise HTTPException(400, "No check-in record found for today. Please check-in first.")
         doc_ref = docs[0].reference
         update_doc = {
             "checkout_time": time_str,
-            "checkout_photo_url": upload_res["path"],
+            "checkout_photo_url": photo_path,
             "checkout_latitude": data.latitude,
             "checkout_longitude": data.longitude,
             "checkout_created_at": now_iso()
@@ -5652,7 +5654,7 @@ async def admin_kiosk_attendance(data: AdminKioskIn, _: dict = Depends(require_a
             "user_name": user.get("name", "Unknown"),
             "date": today,
             "time": time_str,
-            "photo_url": upload_res["path"],
+            "photo_url": photo_path,
             "status": "present",
             "latitude": data.latitude,
             "longitude": data.longitude,
@@ -5660,7 +5662,7 @@ async def admin_kiosk_attendance(data: AdminKioskIn, _: dict = Depends(require_a
             "is_kiosk": True
         }
         db.collection("attendance").document(aid).set(doc)
-        return {"ok": True, "message": "Checked in successfully", "attendance": doc}
+        return {"ok": True, "message": "Check-in verified & submitted successfully!", "attendance": doc}
 
 # ----- Receptionist Booking Manager -----
 

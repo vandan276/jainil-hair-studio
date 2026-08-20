@@ -15123,40 +15123,41 @@ function AttendanceKiosk({ employees, refresh }) {
 
     setLoading(true);
 
-    if (!navigator.geolocation) {
-      toast.error("Geolocation is not supported by your browser.");
-      setLoading(false);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        try {
-          const res = await api.post("/admin/attendance/kiosk", {
-            user_id: selectedEmpId,
-            is_checkout: isCheckout,
-            photo_base64: imgSrc,
-            latitude,
-            longitude
-          });
-          toast.success(res.data.message || "Attendance recorded successfully!");
-          setSelectedEmpId("");
-          setImgSrc(null);
-          refresh();
-        } catch (err) {
-          toast.error(err.response?.data?.detail || "Failed to submit attendance.");
-        } finally {
-          setLoading(false);
-        }
-      },
-      (err) => {
-        console.error(err);
-        toast.error("Geolocation is required to submit kiosk attendance.");
+    const sendKioskAttendance = async (latitude = 0.0, longitude = 0.0) => {
+      try {
+        const res = await api.post("/admin/attendance/kiosk", {
+          user_id: selectedEmpId,
+          is_checkout: isCheckout,
+          photo_base64: imgSrc,
+          latitude: latitude || 0.0,
+          longitude: longitude || 0.0
+        });
+        toast.success(res.data.message || "Attendance recorded successfully!");
+        setSelectedEmpId("");
+        setImgSrc(null);
+        refresh();
+      } catch (err) {
+        toast.error(err.response?.data?.detail || "Failed to submit attendance.");
+      } finally {
         setLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+      }
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          await sendKioskAttendance(latitude, longitude);
+        },
+        async (err) => {
+          console.warn("Kiosk geolocation skipped/denied:", err);
+          await sendKioskAttendance(0.0, 0.0);
+        },
+        { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
+      );
+    } else {
+      await sendKioskAttendance(0.0, 0.0);
+    }
   };
 
   return (
