@@ -4058,9 +4058,14 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
     payroll_data = []
     for emp in employees:
         emp_id = emp["id"]
+        emp_name = emp.get("name", "").strip().lower()
         
-        # Calculate monthly sales for the selected month (similar to reports)
-        emp_payments = [p for p in all_payments if p.get("recorded_by_id") == emp_id and p.get("timestamp", "").startswith(filter_val)]
+        # Calculate monthly sales for the selected month (matching by assigned_to ID or recorded_by name/ID)
+        emp_payments = [
+            p for p in all_payments 
+            if (p.get("recorded_by_id") == emp_id or (p.get("recorded_by") and str(p.get("recorded_by")).strip().lower() == emp_name))
+            and p.get("timestamp", "").startswith(filter_val)
+        ]
         emp_manual = [s for s in manual_sales if s.get("employee_id") == emp_id and s.get("date", "").startswith(filter_val)]
         
         total_sales = sum(p.get("amount", 0) for p in emp_payments) + sum(s.get("amount", 0) for s in emp_manual)
@@ -4165,18 +4170,56 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
                         "commission": round(it_comm, 2)
                     })
 
-        # For sales employees, build daily sales breakdown from payments and orders
+        # For sales employees, build daily sales breakdown and calculate commission per transaction/deal
         if emp.get("role") == "sales":
             sales_daily_map = {}
+            slabs = emp.get("commission_slabs") or []
+            is_custom = emp.get("custom_commission_enabled", False) or bool(slabs)
+            c_type_default = emp.get("commission_type", "%")
+            c_inr_default = float(emp.get("commission_inr", 0) or 0)
+
+            def get_sale_commission(amt):
+                amt_val = float(amt or 0)
+                if amt_val <= 0:
+                    return 0.0
+                if is_custom and slabs:
+                    for slab in slabs:
+                        min_t = float(slab.get("min_target", 0) or 0)
+                        max_t = slab.get("max_target")
+                        max_t_val = float(max_t) if (max_t is not None and str(max_t).strip() != "" and str(max_t).lower() != "none") else float("inf")
+                        if min_t <= amt_val <= max_t_val:
+                            s_type = slab.get("type", "%")
+                            s_val = float(slab.get("value", 0) or 0)
+                            if s_type == "₹" or s_type == "INR":
+                                return s_val
+                            else:
+                                return round(amt_val * (s_val / 100.0), 2)
+                    return round(amt_val * comm_rate, 2)
+                else:
+                    if c_type_default == "₹" or c_type_default == "INR":
+                        return c_inr_default
+                    else:
+                        return round(amt_val * comm_rate, 2)
+
+            total_sales_comm = 0.0
             for p in emp_payments:
                 p_date = (p.get("timestamp") or "")[:10]
                 if not p_date: continue
                 if p_date not in sales_daily_map:
                     sales_daily_map[p_date] = {"date": p_date, "total_sales": 0.0, "total_commission": 0.0, "services_count": 0, "items": []}
                 amt = float(p.get("amount", 0))
+                p_comm = get_sale_commission(amt)
                 sales_daily_map[p_date]["total_sales"] += amt
+                sales_daily_map[p_date]["total_commission"] += p_comm
                 sales_daily_map[p_date]["services_count"] += 1
-                sales_daily_map[p_date]["items"].append({"name": f"Payment ({p.get('method', 'UPI')})", "type": "sale", "quantity": 1, "price": amt, "commission": 0.0})
+                sales_daily_map[p_date]["items"].append({
+                    "name": f"Payment ({p.get('mode') or p.get('method', 'UPI')})",
+                    "type": "sale",
+                    "quantity": 1,
+                    "price": amt,
+                    "commission": p_comm
+                })
+                total_sales_comm += p_comm
             
             for s in emp_manual:
                 s_date = (s.get("date") or "")[:10]
@@ -4184,51 +4227,21 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
                 if s_date not in sales_daily_map:
                     sales_daily_map[s_date] = {"date": s_date, "total_sales": 0.0, "total_commission": 0.0, "services_count": 0, "items": []}
                 amt = float(s.get("amount", 0))
+                s_comm = get_sale_commission(amt)
                 sales_daily_map[s_date]["total_sales"] += amt
+                sales_daily_map[s_date]["total_commission"] += s_comm
                 sales_daily_map[s_date]["services_count"] += 1
-                sales_daily_map[s_date]["items"].append({"name": "Manual Sale Entry", "type": "sale", "quantity": 1, "price": amt, "commission": 0.0})
+                sales_daily_map[s_date]["items"].append({
+                    "name": "Manual Sale Entry",
+                    "type": "sale",
+                    "quantity": 1,
+                    "price": amt,
+                    "commission": s_comm
+                })
+                total_sales_comm += s_comm
 
-            # Calculate commission with tiered target slabs (INR or %) or default
             service_sales = total_sales
-            slabs = emp.get("commission_slabs") or []
-            is_custom = emp.get("custom_commission_enabled", False) or bool(slabs)
-            
-            if is_custom and slabs:
-                calculated_comm = 0.0
-                matched_slab = None
-                for slab in slabs:
-                    min_t = float(slab.get("min_target", 0) or 0)
-                    max_t = slab.get("max_target")
-                    max_t_val = float(max_t) if (max_t is not None and str(max_t).strip() != "" and str(max_t).lower() != "none") else float("inf")
-                    if min_t <= service_sales <= max_t_val:
-                        matched_slab = slab
-                        break
-                
-                if matched_slab:
-                    c_type = matched_slab.get("type", "%")
-                    c_val = float(matched_slab.get("value", 0) or 0)
-                    if c_type == "₹" or c_type == "INR":
-                        calculated_comm = c_val
-                    else:
-                        calculated_comm = service_sales * (c_val / 100.0)
-                else:
-                    calculated_comm = service_sales * comm_rate
-                service_commission = calculated_comm
-            else:
-                c_type = emp.get("commission_type", "%")
-                if c_type == "₹" or c_type == "INR":
-                    service_commission = float(emp.get("commission_inr", 0) or 0)
-                else:
-                    service_commission = service_sales * comm_rate
-
-            # Distribute commission proportionally or as calculated across daily sales
-            effective_comm_rate = (service_commission / service_sales) if service_sales > 0 else 0.0
-            for d_val in sales_daily_map.values():
-                d_comm = round(d_val["total_sales"] * effective_comm_rate, 2)
-                d_val["total_commission"] = d_comm
-                for it in d_val["items"]:
-                    it["commission"] = round(it["price"] * effective_comm_rate, 2)
-
+            service_commission = total_sales_comm
             daily_commissions_list = sorted(sales_daily_map.values(), key=lambda x: x["date"], reverse=True)
             product_commission = 0.0
             package_commission = 0.0
