@@ -16757,7 +16757,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
   };
 
   return (
-    <div className="max-w-6xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
+    <div className="max-w-6xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
       <div className="flex justify-between items-center border-b pb-4 border-gray-100">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Add Product Stock</h2>
@@ -16813,17 +16813,17 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
 
 
         {/* Product Rows Table */}
-        <div className="space-y-3">
-          <div className="overflow-x-auto rounded-2xl border border-emerald-200/70 shadow-sm bg-white">
-            <table className="w-full text-left border-collapse">
+        <div className="space-y-3 relative">
+          <div className="rounded-2xl border border-emerald-200/70 shadow-sm bg-white overflow-visible">
+            <table className="w-full text-left border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-50/80 border-b border-emerald-100 text-emerald-950 uppercase font-bold text-[10px] tracking-wider">
-                  <th className="py-3 px-3 w-[26%]">Product Name *</th>
+                  <th className="py-3 px-3 w-[28%]">Product Name *</th>
                   <th className="py-3 px-2 w-[14%]">SKU / Code</th>
-                  <th className="py-3 px-2 w-[12%]">Qty *</th>
-                  <th className="py-3 px-2 w-[14%]">Cost (₹) *</th>
-                  <th className="py-3 px-2 w-[14%]">Selling (₹)</th>
-                  <th className="py-3 px-2 w-[14%] text-right font-mono">Total (₹)</th>
+                  <th className="py-3 px-2 w-[11%]">Qty *</th>
+                  <th className="py-3 px-2 w-[13%]">Cost (₹) *</th>
+                  <th className="py-3 px-2 w-[13%]">Selling (₹)</th>
+                  <th className="py-3 px-2 w-[15%] text-right font-mono">Total (₹)</th>
                   <th className="py-3 px-2 w-[6%] text-center">Action</th>
                 </tr>
               </thead>
@@ -16860,12 +16860,12 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                             return null;
                           })()}
                           {row.showDrop && filtered.length > 0 && (
-                            <div className="absolute z-30 w-72 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-48 overflow-y-auto left-0">
+                            <div className="absolute z-50 w-80 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-56 overflow-y-auto left-0">
                               {filtered.map(p => (
                                 <div
                                   key={p.id}
                                   onMouseDown={() => handleProductSelect(idx, p)}
-                                  className="px-3 py-2 hover:bg-emerald-50 cursor-pointer text-xs flex flex-col text-left border-b border-gray-50 last:border-0"
+                                  className="px-3 py-2.5 hover:bg-emerald-50 cursor-pointer text-xs flex flex-col text-left border-b border-gray-100 last:border-0"
                                 >
                                   <div className="flex justify-between items-center w-full">
                                     <span className="font-medium text-gray-900">{p.name}</span>
@@ -16888,7 +16888,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                             </div>
                           )}
                           {row.showDrop && row.productSearch && filtered.length === 0 && (
-                            <div className="absolute z-30 w-72 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-2.5 text-xs text-gray-400 italic left-0">
+                            <div className="absolute z-50 w-80 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl px-4 py-2.5 text-xs text-gray-400 italic left-0">
                               No products match "{row.productSearch}"
                             </div>
                           )}
