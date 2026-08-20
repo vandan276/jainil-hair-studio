@@ -12706,6 +12706,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
   const [payrollForm, setPayrollForm] = useState({ base_salary: 0, commission_rate: 0 });
   const [payrollFilterMonth, setPayrollFilterMonth] = useState(new Date().toISOString().slice(0, 7));
   const [expandedDailyCommission, setExpandedDailyCommission] = useState({});
+  const [dailyLogDateFilter, setDailyLogDateFilter] = useState({});
   const [isEditingAttendance, setIsEditingAttendance] = useState(false);
   const [editAttendanceForm, setEditAttendanceForm] = useState({ time: "10:00", checkout_time: "", status: "present" });
 
@@ -13617,7 +13618,14 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                         </tr>
 
                         {/* Expandable Daily Commission Dropdown Panel for Service Providers & Sales Staff */}
-                        {canExpand && isExpanded && (
+                        {canExpand && isExpanded && (() => {
+                          const specificDate = dailyLogDateFilter[emp.id] || "";
+                          const filteredDailyList = specificDate 
+                            ? dailyList.filter(d => d.date === specificDate)
+                            : dailyList;
+                          const filteredTotalComm = filteredDailyList.reduce((acc, d) => acc + (d.total_commission || 0), 0);
+
+                          return (
                           <tr className="bg-emerald-50/60 border-y border-emerald-200/80">
                             <td colSpan={10} className="p-6">
                               <div className="bg-white rounded-2xl p-6 border border-emerald-200 shadow-sm space-y-4">
@@ -13633,15 +13641,42 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                         : "Breakdown of services performed each day. Commission is distributed on a daily basis and excluded from monthly salary payout."}
                                     </p>
                                   </div>
-                                  <div className="text-right">
-                                    <span className="text-xs uppercase font-bold text-eminence-muted block">Total Daily Commission Earned</span>
-                                    <span className="text-xl font-bold font-serif text-emerald-700">₹{(totalDailyComm).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                                  <div className="flex flex-wrap items-center gap-4 sm:justify-end">
+                                    {/* Specific Date Filter */}
+                                    <div className="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200">
+                                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Filter Date:</span>
+                                      <input
+                                        type="date"
+                                        value={specificDate}
+                                        onChange={(e) => setDailyLogDateFilter(prev => ({ ...prev, [emp.id]: e.target.value }))}
+                                        className="bg-white border border-gray-300 rounded px-2 py-1 text-xs font-mono font-medium focus:outline-none focus:border-emerald-600"
+                                      />
+                                      {specificDate && (
+                                        <button
+                                          type="button"
+                                          onClick={() => setDailyLogDateFilter(prev => ({ ...prev, [emp.id]: "" }))}
+                                          className="text-[10px] font-bold text-gray-500 hover:text-rose-600 px-1.5 py-0.5 rounded bg-gray-200/70 hover:bg-rose-50 transition-colors"
+                                          title="Clear Date Filter"
+                                        >
+                                          Clear
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    <div className="text-right">
+                                      <span className="text-[10px] uppercase font-bold text-eminence-muted block">
+                                        {specificDate ? `Commission for ${specificDate}` : "Total Daily Commission Earned"}
+                                      </span>
+                                      <span className="text-xl font-bold font-serif text-emerald-700">₹{(filteredTotalComm).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                                    </div>
                                   </div>
                                 </div>
 
-                                {dailyList.length === 0 ? (
+                                {filteredDailyList.length === 0 ? (
                                   <div className="p-6 text-center text-gray-400 italic text-xs bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                    No billable salon activities/sales logged for {emp.name} in {payrollFilterMonth}.
+                                    {specificDate 
+                                      ? `No billable activities/commissions found for ${emp.name} on date ${specificDate}.`
+                                      : `No billable salon activities/sales logged for ${emp.name} in ${payrollFilterMonth}.`}
                                   </div>
                                 ) : (
                                   <div className="overflow-x-auto max-h-[300px] overflow-y-auto rounded-xl border border-gray-200">
@@ -13656,7 +13691,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                         </tr>
                                       </thead>
                                       <tbody className="divide-y divide-gray-100">
-                                        {dailyList.map((dayItem, dIdx) => (
+                                        {filteredDailyList.map((dayItem, dIdx) => (
                                           <tr key={dIdx} className="hover:bg-emerald-50/30 transition-colors">
                                             <td className="px-4 py-3 font-mono font-bold text-gray-900 whitespace-nowrap">
                                               {dayItem.date}
@@ -13709,7 +13744,8 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                               </div>
                             </td>
                           </tr>
-                        )}
+                          );
+                        })()}
                       </React.Fragment>
                     );
                   })}
