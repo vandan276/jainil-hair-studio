@@ -570,8 +570,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           city: clientData?.city || "Vadodara",
           pincode: "000000",
           notes: `COMBINED BILLING | Discount: ₹${totalDiscount} | Tax: ${selectedTaxOpt?.label || "None"} | Payments: ${paymentNotesStr}${referredByClient ? ` | Referred by: ${referredByClient.name} (${referredByClient.phone})` : ""} | ${notes}`,
-          employee_id: selectedEmployee || undefined,
-          employee_name: emp ? emp.name : undefined,
+          employee_id: selectedEmployee === "walkin" ? null : (selectedEmployee || undefined),
+          employee_name: selectedEmployee === "walkin" ? "Walk-in Client" : (emp ? emp.name : undefined),
           branch: emp?.branch || clientData?.branch || user?.branch || "Baroda",
           payment_method: primaryPaymentMethod,
           split_payments: finalSplitPayments.map(p => ({
@@ -821,7 +821,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     const val = e.target.value;
                     setSelectedEmployee(val);
                     setLineItems(prev => prev.map(item => {
-                      if (item.type === "Product" && !item.service_provider) {
+                      if (item.type === "Product" && !item.service_provider && val !== "walkin") {
                         return { ...item, service_provider: val };
                       }
                       return item;
@@ -830,6 +830,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   className={inputCls}
                 >
                   <option value="">Choose Employee</option>
+                  <option value="walkin">Walk-in Client (Direct / Salon Walk-in)</option>
                   {serviceEmployees
                     .filter(emp => emp.role === "sales")
                     .map(emp => (
