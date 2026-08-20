@@ -4082,19 +4082,18 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
 
                     # Calculate commission for this individual item (including Wig Fitting only if done)
                     it_comm = 0.0
-                    wigfitting_commission_rate = emp.get("wigfitting_commission_rate", 0.0)
-                    wigfitting_commission_inr = emp.get("wigfitting_commission_inr", 0.0)
-                    is_wig = "wig" in it_name.lower() or "patch" in it_name.lower() or "fitting" in it_name.lower()
-                    is_wig_done = bool(it.get("is_wigfitting_done", False)) or (is_wig and it.get("is_wigfitting_done") is None)
+                    wigfitting_commission_rate = float(emp.get("wigfitting_commission_rate", 0.0) or 0.0)
+                    wigfitting_commission_inr = float(emp.get("wigfitting_commission_inr", 0.0) or 0.0)
+                    has_wig_fitting_configured = (wigfitting_commission_inr > 0 or wigfitting_commission_rate > 0)
+                    
+                    is_wig_named = "wig" in it_name.lower() or "patch" in it_name.lower() or "fitting" in it_name.lower()
+                    is_wig_done = bool(it.get("is_wigfitting_done", False))
 
-                    if is_wig:
-                        # Only award wig fitting commission if is_wigfitting_done is checked / true
-                        if is_wig_done and (wigfitting_commission_inr > 0 or wigfitting_commission_rate > 0):
-                            it_comm = (wigfitting_commission_inr * it_qty) if wigfitting_commission_inr > 0 else (it_line_total * wigfitting_commission_rate)
-                        elif is_wig_done:
-                            it_comm = (service_commission_inr * it_qty) if service_commission_inr > 0 else (it_line_total * comm_rate)
-                        else:
-                            it_comm = 0.0
+                    if is_wig_done and has_wig_fitting_configured:
+                        # Award Wig Fitting commission if fitting was done and employee has a rate/fixed amount set
+                        it_comm = (wigfitting_commission_inr * it_qty) if wigfitting_commission_inr > 0 else (it_line_total * wigfitting_commission_rate)
+                    elif is_wig_named and is_wig_done:
+                        it_comm = (service_commission_inr * it_qty) if service_commission_inr > 0 else (it_line_total * comm_rate)
                     elif it_type == "product":
                         it_comm = (product_commission_inr * it_qty) if product_commission_inr > 0 else (it_line_total * product_commission_rate)
                     elif it_type == "package":
