@@ -292,6 +292,15 @@ export default function SalesPanel() {
         finalDuration = Math.floor((Date.now() - callStartTimeRef.current) / 1000);
       }
 
+      let waWindow = null;
+      if (shareInvoice) {
+        // Pre-open window synchronously to prevent Safari/Chrome popup blocker
+        waWindow = window.open("", "_blank");
+      }
+
+      const isToken = callOutcome === "Token Received";
+      const isConverted = callOutcome === "Converted";
+
       const payload = {
         duration: finalDuration,
         talk_time: finalDuration,
@@ -301,8 +310,8 @@ export default function SalesPanel() {
         next_followup_date: callForm.nextDate,
         next_followup_time: callForm.nextTime,
         sale_amount: parseFloat(callForm.saleAmount) || null,
-        pending_amount: (callOutcome === "Token Received" || callOutcome === "Converted") ? (parseFloat(callForm.pendingAmount) || 0) : null,
-        payment_mode: (callOutcome === "Token Received" || callOutcome === "Converted") ? callForm.paymentMode : null,
+        pending_amount: isToken ? (parseFloat(callForm.pendingAmount) || 0) : null,
+        payment_mode: (isToken || isConverted) ? callForm.paymentMode : null,
         consulted_by: callOutcome === "Visited" ? callForm.consultedBy : null
       };
 
@@ -320,7 +329,7 @@ export default function SalesPanel() {
         const cleanPhone = (selectedLead.phone || "").replace(/[^0-9]/g, "");
         const clientName = selectedLead.name || "Valued Client";
         const amtStr = callForm.saleAmount ? ("₹" + parseFloat(callForm.saleAmount).toLocaleString("en-IN")) : "";
-        const pendingStr = callForm.pendingAmount ? ("₹" + parseFloat(callForm.pendingAmount).toLocaleString("en-IN")) : "";
+        const pendingStr = (isToken && callForm.pendingAmount) ? ("₹" + parseFloat(callForm.pendingAmount).toLocaleString("en-IN")) : "";
         const invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
           "Dear " + clientName + ",\n\n" +
           "Thank you for choosing Jainil Hair Studio.\n" +
@@ -332,8 +341,14 @@ export default function SalesPanel() {
           "For any assistance or questions regarding your booking, please reach out to us.\n\n" +
           "*Jainil Hair Studio*";
         
-        const waUrl = "https://wa.me/91" + cleanPhone.slice(-10) + "?text=" + encodeURIComponent(invoiceMsg);
-        window.open(waUrl, "_blank");
+        const phoneDigits = cleanPhone.length > 10 ? cleanPhone : ("91" + cleanPhone.slice(-10));
+        const waUrl = "https://wa.me/" + phoneDigits + "?text=" + encodeURIComponent(invoiceMsg);
+        
+        if (waWindow) {
+          waWindow.location.href = waUrl;
+        } else {
+          window.open(waUrl, "_blank");
+        }
         toast.success("Invoice & payment acknowledgment opened in WhatsApp!");
       } else {
         toast.success("Call logged successfully");
@@ -1585,17 +1600,51 @@ export default function SalesPanel() {
                           </div>
                         )}
 
-                        {["Token Received", "Converted"].includes(callOutcome) && (
+                        {callOutcome === "Converted" && (
+                          <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 mb-5 shadow-sm space-y-4">
+                            <div>
+                              <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
+                                Sale Amount (₹) *
+                              </label>
+                              <input
+                                type="number"
+                                required
+                                placeholder="Enter total amount"
+                                value={callForm.saleAmount}
+                                onChange={e => setCallForm({ ...callForm, saleAmount: e.target.value })}
+                                className="w-full border-emerald-200 rounded-xl p-3 text-xl font-black text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Payment Mode *</label>
+                              <div className="grid grid-cols-3 gap-2">
+                                {["UPI", "Cash", "Card"].map(mode => (
+                                  <button
+                                    type="button"
+                                    key={mode}
+                                    onClick={() => setCallForm({ ...callForm, paymentMode: mode })}
+                                    className={`py-2 rounded-lg text-xs font-bold border transition-all ${callForm.paymentMode === mode ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-emerald-600 border-emerald-200 hover:bg-emerald-100'}`}
+                                  >
+                                    {mode}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {callOutcome === "Token Received" && (
                           <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 mb-5 shadow-sm space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                               <div>
                                 <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
-                                  {callOutcome === "Token Received" ? "Token Received (₹) *" : "Sale Amount (₹) *"}
+                                  Token Received (₹) *
                                 </label>
                                 <input
                                   type="number"
                                   required
-                                  placeholder="Enter amount"
+                                  placeholder="Enter token amount"
                                   value={callForm.saleAmount}
                                   onChange={e => setCallForm({ ...callForm, saleAmount: e.target.value })}
                                   className="w-full border-emerald-200 rounded-xl p-3 text-xl font-black text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
