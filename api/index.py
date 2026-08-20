@@ -1856,16 +1856,31 @@ def get_order_invoice(oid: str):
     c.setFont("Helvetica", 7.5)
     c.drawCentredString(page_width / 2, hy, f"(Branch : {branch_name})")
 
-    # Resolve Next Appointment / Follow-up date
-    next_appt_str = order.get("next_appointment_date") or ""
-    if not next_appt_str and phone:
-        if leads:
-            lead_data = leads[0].to_dict()
-            next_appt_str = lead_data.get("next_appointment_date") or lead_data.get("follow_up_date") or ""
-            if next_appt_str and lead_data.get("follow_up_time"):
-                next_appt_str += f" ({lead_data.get('follow_up_time')})"
-    elif next_appt_str and order.get("next_appointment_time"):
-        next_appt_str += f" ({order.get('next_appointment_time')})"
+    # Resolve Next Appointment / Follow-up date (do not add if client is converted)
+    lead_status_str = ""
+    if leads:
+        lead_status_str = (leads[0].to_dict().get("status") or "").strip().lower()
+    order_notes_str = (order.get("notes") or "").lower()
+    order_items_names = " ".join([it.get("name", "") for it in items]).lower()
+    
+    is_converted_client = (
+        lead_status_str in ["converted", "closed"]
+        or "converted" in order_notes_str
+        or "closure" in order_notes_str
+        or "converted" in order_items_names
+    )
+
+    next_appt_str = ""
+    if not is_converted_client:
+        next_appt_str = order.get("next_appointment_date") or ""
+        if not next_appt_str and phone:
+            if leads:
+                lead_data = leads[0].to_dict()
+                next_appt_str = lead_data.get("next_appointment_date") or lead_data.get("follow_up_date") or ""
+                if next_appt_str and lead_data.get("follow_up_time"):
+                    next_appt_str += f" ({lead_data.get('follow_up_time')})"
+        elif next_appt_str and order.get("next_appointment_time"):
+            next_appt_str += f" ({order.get('next_appointment_time')})"
 
     # ── CUSTOMER DETAILS ───────────────────────────────────────────────────
     y = hy - 14

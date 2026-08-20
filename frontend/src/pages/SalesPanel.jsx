@@ -334,7 +334,7 @@ export default function SalesPanel() {
           "*Outcome / Status:* " + callOutcome + "\n" +
           (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
           (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
-          (callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
+          (callOutcome !== "Converted" && callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
           "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
           "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
 
