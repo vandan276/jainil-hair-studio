@@ -1565,9 +1565,54 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
             lead_update_payload["wallet"] = lead_data["wallet"]
         if amount_due > 0:
             lead_update_payload["pending_payment"] = FSIncrement(amount_due)
-        lead_ref.update(lead_update_payload)
-
     return {**order, "new_points_balance": new_points}
+
+
+@api.delete("/orders/{oid}")
+def delete_order(oid: str, user: dict = Depends(require_admin)):
+    doc_ref = db.collection("orders").document(oid)
+    doc_snap = doc_ref.get()
+    if not doc_snap.exists:
+        raise HTTPException(404, "Order not found")
+    
+    order_data = doc_snap.to_dict()
+    # If order is linked to a lead, adjust total_sale_amount
+    lead_id = order_data.get("lead_id")
+    if lead_id:
+        try:
+            lead_ref = db.collection("leads").document(lead_id)
+            if lead_ref.get().exists:
+                lead_ref.update({
+                    "total_sale_amount": firestore.firestore.Increment(-float(order_data.get("total", 0.0)))
+                })
+        except Exception:
+            pass
+            
+    doc_ref.delete()
+    return {"ok": True, "message": "Order and commissions deleted successfully"}
+
+
+@api.delete("/orders/{oid}/items/{item_idx}")
+def remove_order_item_commission(oid: str, item_idx: int, user: dict = Depends(require_admin)):
+    doc_ref = db.collection("orders").document(oid)
+    doc_snap = doc_ref.get()
+    if not doc_snap.exists:
+        raise HTTPException(404, "Order not found")
+    
+    order_data = doc_snap.to_dict()
+    items = order_data.get("items", [])
+    if item_idx < 0 or item_idx >= len(items):
+        raise HTTPException(404, "Order item not found")
+    
+    target_item = items[item_idx]
+    # Remove service provider attribution from the item so it no longer awards commission
+    target_item["service_provider"] = None
+    target_item["service_provider_2"] = None
+    target_item["commission_removed"] = True
+    
+    doc_ref.update({"items": items, "updated_at": now_iso()})
+    return {"ok": True, "message": "Item commission removed successfully"}
+
 
 @api.get("/orders/me")
 def my_orders(user: dict = Depends(get_current_user)):
@@ -4240,7 +4285,9 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
             o_date = (o.get("created_at") or "")[:10]
             if not o_date:
                 continue
-            for it in o.get("items", []):
+            o_client = o.get("full_name") or o.get("customer_name") or o.get("name") or "Client"
+            o_id = o.get("id") or o.get("order_id")
+            for it_idx, it in enumerate(o.get("items", [])):
                 if it.get("service_provider") == emp_id or it.get("service_provider_2") == emp_id:
                     it_name = it.get("name", "Service")
                     it_qty = it.get("quantity", 1)
@@ -4284,9 +4331,12 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
                     daily_commissions_map[o_date]["services_count"] += it_qty
                     daily_commissions_map[o_date]["items"].append({
                         "name": it_name,
+                        "client_name": o_client,
+                        "order_id": o_id,
+                        "item_idx": it_idx,
                         "type": it_type,
                         "quantity": it_qty,
-                        "price": it_price,
+                        "price": it_line_total,
                         "commission": round(it_comm, 2)
                     })
 

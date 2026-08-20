@@ -12765,23 +12765,42 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
     }
   };
 
-  const handleDeleteSalesCommission = async (item) => {
-    if (!item?.lead_id || !item?.payment_id) {
-      toast.error("Commission item cannot be deleted directly without lead association");
+  const handleDeleteCommission = async (item) => {
+    // 1. Service Provider Order Item Commission
+    if (item?.order_id && item?.item_idx !== undefined) {
+      const clientDesc = item.client_name ? `for client "${item.client_name}"` : "";
+      if (!window.confirm(`Are you sure you want to remove commission for "${item.name}" ${clientDesc} (+₹${item.commission})?`)) {
+        return;
+      }
+      try {
+        await api.delete(`/orders/${item.order_id}/items/${item.item_idx}`);
+        toast.success("Service commission removed successfully");
+        const res = await api.get(`/admin/payroll?month=${payrollFilterMonth}`);
+        setPayrollData(res.data);
+      } catch (err) {
+        toast.error(err.response?.data?.detail || "Failed to remove service commission");
+      }
       return;
     }
-    const clientDesc = item.client_name ? `for ${item.client_name}` : "";
-    if (!window.confirm(`Are you sure you want to delete this payment record ${clientDesc} (₹${item.price}) and remove its commission (+₹${item.commission})?`)) {
+
+    // 2. Sales Employee Lead Payment Commission
+    if (item?.lead_id && item?.payment_id) {
+      const clientDesc = item.client_name ? `for client "${item.client_name}"` : "";
+      if (!window.confirm(`Are you sure you want to delete payment record ${clientDesc} (₹${item.price}) and remove its commission (+₹${item.commission})?`)) {
+        return;
+      }
+      try {
+        await api.delete(`/leads/${item.lead_id}/payments/${item.payment_id}`);
+        toast.success("Payment and commission deleted successfully");
+        const res = await api.get(`/admin/payroll?month=${payrollFilterMonth}`);
+        setPayrollData(res.data);
+      } catch (err) {
+        toast.error(err.response?.data?.detail || "Failed to delete commission entry");
+      }
       return;
     }
-    try {
-      await api.delete(`/leads/${item.lead_id}/payments/${item.payment_id}`);
-      toast.success("Payment and commission deleted successfully");
-      const res = await api.get(`/admin/payroll?month=${payrollFilterMonth}`);
-      setPayrollData(res.data);
-    } catch (err) {
-      toast.error(err.response?.data?.detail || "Failed to delete commission entry");
-    }
+
+    toast.error("This commission entry cannot be modified directly");
   };
 
   const toggleActive = async (emp) => {
@@ -13658,12 +13677,12 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                                     <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
                                                       (+₹{it.commission})
                                                     </span>
-                                                    {it.lead_id && it.payment_id && (
+                                                    {((it.lead_id && it.payment_id) || (it.order_id && it.item_idx !== undefined)) && (
                                                       <button
                                                         type="button"
-                                                        onClick={() => handleDeleteSalesCommission(it)}
+                                                        onClick={() => handleDeleteCommission(it)}
                                                         className="text-rose-400 hover:text-rose-600 hover:bg-rose-50 p-1 rounded transition-colors ml-0.5"
-                                                        title="Delete this commission / payment record"
+                                                        title="Delete this commission record"
                                                       >
                                                         <Trash2 size={13} />
                                                       </button>
