@@ -129,6 +129,7 @@ export default function SalesPanel() {
     nextDate: "", 
     nextTime: "", 
     saleAmount: "",
+    pendingAmount: "",
     paymentMode: "UPI",
     consultedBy: ""
   });
@@ -300,6 +301,7 @@ export default function SalesPanel() {
         next_followup_date: callForm.nextDate,
         next_followup_time: callForm.nextTime,
         sale_amount: parseFloat(callForm.saleAmount) || null,
+        pending_amount: (callOutcome === "Token Received" || callOutcome === "Converted") ? (parseFloat(callForm.pendingAmount) || 0) : null,
         payment_mode: (callOutcome === "Token Received" || callOutcome === "Converted") ? callForm.paymentMode : null,
         consulted_by: callOutcome === "Visited" ? callForm.consultedBy : null
       };
@@ -318,11 +320,13 @@ export default function SalesPanel() {
         const cleanPhone = (selectedLead.phone || "").replace(/[^0-9]/g, "");
         const clientName = selectedLead.name || "Valued Client";
         const amtStr = callForm.saleAmount ? ("₹" + parseFloat(callForm.saleAmount).toLocaleString("en-IN")) : "";
+        const pendingStr = callForm.pendingAmount ? ("₹" + parseFloat(callForm.pendingAmount).toLocaleString("en-IN")) : "";
         const invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
           "Dear " + clientName + ",\n\n" +
           "Thank you for choosing Jainil Hair Studio.\n" +
           "*Outcome / Status:* " + callOutcome + "\n" +
           (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
+          (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
           "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
           "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n" +
           "For any assistance or questions regarding your booking, please reach out to us.\n\n" +
@@ -338,7 +342,7 @@ export default function SalesPanel() {
       setCallingMode(false);
       setCallActive(false);
       callDurationRef.current = 0;
-      setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", saleAmount: "", paymentMode: "UPI", consultedBy: "" });
+      setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", saleAmount: "", pendingAmount: "", paymentMode: "UPI", consultedBy: "" });
       setSelectedLead(null);
       fetchLeads();
       fetchStats();
@@ -1459,6 +1463,20 @@ export default function SalesPanel() {
                     <label className="text-xs text-gray-400 uppercase tracking-wide">Hair Condition</label>
                     <p className="font-medium text-gray-800 mt-1">{selectedLead.hair_condition || "Not Provided"}</p>
                   </div>
+
+                  <div>
+                    <label className="text-xs text-gray-400 uppercase tracking-wide">Total Paid / Pending</label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-emerald-700 font-bold text-sm bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                        Paid: ₹{(selectedLead.total_sale_amount || 0).toLocaleString("en-IN")}
+                      </span>
+                      {selectedLead.pending_payment > 0 && (
+                        <span className="text-amber-700 font-bold text-sm bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                          Due: ₹{selectedLead.pending_payment.toLocaleString("en-IN")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b pb-2">Activity & Comments History</h3>
@@ -1566,16 +1584,32 @@ export default function SalesPanel() {
 
                         {["Token Received", "Converted"].includes(callOutcome) && (
                           <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 mb-5 shadow-sm space-y-4">
-                            <div>
-                              <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Sale Amount (₹) *</label>
-                              <input
-                                type="number"
-                                required
-                                placeholder="Enter total amount"
-                                value={callForm.saleAmount}
-                                onChange={e => setCallForm({ ...callForm, saleAmount: e.target.value })}
-                                className="w-full border-emerald-200 rounded-xl p-3 text-2xl font-black text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500"
-                              />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
+                                  {callOutcome === "Token Received" ? "Token Received (₹) *" : "Sale Amount (₹) *"}
+                                </label>
+                                <input
+                                  type="number"
+                                  required
+                                  placeholder="Enter amount"
+                                  value={callForm.saleAmount}
+                                  onChange={e => setCallForm({ ...callForm, saleAmount: e.target.value })}
+                                  className="w-full border-emerald-200 rounded-xl p-3 text-xl font-black text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-amber-800 uppercase tracking-widest mb-2">
+                                  Pending Amount (₹)
+                                </label>
+                                <input
+                                  type="number"
+                                  placeholder="Remaining balance"
+                                  value={callForm.pendingAmount}
+                                  onChange={e => setCallForm({ ...callForm, pendingAmount: e.target.value })}
+                                  className="w-full border-amber-200 rounded-xl p-3 text-xl font-black text-amber-900 focus:ring-amber-500 focus:border-amber-500 bg-white"
+                                />
+                              </div>
                             </div>
                             
                             <div>

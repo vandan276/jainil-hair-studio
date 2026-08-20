@@ -512,6 +512,7 @@ class CallLogIn(BaseModel):
     next_followup_date: Optional[str] = None
     next_followup_time: Optional[str] = None
     sale_amount: Optional[float] = None
+    pending_amount: Optional[float] = None
     payment_mode: Optional[str] = None
     consulted_by: Optional[str] = None
 
@@ -2868,7 +2869,7 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
     if data.comment:
         notes_to_add.append({"text": f"Call Outcome: {data.outcome} - {data.comment}", "author": user["name"], "timestamp": now_iso()})
         
-    # Handle Sale Amount
+    # Handle Sale Amount & Pending Amount
     if data.sale_amount:
         payment = {
             "amount": data.sale_amount,
@@ -2883,11 +2884,15 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         # Add payment tracking note
         ptype = "Token" if data.outcome == "Token Received" else "Closure Amount"
         pmode = data.payment_mode or "Not Specified"
+        pending_str = f" | Pending Due: ₹{data.pending_amount:,.2f}" if (data.pending_amount is not None and data.pending_amount > 0) else ""
         notes_to_add.append({
-            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}", 
+            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str}", 
             "author": "System", 
             "timestamp": now_iso()
         })
+
+    if data.pending_amount is not None:
+        update_data["pending_payment"] = data.pending_amount
 
     if notes_to_add:
         update_data["notes"] = firestore.firestore.ArrayUnion(notes_to_add)
