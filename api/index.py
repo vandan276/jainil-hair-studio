@@ -4153,28 +4153,34 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
     leads_query = db.collection("leads")
     if branch:
         leads_query = leads_query.where("branch", "==", branch)
-    leads_docs = leads_query.select(["id", "name", "phone", "assigned_to", "payments", "status", "updated_at"]).stream()
+    leads_docs = leads_query.select(["id", "name", "phone", "source", "assigned_to", "payments", "status", "updated_at"]).stream()
     all_payments = []
     for doc in leads_docs:
         d = doc.to_dict()
         lid = doc.id
         client_name = d.get("name", "Client")
         emp_id = d.get("assigned_to")
+        lead_source = (d.get("source") or "").strip().lower()
+        lead_status = (d.get("status") or "").strip().lower()
+
+        # 1. No sales commission for Walk-in clients
+        if lead_source in ["walk-in", "walkin", "direct", "walk in"]:
+            continue
+
+        # 2. Sales commission is only awarded when the client is officially converted
+        if lead_status not in ["converted", "closed"]:
+            continue
+
         payments = d.get("payments", [])
         for idx, p in enumerate(payments):
             if isinstance(p, dict):
-                if p.get("type") == "token":
-                    if d.get("status") not in ["converted", "closed"]:
-                        continue
-                    ts = None
-                    for pay in payments:
-                        if pay.get("type") == "closure" and pay.get("timestamp"):
-                            ts = pay.get("timestamp")
-                            break
-                    if not ts:
-                        ts = d.get("updated_at") or p.get("timestamp") or ""
-                else:
-                    ts = p.get("timestamp") or ""
+                p_type = (p.get("type") or "").strip().lower()
+                
+                # 3. Do NOT add commission on token amounts
+                if p_type == "token":
+                    continue
+
+                ts = p.get("timestamp") or d.get("updated_at") or ""
                 
                 p_copy = p.copy()
                 p_copy["timestamp"] = ts
@@ -4577,7 +4583,7 @@ def admin_reports(month: Optional[str] = None, branch: Optional[str] = None, use
     leads_query = db.collection("leads")
     if branch:
         leads_query = leads_query.where("branch", "==", branch)
-    leads_docs = leads_query.select(["assigned_to", "payments", "status", "created_at", "updated_at", "branch", "section"]).stream()
+    leads_docs = leads_query.select(["assigned_to", "payments", "status", "source", "created_at", "updated_at", "branch", "section"]).stream()
     
     leads_by_emp = {}
     all_payments = []
@@ -4585,27 +4591,31 @@ def admin_reports(month: Optional[str] = None, branch: Optional[str] = None, use
     for doc in leads_docs:
         d = doc.to_dict()
         emp_id = d.get("assigned_to")
+        lead_source = (d.get("source") or "").strip().lower()
+        lead_status = (d.get("status") or "").strip().lower()
         
         # Group leads created in the current month
         created_at = d.get("created_at", "")
         if created_at.startswith(month_prefix) and emp_id:
             leads_by_emp.setdefault(emp_id, []).append(d)
             
+        # 1. No sales performance / commission for Walk-in clients
+        if lead_source in ["walk-in", "walkin", "direct", "walk in"]:
+            continue
+
+        # 2. Only converted leads count for sales revenue attribution
+        if lead_status not in ["converted", "closed"]:
+            continue
+
         payments = d.get("payments", [])
         for p in payments:
             if isinstance(p, dict):
-                if p.get("type") == "token":
-                    if d.get("status") not in ["converted", "closed"]:
-                        continue
-                    ts = None
-                    for pay in payments:
-                        if pay.get("type") == "closure" and pay.get("timestamp"):
-                            ts = pay.get("timestamp")
-                            break
-                    if not ts:
-                        ts = d.get("updated_at") or p.get("timestamp") or ""
-                else:
-                    ts = p.get("timestamp") or ""
+                p_type = (p.get("type") or "").strip().lower()
+                # 3. Do not count token payments
+                if p_type == "token":
+                    continue
+
+                ts = p.get("timestamp") or d.get("updated_at") or ""
                 
                 p_copy = p.copy()
                 p_copy["timestamp"] = ts
