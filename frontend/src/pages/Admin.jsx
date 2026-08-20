@@ -1967,6 +1967,7 @@ export default function Admin() {
           title={t("product")} testid="products" items={products} t={t}
           fields={[
             { k: "name", label: t("productName"), type: "text" },
+            { k: "sku", label: "SKU / Barcode", type: "text" },
             { k: "category", label: t("category"), type: "category_manager", options: productCategories, onAddCategory: handleAddCategory, onDeleteCategory: handleDeleteCategory, default: "" },
             { k: "description", label: t("description"), type: "textarea" },
             { k: "price", label: `${t("total")} (₹)`, type: "number" },
@@ -12318,10 +12319,11 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
     const nameMatch = (it.name || "").toLowerCase().includes(query);
+    const skuMatch = (it.sku || "").toLowerCase().includes(query);
     const categoryMatch = (it.category || "").toLowerCase().includes(query);
     const descMatch = (it.description || "").toLowerCase().includes(query);
     const contactMatch = (it.contact_person || "").toLowerCase().includes(query);
-    return nameMatch || categoryMatch || descMatch || contactMatch;
+    return nameMatch || skuMatch || categoryMatch || descMatch || contactMatch;
   });
 
   return (
@@ -12391,7 +12393,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-gold" />
             <input
               type="text"
-              placeholder={testid === "products" ? "Search products by name or category..." : "Search vendors..."}
+              placeholder={testid === "products" ? "Search products by name, SKU, or category..." : "Search vendors..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-eminence-surface border border-eminence-border pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:border-eminence-gold rounded-xl"
@@ -12411,7 +12413,14 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                     !(it.contact_person || it.phone || it.email || it.address) && <div className="w-16 h-16 bg-eminence-surface rounded-lg" />
                   )}
                   <div className="flex-1">
-                    {it.category && <p className="overline mb-1">{it.category}</p>}
+                    <div className="flex items-center gap-2 mb-1">
+                      {it.category && <p className="overline">{it.category}</p>}
+                      {it.sku && (
+                        <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-600 border border-gray-200">
+                          SKU: {it.sku}
+                        </span>
+                      )}
+                    </div>
                     <h4 className="font-serif text-lg">{it.name}</h4>
                     {(it.volume || it.measurement_unit) && (
                       <p className="text-xs text-eminence-gold font-bold uppercase tracking-wider mt-0.5">
