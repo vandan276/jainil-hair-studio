@@ -23,7 +23,7 @@ export default function ImageUpload({ value, onChange, testId = "image-upload" }
     setBusy(true);
     setProgress(0);
     try {
-      // Strategy 1: Direct multipart upload (best for local dev)
+      // Strategy 1: Direct multipart server upload to /api/admin/upload
       const formData = new FormData();
       formData.append("file", file);
 
@@ -39,42 +39,26 @@ export default function ImageUpload({ value, onChange, testId = "image-upload" }
         toast.success("Media uploaded successfully!");
         return;
       } catch (err) {
-        // If it's a size limit or not found (Vercel limit), try Strategy 2
-        console.warn("Direct upload failed, trying Signed URL fallback...", err.response?.status);
-        if (err.response?.status !== 413 && err.response?.status !== 404 && BACKEND_URL) {
-          throw err; // If it's a real error (like 401), don't retry
-        }
+        console.warn("Direct upload error:", err);
       }
 
-      // Strategy 2: Signed URL (best for Vercel production / large files)
-      const { data: signData } = await api.post("/admin/signed-url", {
-        filename: file.name,
-        contentType: file.type || "application/octet-stream"
-      });
+      // Strategy 2: Base64 data URL for images under 5MB (fail-safe fallback)
+      if (file.size < 5 * 1024 * 1024) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          onChange(e.target.result);
+          toast.success("Media loaded successfully!");
+        };
+        reader.readAsDataURL(file);
+        return;
+      }
 
-      const { uploadUrl, publicUrl } = signData;
-
-      // Upload directly to storage (using axios without the base 'api' instance to avoid prefixing)
-      const axiosDirect = (await import("axios")).default;
-      await axiosDirect.put(uploadUrl, file, {
-        headers: { "Content-Type": file.type || "application/octet-stream" },
-        onUploadProgress: (e) => {
-          if (e.total) setProgress(Math.round((e.loaded / e.total) * 100));
-        },
-      });
-
-      onChange(`${BACKEND_URL}${publicUrl}`);
-      toast.success("Media uploaded successfully (via cloud storage)!");
+      throw new Error("Upload failed. File too large or network error.");
 
     } catch (err) {
       console.error("Upload error detail:", err);
-      let msg = "Upload failed";
-      if (err.message === "Network Error") {
-        msg = "Network Error: This usually means Firebase Storage CORS is not configured. Please see the instructions.";
-      } else {
-        const detail = err.response?.data?.detail;
-        msg = typeof detail === "string" ? detail : (err.message || "Upload failed");
-      }
+      const detail = err.response?.data?.detail;
+      const msg = typeof detail === "string" ? detail : (err.message || "Upload failed");
       toast.error(msg, { duration: 5000 });
     } finally {
       setBusy(false);
