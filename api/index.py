@@ -2600,6 +2600,17 @@ def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employe
     return doc_ref.get().to_dict()
 
 
+@api.delete("/leads/{lid}")
+def delete_lead(lid: str, user: dict = Depends(require_employee)):
+    doc_ref = db.collection("leads").document(lid)
+    doc_snap = doc_ref.get()
+    if not doc_snap.exists:
+        raise HTTPException(404, "Lead not found")
+    
+    doc_ref.delete()
+    return {"ok": True, "message": "Lead deleted successfully"}
+
+
 @api.post("/leads/{lid}/notes")
 def add_lead_note(lid: str, data: LeadNoteIn, user: dict = Depends(require_employee)):
     doc_ref = db.collection("leads").document(lid)

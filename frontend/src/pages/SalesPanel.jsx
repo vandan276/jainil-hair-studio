@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   Phone, User, Calendar, MessageSquare, Plus, Search, Scissors,
   CheckCircle2, XCircle, ArrowRight, Clock, MapPin, Star, Bell, ArrowRightLeft, Trophy,
-  ChevronLeft, ChevronRight, ChevronUp, ChevronDown
+  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Trash2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import BillingPanel from "@/components/BillingPanel";
@@ -434,6 +434,26 @@ export default function SalesPanel() {
       fetchStats();
     } catch (err) {
       toast.error("Failed to convert lead");
+    }
+  };
+
+  const handleDeleteLead = async (leadToDelete) => {
+    const target = leadToDelete || selectedLead;
+    if (!target) return;
+    if (!window.confirm(`Are you sure you want to permanently delete lead "${target.name}"?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/leads/${target.id}`);
+      toast.success("Lead deleted successfully");
+      if (selectedLead?.id === target.id) {
+        setSelectedLead(null);
+        setCallingMode(false);
+      }
+      fetchLeads();
+      fetchStats();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to delete lead");
     }
   };
 
@@ -1309,14 +1329,23 @@ export default function SalesPanel() {
                             <button 
                               onClick={(e) => { e.stopPropagation(); window.open(`https://wa.me/${lead.phone.replace(/\D/g, '')}`, '_blank'); }} 
                               className="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
+                              title="WhatsApp"
                             >
                               <MessageSquare size={14} />
                             </button>
                             <button 
                               onClick={(e) => { e.stopPropagation(); setSelectedLead(lead); startCall(lead); }} 
                               className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+                              title="Call"
                             >
                               <Phone size={14} />
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); handleDeleteLead(lead); }} 
+                              className="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                              title="Delete Lead"
+                            >
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
@@ -1415,6 +1444,13 @@ export default function SalesPanel() {
                     className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-200 transition-colors shadow-sm"
                   >
                     Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteLead(selectedLead)}
+                    className="flex items-center gap-1.5 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-600 hover:text-white px-3.5 py-2 rounded font-medium transition-all shadow-sm"
+                    title="Delete Lead"
+                  >
+                    <Trash2 size={16} /> Delete
                   </button>
                   <button
                     onClick={() => startCall()}
