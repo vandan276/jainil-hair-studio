@@ -16659,6 +16659,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
     id: Date.now() + Math.random(),
     productId: "",
     productSearch: "",
+    sku: "",
     showDrop: false,
     quantity: "",
     costPrice: "",
@@ -16688,6 +16689,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
     updateRow(idx, {
       productId: p.id,
       productSearch: p.name,
+      sku: p.sku || "",
       showDrop: false,
       sellingPrice: p.price !== undefined ? p.price.toString() : ""
     });
@@ -16810,125 +16812,161 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
 
 
 
-        {/* Product Rows Table Headers */}
+        {/* Product Rows Table */}
         <div className="space-y-3">
-          <div className="hidden md:grid md:grid-cols-12 gap-3 px-3 py-2.5 bg-emerald-50/60 border border-emerald-100 rounded-xl text-emerald-900 uppercase font-bold text-[10px] tracking-wider items-center">
-            <div className="col-span-4 text-left">Select Product *</div>
-            <div className="col-span-2 text-left">Qty *</div>
-            <div className="col-span-2 text-left">Cost (₹) *</div>
-            <div className="col-span-2 text-left">Selling (₹) (Optional)</div>
-            <div className="col-span-1 text-right font-mono">Total (₹)</div>
-            <div className="col-span-1 text-center">Action</div>
-          </div>
-
-          <div className="space-y-3">
-            {rows.map((row, idx) => {
-              const filtered = products.filter(p =>
-                p.name.toLowerCase().includes(row.productSearch.toLowerCase())
-              );
-              return (
-                <div key={row.id} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center border border-gray-200 md:border-transparent rounded-2xl md:rounded-none p-4 md:p-0 bg-white md:bg-transparent shadow-sm md:shadow-none relative">
-                  {/* Select Product */}
-                  <div className="relative col-span-1 md:col-span-4 text-left">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Select Product *</label>
-                    <input
-                      type="text"
-                      placeholder="Search product..."
-                      value={row.productSearch}
-                      onChange={e => updateRow(idx, { productSearch: e.target.value, productId: "", showDrop: true })}
-                      onFocus={() => updateRow(idx, { showDrop: true })}
-                      onBlur={() => updateRow(idx, { showDrop: false })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
-                      autoComplete="off"
-                    />
-                    {row.productId && (() => {
-                      const selectedP = products.find(p => p.id === row.productId);
-                      if (selectedP && (selectedP.volume || selectedP.measurement_unit)) {
-                        return (
-                          <div className="text-[10px] text-eminence-gold font-bold uppercase tracking-wider mt-1 px-1">
-                            {selectedP.volume ? `${selectedP.volume} ` : ""}{selectedP.measurement_unit || ""}
-                          </div>
-                        );
-                      }
-                      return null;
-                    })()}
-                    {row.showDrop && filtered.length > 0 && (
-                      <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-48 overflow-y-auto">
-                        {filtered.map(p => (
-                          <div
-                            key={p.id}
-                            onMouseDown={() => handleProductSelect(idx, p)}
-                            className="px-4 py-2 hover:bg-eminence-gold/10 cursor-pointer text-xs flex flex-col text-left"
-                          >
-                            <div className="flex justify-between items-center w-full">
-                              <span className="font-medium text-gray-900">{p.name}</span>
-                              <span className="text-[10px] text-gray-400 ml-2">Stock: {p.stock || 0}</span>
+          <div className="overflow-x-auto rounded-2xl border border-emerald-200/70 shadow-sm bg-white">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-emerald-50/80 border-b border-emerald-100 text-emerald-950 uppercase font-bold text-[10px] tracking-wider">
+                  <th className="py-3 px-3 w-[26%]">Product Name *</th>
+                  <th className="py-3 px-2 w-[14%]">SKU / Code</th>
+                  <th className="py-3 px-2 w-[12%]">Qty *</th>
+                  <th className="py-3 px-2 w-[14%]">Cost (₹) *</th>
+                  <th className="py-3 px-2 w-[14%]">Selling (₹)</th>
+                  <th className="py-3 px-2 w-[14%] text-right font-mono">Total (₹)</th>
+                  <th className="py-3 px-2 w-[6%] text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {rows.map((row, idx) => {
+                  const filtered = products.filter(p =>
+                    (p.name || "").toLowerCase().includes(row.productSearch.toLowerCase()) ||
+                    (p.sku || "").toLowerCase().includes(row.productSearch.toLowerCase())
+                  );
+                  return (
+                    <tr key={row.id} className="hover:bg-emerald-50/20 transition-colors">
+                      {/* Product Search */}
+                      <td className="py-2.5 px-3 align-top">
+                        <div className="relative">
+                          <input
+                            type="text"
+                            placeholder="Search name or SKU..."
+                            value={row.productSearch}
+                            onChange={e => updateRow(idx, { productSearch: e.target.value, productId: "", sku: "", showDrop: true })}
+                            onFocus={() => updateRow(idx, { showDrop: true })}
+                            onBlur={() => updateRow(idx, { showDrop: false })}
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
+                            autoComplete="off"
+                          />
+                          {row.productId && (() => {
+                            const selectedP = products.find(p => p.id === row.productId);
+                            if (selectedP && (selectedP.volume || selectedP.measurement_unit)) {
+                              return (
+                                <div className="text-[10px] text-eminence-gold font-bold uppercase tracking-wider mt-1 px-1">
+                                  {selectedP.volume ? `${selectedP.volume} ` : ""}{selectedP.measurement_unit || ""}
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
+                          {row.showDrop && filtered.length > 0 && (
+                            <div className="absolute z-30 w-72 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl max-h-48 overflow-y-auto left-0">
+                              {filtered.map(p => (
+                                <div
+                                  key={p.id}
+                                  onMouseDown={() => handleProductSelect(idx, p)}
+                                  className="px-3 py-2 hover:bg-emerald-50 cursor-pointer text-xs flex flex-col text-left border-b border-gray-50 last:border-0"
+                                >
+                                  <div className="flex justify-between items-center w-full">
+                                    <span className="font-medium text-gray-900">{p.name}</span>
+                                    <span className="text-[10px] text-gray-400 ml-2">Stock: {p.stock || 0}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    {p.sku && (
+                                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 border border-gray-200">
+                                        SKU: {p.sku}
+                                      </span>
+                                    )}
+                                    {(p.volume || p.measurement_unit) && (
+                                      <span className="text-[9px] text-eminence-gold uppercase tracking-wider font-semibold">
+                                        {p.volume ? `${p.volume} ` : ""}{p.measurement_unit || ""}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                            {(p.volume || p.measurement_unit) && (
-                              <span className="text-[9px] text-eminence-gold uppercase tracking-wider font-semibold mt-0.5">
-                                {p.volume ? `${p.volume} ` : ""}{p.measurement_unit || ""}
-                              </span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {row.showDrop && row.productSearch && filtered.length === 0 && (
-                      <div className="absolute z-30 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-2.5 text-xs text-gray-400 italic">
-                        No products match "{row.productSearch}"
-                      </div>
-                    )}
-                  </div>
+                          )}
+                          {row.showDrop && row.productSearch && filtered.length === 0 && (
+                            <div className="absolute z-30 w-72 mt-1 bg-white border border-gray-200 rounded-xl shadow-xl px-4 py-2.5 text-xs text-gray-400 italic left-0">
+                              No products match "{row.productSearch}"
+                            </div>
+                          )}
+                        </div>
+                      </td>
 
-                  {/* Quantity */}
-                  <div className="col-span-1 md:col-span-2 text-left">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Quantity *</label>
-                    <input type="number" min="1" value={row.quantity}
-                      onChange={e => updateRow(idx, { quantity: e.target.value })}
-                      placeholder="0"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono" />
-                  </div>
+                      {/* SKU Input / Display */}
+                      <td className="py-2.5 px-2 align-top">
+                        <input
+                          type="text"
+                          placeholder="SKU"
+                          value={row.sku || ""}
+                          onChange={e => updateRow(idx, { sku: e.target.value })}
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs font-mono focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
+                        />
+                      </td>
 
-                  {/* Cost Price */}
-                  <div className="col-span-1 md:col-span-2 text-left">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Cost Price *</label>
-                    <input type="number" min="0" step="0.01" value={row.costPrice}
-                      onChange={e => updateRow(idx, { costPrice: e.target.value })}
-                      placeholder="0.00"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono" />
-                  </div>
+                      {/* Quantity */}
+                      <td className="py-2.5 px-2 align-top">
+                        <input
+                          type="number"
+                          min="1"
+                          value={row.quantity}
+                          onChange={e => updateRow(idx, { quantity: e.target.value })}
+                          placeholder="0"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono"
+                        />
+                      </td>
 
-                  {/* Selling Price (Optional) */}
-                  <div className="col-span-1 md:col-span-2 text-left">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Selling Price (Optional)</label>
-                    <input type="number" min="0" step="0.01" value={row.sellingPrice}
-                      onChange={e => updateRow(idx, { sellingPrice: e.target.value })}
-                      placeholder="Optional"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono" />
-                  </div>
+                      {/* Cost Price */}
+                      <td className="py-2.5 px-2 align-top">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={row.costPrice}
+                          onChange={e => updateRow(idx, { costPrice: e.target.value })}
+                          placeholder="0.00"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono"
+                        />
+                      </td>
 
-                  {/* Row Total */}
-                  <div className="col-span-1 md:col-span-1 text-left md:text-right font-mono text-sm font-bold text-emerald-800 bg-gray-50 md:bg-transparent px-3 py-2 md:p-0 rounded-lg md:rounded-none">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Total</label>
-                    ₹{((Number(row.quantity) || 0) * (Number(row.costPrice) || 0)).toLocaleString("en-IN")}
-                  </div>
+                      {/* Selling Price */}
+                      <td className="py-2.5 px-2 align-top">
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={row.sellingPrice}
+                          onChange={e => updateRow(idx, { sellingPrice: e.target.value })}
+                          placeholder="Optional"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono"
+                        />
+                      </td>
 
-                  {/* Delete Button */}
-                  <div className="col-span-1 md:col-span-1 text-center mt-2 md:mt-0 flex items-center justify-center">
-                    {rows.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeRow(idx)}
-                        className="text-rose-400 hover:text-rose-600 transition-colors p-2 md:p-1.5 hover:bg-rose-50 rounded-lg"
-                        title="Remove row"
-                      >
-                        <X size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                      {/* Total */}
+                      <td className="py-2.5 px-2 align-middle text-right font-mono text-sm font-bold text-emerald-800">
+                        ₹{((Number(row.quantity) || 0) * (Number(row.costPrice) || 0)).toLocaleString("en-IN")}
+                      </td>
+
+                      {/* Action */}
+                      <td className="py-2.5 px-2 align-middle text-center">
+                        {rows.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeRow(idx)}
+                            className="text-rose-400 hover:text-rose-600 transition-colors p-1.5 hover:bg-rose-50 rounded-lg inline-flex items-center justify-center"
+                            title="Remove row"
+                          >
+                            <X size={15} />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
 
