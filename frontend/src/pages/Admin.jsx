@@ -12765,6 +12765,25 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
     }
   };
 
+  const handleDeleteSalesCommission = async (item) => {
+    if (!item?.lead_id || !item?.payment_id) {
+      toast.error("Commission item cannot be deleted directly without lead association");
+      return;
+    }
+    const clientDesc = item.client_name ? `for ${item.client_name}` : "";
+    if (!window.confirm(`Are you sure you want to delete this payment record ${clientDesc} (₹${item.price}) and remove its commission (+₹${item.commission})?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/leads/${item.lead_id}/payments/${item.payment_id}`);
+      toast.success("Payment and commission deleted successfully");
+      const res = await api.get(`/admin/payroll?month=${payrollFilterMonth}`);
+      setPayrollData(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to delete commission entry");
+    }
+  };
+
   const toggleActive = async (emp) => {
     try {
       await api.patch(`/admin/employees/${emp.id}`, { is_active: !emp.is_active });
@@ -13624,12 +13643,31 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                               {dayItem.date}
                                             </td>
                                             <td className="px-4 py-3 text-gray-700">
-                                              <div className="flex flex-wrap gap-1.5">
+                                              <div className="flex flex-wrap gap-2">
                                                 {(dayItem.items || []).map((it, itIdx) => (
-                                                  <span key={itIdx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200 text-[11px]">
-                                                    <span>{it.name}</span>
-                                                    <span className="text-gray-400">x{it.quantity}</span>
-                                                    <span className="text-emerald-700 font-bold">(+₹{it.commission})</span>
+                                                  <span key={itIdx} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100/90 border border-gray-200 text-xs shadow-xs">
+                                                    {it.client_name && (
+                                                      <span className="font-bold text-gray-900 bg-white px-1.5 py-0.5 rounded border border-gray-200">
+                                                        {it.client_name}
+                                                      </span>
+                                                    )}
+                                                    <span className="text-gray-700">{it.name}</span>
+                                                    {it.price !== undefined && (
+                                                      <span className="text-gray-500 font-mono">₹{it.price.toLocaleString("en-IN")}</span>
+                                                    )}
+                                                    <span className="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                                                      (+₹{it.commission})
+                                                    </span>
+                                                    {it.lead_id && it.payment_id && (
+                                                      <button
+                                                        type="button"
+                                                        onClick={() => handleDeleteSalesCommission(it)}
+                                                        className="text-rose-400 hover:text-rose-600 hover:bg-rose-50 p-1 rounded transition-colors ml-0.5"
+                                                        title="Delete this commission / payment record"
+                                                      >
+                                                        <Trash2 size={13} />
+                                                      </button>
+                                                    )}
                                                   </span>
                                                 ))}
                                               </div>

@@ -2611,6 +2611,59 @@ def delete_lead(lid: str, user: dict = Depends(require_employee)):
     return {"ok": True, "message": "Lead deleted successfully"}
 
 
+@api.delete("/leads/{lid}/payments/{payment_id}")
+def delete_lead_payment(lid: str, payment_id: str, user: dict = Depends(require_admin)):
+    doc_ref = db.collection("leads").document(lid)
+    doc_snap = doc_ref.get()
+    if not doc_snap.exists:
+        raise HTTPException(404, "Lead not found")
+    
+    lead_data = doc_snap.to_dict()
+    payments = lead_data.get("payments", [])
+    
+    target_payment = None
+    remaining_payments = []
+    for p in payments:
+        if isinstance(p, dict):
+            # match by id or timestamp/index
+            pid = p.get("id") or p.get("timestamp") or ""
+            if pid == payment_id or p.get("timestamp") == payment_id:
+                target_payment = p
+            else:
+                remaining_payments.append(p)
+    
+    if not target_payment:
+        # If no direct ID match, try matching by timestamp substring
+        for idx, p in enumerate(payments):
+            if isinstance(p, dict) and (str(idx) == payment_id or p.get("timestamp", "").startswith(payment_id)):
+                target_payment = p
+                remaining_payments = [item for j, item in enumerate(payments) if j != idx]
+                break
+
+    if not target_payment:
+        raise HTTPException(404, "Payment record not found")
+    
+    removed_amount = float(target_payment.get("amount", 0.0))
+    current_total = float(lead_data.get("total_sale_amount", 0.0) or 0.0)
+    new_total = max(0.0, current_total - removed_amount)
+    
+    doc_ref.update({
+        "payments": remaining_payments,
+        "total_sale_amount": new_total,
+        "updated_at": now_iso()
+    })
+    
+    # Also if there's an associated order doc, delete or mark it cancelled
+    order_id = target_payment.get("order_id")
+    if order_id:
+        try:
+            db.collection("orders").document(order_id).delete()
+        except Exception:
+            pass
+
+    return {"ok": True, "message": "Payment and associated commission removed successfully"}
+
+
 @api.post("/leads/{lid}/notes")
 def add_lead_note(lid: str, data: LeadNoteIn, user: dict = Depends(require_employee)):
     doc_ref = db.collection("leads").document(lid)
@@ -4055,13 +4108,15 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
     leads_query = db.collection("leads")
     if branch:
         leads_query = leads_query.where("branch", "==", branch)
-    leads_docs = leads_query.select(["assigned_to", "payments", "status", "updated_at"]).stream()
+    leads_docs = leads_query.select(["id", "name", "phone", "assigned_to", "payments", "status", "updated_at"]).stream()
     all_payments = []
     for doc in leads_docs:
         d = doc.to_dict()
+        lid = doc.id
+        client_name = d.get("name", "Client")
         emp_id = d.get("assigned_to")
         payments = d.get("payments", [])
-        for p in payments:
+        for idx, p in enumerate(payments):
             if isinstance(p, dict):
                 if p.get("type") == "token":
                     if d.get("status") not in ["converted", "closed"]:
@@ -4079,6 +4134,9 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
                 p_copy = p.copy()
                 p_copy["timestamp"] = ts
                 p_copy["recorded_by_id"] = emp_id
+                p_copy["lead_id"] = lid
+                p_copy["client_name"] = client_name
+                p_copy["payment_id"] = p.get("id") or p.get("timestamp") or str(idx)
                 all_payments.append(p_copy)
                 
     m_query = db.collection("manual_sales").where("date", ">=", start_str).where("date", "<=", end_str)
@@ -4276,6 +4334,9 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
                 sales_daily_map[p_date]["services_count"] += 1
                 sales_daily_map[p_date]["items"].append({
                     "name": f"Payment ({p.get('mode') or p.get('method', 'UPI')})",
+                    "client_name": p.get("client_name") or "Client",
+                    "lead_id": p.get("lead_id"),
+                    "payment_id": p.get("payment_id"),
                     "type": "sale",
                     "quantity": 1,
                     "price": amt,
@@ -4295,6 +4356,7 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
                 sales_daily_map[s_date]["services_count"] += 1
                 sales_daily_map[s_date]["items"].append({
                     "name": "Manual Sale Entry",
+                    "client_name": s.get("client_name") or s.get("customer_name") or "Manual Sale",
                     "type": "sale",
                     "quantity": 1,
                     "price": amt,
