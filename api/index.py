@@ -1762,11 +1762,6 @@ def get_order_invoice(oid: str):
         hy -= 6
 
     # ── HEADER (Centered) ──────────────────────────────────────────────────
-    c.setFont("Helvetica-Bold", 9.5)
-    c.setFillColorRGB(0.06, 0.35, 0.23) # Jainil Emerald
-    c.drawCentredString(page_width / 2, hy, "JAINIL HAIR STUDIO")
-    hy -= 10
-
     c.setFont("Helvetica", 7.2)
     c.setFillColorRGB(0.15, 0.15, 0.15)
     header_lines = [
