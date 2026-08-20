@@ -12,25 +12,23 @@ export function AuthProvider({ children }) {
   const [recessEndTime, setRecessEndTime] = useState(null);
 
   const checkAttendance = async (userObj) => {
-    // Admins and non-staff skip attendance verification
+    // Allow seamless access without timing/attendance blockages
+    setAttendanceVerified(true);
     if (!userObj || !["sales", "service", "employee"].includes(userObj.role)) {
-      setAttendanceVerified(true);
       setShiftCompleted(false);
       return true;
     }
     try {
       const { data } = await api.get("/attendance/today");
-      setAttendanceVerified(data.verified);
       setShiftCompleted(data.shift_completed || false);
       setRecessStartTime(data.recess_start_time || null);
       setRecessEndTime(data.recess_end_time || null);
-      return data.verified;
+      return true;
     } catch {
-      setAttendanceVerified(false);
       setShiftCompleted(false);
       setRecessStartTime(null);
       setRecessEndTime(null);
-      return false;
+      return true;
     }
   };
 

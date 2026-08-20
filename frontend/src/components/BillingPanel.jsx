@@ -319,7 +319,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       price: 0,
       type: "Service",
       package_id: null,
-      deducted_from_package: false
+      deducted_from_package: false,
+      is_wigfitting_done: false
     }]);
   };
 
@@ -565,7 +566,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             service_provider: item.service_provider || null,
             extra_providers: (item.extra_providers || []).filter(Boolean),
             discount: Number(item.discount) || 0,
-            discount_type: item.discount_type || "INR"
+            discount_type: item.discount_type || "INR",
+            is_wigfitting_done: Boolean(item.is_wigfitting_done)
           })),
           full_name: clientName,
           phone: contactNumber,
@@ -879,6 +881,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     <th className="px-3 py-3 text-center w-16">Qty</th>
                     <th className="px-3 py-3 text-center">Discount</th>
                     <th className="px-3 py-3 text-left">Provider/Employee</th>
+                    <th className="px-2 py-3 text-center">Wig Fitting?</th>
                     <th className="px-3 py-3 text-center">Start & End Time</th>
                     <th className="px-3 py-3 text-right w-24">Price</th>
                     <th className="px-3 py-3 text-center w-10"></th>
@@ -980,6 +983,20 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                             </div>
                           ))}
                         </div>
+                      </td>
+                      {/* Wig Fitting Done Checkbox for Service Staff Commission */}
+                      <td className="px-2 py-2 text-center align-middle">
+                        <label className="inline-flex flex-col items-center justify-center gap-1 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(item.is_wigfitting_done)}
+                            onChange={e => updateLineItem(idx, "is_wigfitting_done", e.target.checked)}
+                            className="w-4 h-4 text-emerald-600 rounded border-gray-300 focus:ring-emerald-500 cursor-pointer"
+                          />
+                          <span className={"text-[9px] font-bold uppercase tracking-wider " + (item.is_wigfitting_done ? "text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded border border-emerald-300" : "text-gray-400 group-hover:text-gray-600")}>
+                            {item.is_wigfitting_done ? "Fitting Done" : "No Fitting"}
+                          </span>
+                        </label>
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-1 text-xs">
@@ -1300,7 +1317,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     }
                     const nameToUse = lastOrderClientName || "Client";
                     const invoiceUrl = `${window.location.origin}/api/orders/${lastOrderId}/invoice`;
-                    const msg = `Hi ${nameToUse}! Thank you for visiting Eminence Salon. Here is your invoice: ${invoiceUrl}`;
+                    const msg = `Hi ${nameToUse}! Thank you for visiting Jainil Hair Studio. Here is your invoice: ${invoiceUrl}`;
                     const waUrl = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(msg)}`;
                     window.open(waUrl, "_blank");
                   }}

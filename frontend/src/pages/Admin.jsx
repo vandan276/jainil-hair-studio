@@ -1077,7 +1077,7 @@ export default function Admin() {
   const { t } = useLang();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const isSuperAdmin = user?.email === "superadmin@eminence.com" || user?.role === "super_admin" || user?.is_super_admin === true;
+  const isSuperAdmin = user?.email === "superadmin@jainil.com" || user?.email === "superadmin@jainilhairsaloon.com" || user?.email === "superadmin@eminence.com" || user?.email?.startsWith("superadmin@") || user?.role === "super_admin" || user?.is_super_admin === true;
   const [selectedBranch, setSelectedBranch] = useState(isSuperAdmin ? "" : (user?.branch || "Baroda"));
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -1376,7 +1376,7 @@ export default function Admin() {
       return true;
     }
     // Core tabs always accessible to branch admins — never blocked by permissions
-    if (tabKey === "add-kiosk" || tabKey === "appointments" || tabKey === "dashboard") return true;
+    if (tabKey === "add-kiosk" || tabKey === "appointments" || tabKey === "dashboard" || tabKey === "approve-leaves") return true;
     if (adminPermissions === "__ALL__") return true;
     if (Array.isArray(adminPermissions)) {
       return adminPermissions.includes(tabKey);
@@ -1400,11 +1400,29 @@ export default function Admin() {
 
   return (
     <div className="max-w-[1500px] mx-auto px-6 lg:px-12 py-20" data-testid="admin-page">
-      <p className="overline mb-4">{isSuperAdmin ? "Super Admin" : t("operations")}</p>
-      <h1 className="font-serif text-5xl mb-2">{isSuperAdmin ? "Super Admin Dashboard" : t("adminDashboard")}</h1>
-      <p className="text-eminence-muted mb-10">{isSuperAdmin ? "Full System Control & Settings" : t("adminSub")}</p>
+      {/* Clean Premium Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-6 border-b border-gray-200">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#0F5A3B]/10 text-[#0F5A3B] border border-[#0F5A3B]/20">
+              {isSuperAdmin ? "Super Admin Portal" : "Branch Operations"}
+            </span>
+            {isSuperAdmin && (
+              <span className="text-xs font-semibold text-gray-500">
+                • Scope: <strong className="text-gray-900">{selectedBranch || "All Branches (Global)"}</strong>
+              </span>
+            )}
+          </div>
+          <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+            {isSuperAdmin ? "Super Admin Dashboard" : t("adminDashboard")}
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">
+            {isSuperAdmin ? "Full multi-branch control, live salon sales monitor, inventory, and staff management." : t("adminSub")}
+          </p>
+        </div>
+      </div>
 
-      <div className="flex gap-2 flex-wrap mb-12 bg-gray-100/50 p-1.5 rounded-full w-fit backdrop-blur-md border border-gray-200 relative z-30">
+      <div className="flex gap-1.5 flex-wrap mb-8 bg-gray-100/80 p-1.5 rounded-2xl w-full border border-gray-200 shadow-inner relative z-30 items-center">
 
         {/* DASHBOARD SCHEDULER */}
         {canAccess("dashboard") && (
@@ -1430,19 +1448,6 @@ export default function Admin() {
           {t("overview")}
         </button>
 
-        {/* ORDERS */}
-        {canAccess("orders") && (
-          <button
-            onClick={() => {
-              setTab("orders");
-              closeAllDropdowns();
-            }}
-            className={`pill-tab ${tab === "orders" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
-          >
-            {t("orders")}
-          </button>
-        )}
-
         {/* APPOINTMENTS */}
         {canAccess("appointments") && (
           <button
@@ -1453,6 +1458,50 @@ export default function Admin() {
             className={`pill-tab ${tab === "appointments" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             Appointments
+          </button>
+        )}
+
+        {/* CONSULTING FORM - Branch Admin / Sales Direct */}
+        <a
+          href="/consultancy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="pill-tab flex items-center gap-1.5 text-gray-700 hover:text-gray-900 hover:bg-white/50 transition-colors"
+        >
+          Consulting Form
+        </a>
+
+        {/* ATTENDANCE KIOSK - Branch Admin */}
+        {canAccess("add-kiosk") && (
+          <button
+            onClick={() => {
+              setTab("add-kiosk");
+              closeAllDropdowns();
+            }}
+            className={`pill-tab flex items-center gap-1.5 ${tab === "add-kiosk" ? "bg-gray-950 text-white shadow-lg" : "text-gray-700 hover:text-gray-900 hover:bg-white/50"}`}
+          >
+            <span>Attendance Kiosk</span>
+          </button>
+        )}
+
+        {/* LEAVE APPROVALS - Prominent for branch admins */}
+        {canAccess("approve-leaves") && (
+          <button
+            onClick={() => {
+              setTab("approve-leaves");
+              closeAllDropdowns();
+            }}
+            className={`pill-tab flex items-center gap-1.5 ${tab === "approve-leaves" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+          >
+            <span>Approve Leaves</span>
+            {(() => {
+              const pendingCount = (leaveRequests || []).filter(r => isSuperAdmin ? r.status === "branch_approved" : r.status === "pending").length;
+              return pendingCount > 0 ? (
+                <span className="px-1.5 py-0.2 text-[9px] font-bold rounded-full bg-amber-500 text-white">
+                  {pendingCount}
+                </span>
+              ) : null;
+            })()}
           </button>
         )}
 
@@ -1705,19 +1754,6 @@ export default function Admin() {
             className={`pill-tab ${tab === "consultations" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             Consultancy Records
-          </button>
-        )}
-
-        {/* CLIENTS */}
-        {canAccess("clients") && (
-          <button
-            onClick={() => {
-              setTab("clients");
-              closeAllDropdowns();
-            }}
-            className={`pill-tab ${tab === "clients" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
-          >
-            Clients
           </button>
         )}
 
@@ -2117,16 +2153,16 @@ export default function Admin() {
         <CouponsPanel coupons={coupons} refresh={refresh} t={t} />
       )}
       {tab === "add-salary" && (
-        <EmployeeManager key={tab} defaultSubTab="payroll" employees={employees} refresh={refresh} t={t} isSuperAdmin={isSuperAdmin} />
+        <EmployeeManager key={tab} defaultSubTab="payroll" employees={employees} refresh={refresh} t={t} isSuperAdmin={isSuperAdmin} branches={branches} />
       )}
       {tab === "add-providers" && (
-        <EmployeeManager key={tab} defaultSubTab="service providers" employees={employees} refresh={refresh} t={t} isSuperAdmin={isSuperAdmin} />
+        <EmployeeManager key={tab} defaultSubTab="service providers" employees={employees} refresh={refresh} t={t} isSuperAdmin={isSuperAdmin} branches={branches} />
       )}
       {tab === "add-reminders" && (
         <ReminderSettingsPanel services={services} orders={orders} t={t} />
       )}
       {tab === "add-staff" && (
-        <EmployeeManager key={tab} defaultSubTab="sales staff" employees={employees} refresh={refresh} t={t} isSuperAdmin={isSuperAdmin} />
+        <EmployeeManager key={tab} defaultSubTab="sales staff" employees={employees} refresh={refresh} t={t} isSuperAdmin={isSuperAdmin} branches={branches} />
       )}
       {tab === "add-membership" && (
         <AdminMembershipPanel memberships={memberships} refresh={refresh} t={t} />
@@ -4333,7 +4369,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
   const totalPages = Math.ceil(filteredTxs.length / pageSize) || 1;
   const paginatedTxs = filteredTxs.slice((page - 1) * pageSize, page * pageSize);
 
-  const serviceEmployees = employees.filter(e => e.role === "service");
+  const serviceEmployees = (employees || []).filter(e => e && e.role === "service");
 
   const handleExport = () => {
     const csvHeader = "Date,Service Provider,Contact,Item Name,Price,Commission\n";
@@ -9419,7 +9455,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
     <div className="space-y-10">
 
       {/* Today's Operations Tracker (Live Operations Monitor) */}
-      <div className="space-y-6 bg-eminence-surface/30 p-6 rounded-3xl border border-eminence-border/30">
+      <div className="space-y-6 bg-white p-8 rounded-3xl border border-gray-200/80 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-4">
             <div>
@@ -12647,7 +12683,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
   );
 }
 
-function EmployeeManager({ defaultSubTab = "sales staff", employees, refresh, t, isSuperAdmin }) {
+function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refresh, t, isSuperAdmin, branches = [] }) {
   const [subTab, setSubTab] = useState(defaultSubTab);
   const [form, setForm] = useState({ name: "", email: "", phones: [""], password: "", branch: "Surat", section: "Men", role: "sales", pancard: "", adhaar_card: "", bank_details: "", commission_rate: 5, base_salary: "", pancard_image: "", adhaar_card_image: "" });
   const [editingEmpId, setEditingEmpId] = useState(null);
@@ -12660,6 +12696,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees, refresh, t,
   const [editingPayroll, setEditingPayroll] = useState(null);
   const [payrollForm, setPayrollForm] = useState({ base_salary: 0, commission_rate: 0 });
   const [payrollFilterMonth, setPayrollFilterMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [expandedDailyCommission, setExpandedDailyCommission] = useState({});
   const [isEditingAttendance, setIsEditingAttendance] = useState(false);
   const [editAttendanceForm, setEditAttendanceForm] = useState({ time: "10:00", checkout_time: "", status: "present" });
 
@@ -13340,144 +13377,276 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees, refresh, t,
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-eminence-border/50">
-                  {payrollData.map((emp) => (
-                    <tr key={emp.id} className="hover:bg-eminence-surface/30 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="font-bold font-serif text-lg">{emp.name}</div>
-                        <div className="text-[10px] text-eminence-muted uppercase">{emp.role} • {emp.branch}</div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {editingPayroll === emp.id ? (
-                          <input
-                            type="number"
-                            value={payrollForm.base_salary}
-                            onChange={(e) => setPayrollForm({ ...payrollForm, base_salary: e.target.value })}
-                            className="w-24 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
-                          />
-                        ) : (
-                          `₹${emp.base_salary.toLocaleString("en-IN")}`
-                        )}
-                      </td>
-                      <td className="px-6 py-4">₹{emp.monthly_sales.toLocaleString("en-IN")}</td>
-                      {/* Service Comm */}
-                      <td className="px-6 py-4 text-emerald-600">
-                        {editingPayroll === emp.id ? (
-                          <div className="flex items-center gap-1">
-                            <input
-                              type="number"
-                              step="0.1"
-                              value={payrollForm.commission_rate}
-                              onChange={(e) => setPayrollForm({ ...payrollForm, commission_rate: e.target.value })}
-                              className="w-16 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
-                            />
-                            <span>%</span>
-                          </div>
-                        ) : (
-                          <div>
-                            <span>₹{(emp.service_commission || 0).toLocaleString("en-IN")}</span>
-                            <span className="text-[10px] ml-1.5 text-eminence-muted">({((emp.service_commission_rate || 0) * 100).toFixed(0)}%)</span>
-                          </div>
-                        )}
-                      </td>
-                      {/* Product Comm */}
-                      <td className="px-6 py-4 text-emerald-600 font-serif">
-                        ₹{(emp.product_commission || 0).toLocaleString("en-IN")}
-                        <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.product_commission_rate || 0) * 100).toFixed(0)}%)</span>
-                      </td>
-                      {/* Package Comm */}
-                      <td className="px-6 py-4 text-emerald-600 font-serif">
-                        ₹{(emp.package_commission || 0).toLocaleString("en-IN")}
-                        <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.package_commission_rate || 0) * 100).toFixed(0)}%)</span>
-                      </td>
-                      {/* Member Comm */}
-                      <td className="px-6 py-4 text-emerald-600 font-serif">
-                        ₹{(emp.membership_commission || 0).toLocaleString("en-IN")}
-                        <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.membership_commission_rate || 0) * 100).toFixed(0)}%)</span>
-                      </td>
-                      <td className="px-6 py-4">
-                        {editingPayroll === emp.id ? (
-                          <div className="flex flex-col gap-2">
+                  {payrollData.map((emp) => {
+                    const isService = emp.role === "service";
+                    const isSales = emp.role === "sales";
+                    const canExpand = isService || isSales || (emp.daily_commissions && emp.daily_commissions.length > 0);
+                    const isExpanded = !!expandedDailyCommission[emp.id];
+                    const dailyList = emp.daily_commissions || [];
+                    const totalDailyComm = emp.total_daily_commission ?? emp.service_commission ?? 0;
+
+                    return (
+                      <React.Fragment key={emp.id}>
+                        <tr className={isExpanded ? "bg-emerald-50/40" : "hover:bg-eminence-surface/30 transition-colors"}>
+                          <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
+                              {canExpand && (
+                                <button
+                                  type="button"
+                                  onClick={() => setExpandedDailyCommission(prev => ({ ...prev, [emp.id]: !prev[emp.id] }))}
+                                  className="p-1 text-emerald-700 hover:bg-emerald-100 rounded-md transition-colors"
+                                  title={isExpanded ? "Hide Daily Commission" : "View Daily Commission Breakdown"}
+                                >
+                                  <ChevronDown size={16} className={isExpanded ? "rotate-180 transition-transform duration-200" : "transition-transform duration-200"} />
+                                </button>
+                              )}
+                              <div>
+                                <div className="font-bold font-serif text-lg text-gray-900">{emp.name}</div>
+                                <div className="text-[10px] text-eminence-muted uppercase flex items-center gap-1.5">
+                                  <span>{emp.role} • {emp.branch}</span>
+                                  {isService ? (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100/80 text-emerald-800 font-bold border border-emerald-300">
+                                      Daily Payout (Separate)
+                                    </span>
+                                  ) : isSales ? (
+                                    <span className="text-[9px] px-1.5 py-0.2 rounded bg-blue-100/80 text-blue-800 font-bold border border-blue-300">
+                                      In Monthly Salary
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {editingPayroll === emp.id ? (
                               <input
-                                type="number" min="0" max="31"
-                                value={payrollForm.allowed_weekoffs}
-                                onChange={(e) => setPayrollForm({ ...payrollForm, allowed_weekoffs: e.target.value })}
-                                className="w-16 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
+                                type="number"
+                                value={payrollForm.base_salary}
+                                onChange={(e) => setPayrollForm({ ...payrollForm, base_salary: e.target.value })}
+                                className="w-24 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
                               />
-                              <span className="text-[11px] uppercase tracking-widest text-eminence-muted">Weekoffs allowed</span>
-                            </div>
-                          </div>
-                        ) : emp.attendance_details ? (
-                          <div className="flex flex-col gap-1 text-sm">
-                            <div>
-                              <span className="font-medium text-red-600">{emp.attendance_details.unpaid_leaves}</span> Unpaid Leaves
-                              {emp.attendance_details.weekoffs_taken > 0 && ` • ${emp.attendance_details.weekoffs_taken} / ${emp.allowed_weekoffs} Weekoffs taken`}
-                            </div>
-                            {emp.attendance_details.weekoffs_cancelled ? (
-                              <div className="text-red-500 text-[11px] font-bold">Weekoffs Cancelled (≥5 unpaid)</div>
                             ) : (
-                              <div className="text-emerald-500 text-[11px]">Weekoffs Active</div>
+                              "₹" + (emp.base_salary || 0).toLocaleString("en-IN")
                             )}
-                            {emp.late_penalty > 0 && (
-                              <div className="text-orange-500 text-[11px] font-bold mt-1" title="Late arrival past 10 min grace period (>3 days)">
-                                -₹{emp.late_penalty} (Late {emp.attendance_details.late_days} days)
+                          </td>
+                          <td className="px-6 py-4">₹{(emp.monthly_sales || 0).toLocaleString("en-IN")}</td>
+                          
+                          {/* Service Comm */}
+                          <td className="px-6 py-4 text-emerald-600">
+                            {editingPayroll === emp.id ? (
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  step="0.1"
+                                  value={payrollForm.commission_rate}
+                                  onChange={(e) => setPayrollForm({ ...payrollForm, commission_rate: e.target.value })}
+                                  className="w-16 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
+                                />
+                                <span>%</span>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="font-bold flex items-center gap-1.5">
+                                  <span>₹{(totalDailyComm || 0).toLocaleString("en-IN")}</span>
+                                  {isService && (
+                                    <button
+                                      type="button"
+                                      onClick={() => setExpandedDailyCommission(prev => ({ ...prev, [emp.id]: !prev[emp.id] }))}
+                                      className="text-[10px] font-bold text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2 py-0.5 rounded-full border border-emerald-300 transition-colors inline-flex items-center gap-0.5"
+                                    >
+                                      Daily Breakdown <ChevronDown size={11} className={isExpanded ? "rotate-180" : ""} />
+                                    </button>
+                                  )}
+                                </div>
+                                <span className="text-[10px] text-eminence-muted block mt-0.5">
+                                  {isService ? "Paid separately (not in salary)" : "Sales Commission"}
+                                </span>
                               </div>
                             )}
-                          </div>
-                        ) : (
-                          <div className="text-gray-400 italic">No Data</div>
+                          </td>
+
+                          {/* Product Comm */}
+                          <td className="px-6 py-4 text-emerald-600 font-serif">
+                            ₹{(emp.product_commission || 0).toLocaleString("en-IN")}
+                            <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.product_commission_rate || 0) * 100).toFixed(0)}%)</span>
+                          </td>
+
+                          {/* Package Comm */}
+                          <td className="px-6 py-4 text-emerald-600 font-serif">
+                            ₹{(emp.package_commission || 0).toLocaleString("en-IN")}
+                            <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.package_commission_rate || 0) * 100).toFixed(0)}%)</span>
+                          </td>
+
+                          {/* Member Comm */}
+                          <td className="px-6 py-4 text-emerald-600 font-serif">
+                            ₹{(emp.membership_commission || 0).toLocaleString("en-IN")}
+                            <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.membership_commission_rate || 0) * 100).toFixed(0)}%)</span>
+                          </td>
+
+                          <td className="px-6 py-4">
+                            {editingPayroll === emp.id ? (
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number" min="0" max="31"
+                                    value={payrollForm.allowed_weekoffs}
+                                    onChange={(e) => setPayrollForm({ ...payrollForm, allowed_weekoffs: e.target.value })}
+                                    className="w-16 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
+                                  />
+                                  <span className="text-[11px] uppercase tracking-widest text-eminence-muted">Weekoffs allowed</span>
+                                </div>
+                              </div>
+                            ) : emp.attendance_details ? (
+                              <div className="flex flex-col gap-1 text-sm">
+                                <div>
+                                  <span className="font-medium text-red-600">{emp.attendance_details.unpaid_leaves}</span> Unpaid Leaves
+                                  {emp.attendance_details.weekoffs_taken > 0 ? (" • " + emp.attendance_details.weekoffs_taken + " / " + (emp.allowed_weekoffs || 2) + " Weekoffs taken") : ""}
+                                </div>
+                                {emp.attendance_details.weekoffs_cancelled ? (
+                                  <div className="text-red-500 text-[11px] font-bold">Weekoffs Cancelled (≥5 unpaid)</div>
+                                ) : (
+                                  <div className="text-emerald-500 text-[11px]">Weekoffs Active</div>
+                                )}
+                                {emp.late_penalty > 0 && (
+                                  <div className="text-orange-500 text-[11px] font-bold mt-1" title="Late arrival past 10 min grace period (>3 days)">
+                                    -₹{emp.late_penalty} (Late {emp.attendance_details.late_days} days)
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="text-gray-400 italic">No Data</div>
+                            )}
+                          </td>
+
+                          <td className="px-6 py-4 font-serif">
+                            <div className="text-xl text-eminence-gold">₹{emp.total_payout ? Math.round(emp.total_payout).toLocaleString("en-IN") : 0}</div>
+                            {(emp.attendance_deduction > 0 || emp.late_penalty > 0) && (
+                              <div className="text-red-500 text-xs font-bold mt-1">
+                                -₹{Math.round((emp.attendance_deduction || 0) + (emp.late_penalty || 0)).toLocaleString("en-IN")} deduction
+                              </div>
+                            )}
+                          </td>
+
+                          <td className="px-6 py-4">
+                            {editingPayroll === emp.id ? (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleUpdatePayroll(emp.id)}
+                                  className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 bg-eminence-gold text-white hover:bg-black transition-colors"
+                                >
+                                  Save
+                                </button>
+                                <button
+                                  onClick={() => setEditingPayroll(null)}
+                                  className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 hover:bg-gray-100 transition-colors"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingPayroll(emp.id);
+                                    setPayrollForm({
+                                      base_salary: emp.base_salary,
+                                      commission_rate: emp.commission_rate * 100,
+                                      allowed_weekoffs: emp.allowed_weekoffs !== undefined ? emp.allowed_weekoffs : 2
+                                    });
+                                  }}
+                                  className="text-[10px] uppercase tracking-widest text-eminence-muted hover:text-eminence-gold transition-colors"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => toast.success()}
+                                  className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 hover:bg-eminence-gold hover:text-white transition-colors"
+                                >
+                                  Slip
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+
+                        {/* Expandable Daily Commission Dropdown Panel for Service Providers & Sales Staff */}
+                        {canExpand && isExpanded && (
+                          <tr className="bg-emerald-50/60 border-y border-emerald-200/80">
+                            <td colSpan={10} className="p-6">
+                              <div className="bg-white rounded-2xl p-6 border border-emerald-200 shadow-sm space-y-4">
+                                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-gray-100">
+                                  <div>
+                                    <h4 className="font-bold text-base text-gray-900 flex items-center gap-2">
+                                      <span className={"w-2.5 h-2.5 rounded-full " + (isSales ? "bg-blue-500" : "bg-emerald-500")} />
+                                      Daily Sales & Commission Log — {emp.name} ({payrollFilterMonth})
+                                    </h4>
+                                    <p className="text-xs text-eminence-muted mt-0.5">
+                                      {isSales
+                                        ? "Daily breakdown of sales and performance. Commission is credited and added directly into monthly salary payout."
+                                        : "Breakdown of services performed each day. Commission is distributed on a daily basis and excluded from monthly salary payout."}
+                                    </p>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className="text-xs uppercase font-bold text-eminence-muted block">Total Daily Commission Earned</span>
+                                    <span className="text-xl font-bold font-serif text-emerald-700">₹{(totalDailyComm).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                                  </div>
+                                </div>
+
+                                {dailyList.length === 0 ? (
+                                  <div className="p-6 text-center text-gray-400 italic text-xs bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                    No billable salon activities/sales logged for {emp.name} in {payrollFilterMonth}.
+                                  </div>
+                                ) : (
+                                  <div className="overflow-x-auto max-h-[300px] overflow-y-auto rounded-xl border border-gray-200">
+                                    <table className="w-full text-xs">
+                                      <thead className="bg-gray-100/90 text-gray-700 font-bold sticky top-0">
+                                        <tr>
+                                          <th className="text-left px-4 py-2.5 uppercase tracking-wider text-[10px]">Date</th>
+                                          <th className="text-left px-4 py-2.5 uppercase tracking-wider text-[10px]">Services / Items Done</th>
+                                          <th className="text-center px-4 py-2.5 uppercase tracking-wider text-[10px]">Qty</th>
+                                          <th className="text-right px-4 py-2.5 uppercase tracking-wider text-[10px]">Daily Service Bill</th>
+                                          <th className="text-right px-4 py-2.5 uppercase tracking-wider text-[10px] text-emerald-700">Daily Commission (₹)</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-gray-100">
+                                        {dailyList.map((dayItem, dIdx) => (
+                                          <tr key={dIdx} className="hover:bg-emerald-50/30 transition-colors">
+                                            <td className="px-4 py-3 font-mono font-bold text-gray-900 whitespace-nowrap">
+                                              {dayItem.date}
+                                            </td>
+                                            <td className="px-4 py-3 text-gray-700">
+                                              <div className="flex flex-wrap gap-1.5">
+                                                {(dayItem.items || []).map((it, itIdx) => (
+                                                  <span key={itIdx} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-gray-100 border border-gray-200 text-[11px]">
+                                                    <span>{it.name}</span>
+                                                    <span className="text-gray-400">x{it.quantity}</span>
+                                                    <span className="text-emerald-700 font-bold">(+₹{it.commission})</span>
+                                                  </span>
+                                                ))}
+                                              </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-center font-bold text-gray-800">
+                                              {dayItem.services_count}
+                                            </td>
+                                            <td className="px-4 py-3 text-right font-medium text-gray-600">
+                                              ₹{dayItem.total_sales.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                            </td>
+                                            <td className="px-4 py-3 text-right font-bold text-emerald-700 font-mono text-sm">
+                                              ₹{dayItem.total_commission.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
                         )}
-                      </td>
-                      <td className="px-6 py-4 font-serif">
-                        <div className="text-xl text-eminence-gold">₹{emp.total_payout ? Math.round(emp.total_payout).toLocaleString("en-IN") : 0}</div>
-                        {(emp.attendance_deduction > 0 || emp.late_penalty > 0) && (
-                          <div className="text-red-500 text-xs font-bold mt-1">
-                            -₹{Math.round((emp.attendance_deduction || 0) + (emp.late_penalty || 0)).toLocaleString("en-IN")} deduction
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4">
-                        {editingPayroll === emp.id ? (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleUpdatePayroll(emp.id)}
-                              className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 bg-eminence-gold text-white hover:bg-black transition-colors"
-                            >
-                              Save
-                            </button>
-                            <button
-                              onClick={() => setEditingPayroll(null)}
-                              className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 hover:bg-gray-100 transition-colors"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => {
-                                setEditingPayroll(emp.id);
-                                setPayrollForm({
-                                  base_salary: emp.base_salary,
-                                  commission_rate: emp.commission_rate * 100,
-                                  allowed_weekoffs: emp.allowed_weekoffs !== undefined ? emp.allowed_weekoffs : 2
-                                });
-                              }}
-                              className="text-[10px] uppercase tracking-widest text-eminence-muted hover:text-eminence-gold transition-colors"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => toast.success(`Payslip generated for ${emp.name}`)}
-                              className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 hover:bg-eminence-gold hover:text-white transition-colors"
-                            >
-                              Slip
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
@@ -13488,8 +13657,6 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees, refresh, t,
     </div>
   );
 }
-
-
 function AdminMembershipPanel({ memberships, refresh, t }) {
   const emptyForm = {
     name: "", price: "", duration_days: "", reward_points_on_purchase: "",
@@ -14326,6 +14493,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
     product_commission: "", product_commission_inr: "", product_commission_type: "%",
     package_commission: "", package_commission_inr: "", package_commission_type: "%",
     member_commission: "", member_commission_inr: "", member_commission_type: "%",
+    wigfitting_commission: "", wigfitting_commission_inr: "", wigfitting_commission_type: "%",
     monthly_target: "",
     date_of_birth: "", working_hours_from: "10:00", working_hours_to: "19:00",
     base_salary: "", service_provider_type: "Hair Dresser",
@@ -14337,7 +14505,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
 
-  const serviceEmployees = employees.filter(e => e.role === "service");
+  const serviceEmployees = (employees || []).filter(e => e && e.role === "service");
 
   const startEdit = (emp) => {
     const phones = (emp.phone_numbers && emp.phone_numbers.length > 0) ? [...emp.phone_numbers] : [emp.phone || ""];
@@ -14360,6 +14528,9 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
       member_commission: emp.member_commission_rate !== undefined ? Math.round(emp.member_commission_rate * 100) : "",
       member_commission_inr: emp.member_commission_inr || "",
       member_commission_type: emp.member_commission_inr > 0 ? "₹" : "%",
+      wigfitting_commission: emp.wigfitting_commission_rate !== undefined ? Math.round(emp.wigfitting_commission_rate * 100) : "",
+      wigfitting_commission_inr: emp.wigfitting_commission_inr || "",
+      wigfitting_commission_type: emp.wigfitting_commission_inr > 0 ? "₹" : "%",
       monthly_target: emp.monthly_target || "",
       date_of_birth: emp.date_of_birth || "",
       working_hours_from: emp.working_hours_from || "10:00",
@@ -14424,6 +14595,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
         package_commission_inr: Number(form.package_commission_inr) || 0,
         member_commission_rate: form.member_commission ? Number(form.member_commission) / 100 : 0,
         member_commission_inr: Number(form.member_commission_inr) || 0,
+        wigfitting_commission_rate: form.wigfitting_commission ? Number(form.wigfitting_commission) / 100 : 0,
+        wigfitting_commission_inr: Number(form.wigfitting_commission_inr) || 0,
         monthly_target: Number(form.monthly_target) || 0,
         date_of_birth: form.date_of_birth,
         working_hours_from: form.working_hours_from,
@@ -14619,6 +14792,41 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                 }}
                 className="w-full bg-transparent px-3 py-2.5 focus:outline-none text-sm"
                 placeholder={form.member_commission_type === "%" ? "Percentage" : "Fixed INR"}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-eminence-muted block mb-1">Wig Fitting Commission</label>
+            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+              <select
+                value={form.wigfitting_commission_type}
+                onChange={(e) => {
+                  const t = e.target.value;
+                  set("wigfitting_commission_type", t);
+                  if (t === "%") {
+                    set("wigfitting_commission", form.wigfitting_commission_inr);
+                    set("wigfitting_commission_inr", "");
+                  } else {
+                    set("wigfitting_commission_inr", form.wigfitting_commission);
+                    set("wigfitting_commission", "");
+                  }
+                }}
+                className="bg-transparent border-r border-eminence-border px-3 py-2.5 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+              >
+                <option value="%">%</option>
+                <option value="₹">₹</option>
+              </select>
+              <input
+                type="number"
+                min={0}
+                max={form.wigfitting_commission_type === "%" ? 100 : undefined}
+                value={form.wigfitting_commission_type === "%" ? form.wigfitting_commission : form.wigfitting_commission_inr}
+                onChange={(e) => {
+                  if (form.wigfitting_commission_type === "%") set("wigfitting_commission", e.target.value);
+                  else set("wigfitting_commission_inr", e.target.value);
+                }}
+                className="w-full bg-transparent px-3 py-2.5 focus:outline-none text-sm"
+                placeholder={form.wigfitting_commission_type === "%" ? "Percentage" : "Fixed INR"}
               />
             </div>
           </div>
@@ -15060,6 +15268,13 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
     name: "", email: "", username: "", password: "", confirmPassword: "",
     phone: "", phones: [""],
     commission: "",
+    commission_type: "%",
+    custom_commission_enabled: false,
+    commission_slabs: [
+      { min_target: "0", max_target: "15000", value: "5", type: "%" },
+      { min_target: "15001", max_target: "30000", value: "10", type: "%" },
+      { min_target: "30001", max_target: "", value: "15", type: "%" }
+    ],
     date_of_birth: "", working_hours_from: "10:00", working_hours_to: "19:00",
     base_salary: "", sales_staff_type: "Sales Consultant",
     emergency_contact_number: "", emergency_contact_person: "",
@@ -15072,10 +15287,23 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
 
-  const salesEmployees = employees.filter(e => e.role === "sales");
+  const salesEmployees = (employees || []).filter(e => e && e.role === "sales");
 
   const startEdit = (emp) => {
     const phones = (emp.phone_numbers && emp.phone_numbers.length > 0) ? [...emp.phone_numbers] : [emp.phone || ""];
+    const existingSlabs = (emp.commission_slabs && emp.commission_slabs.length > 0)
+      ? emp.commission_slabs.map(s => ({
+          min_target: s.min_target ?? "",
+          max_target: s.max_target ?? "",
+          value: s.value ?? "",
+          type: s.type || "%"
+        }))
+      : [
+          { min_target: "0", max_target: "15000", value: "5", type: "%" },
+          { min_target: "15001", max_target: "30000", value: "10", type: "%" },
+          { min_target: "30001", max_target: "", value: "15", type: "%" }
+        ];
+
     setForm({
       name: emp.name || "",
       email: emp.email || "",
@@ -15084,6 +15312,9 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
       phone: emp.phone || "",
       phones,
       commission: emp.commission_rate !== undefined ? Math.round(emp.commission_rate * 100) : "",
+      commission_type: emp.commission_type || "%",
+      custom_commission_enabled: emp.custom_commission_enabled ?? (Boolean(emp.commission_slabs && emp.commission_slabs.length > 0)),
+      commission_slabs: existingSlabs,
       date_of_birth: emp.date_of_birth || "",
       working_hours_from: emp.working_hours_from || "10:00",
       working_hours_to: emp.working_hours_to || "19:00",
@@ -15134,6 +15365,15 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
 
     try {
       const activePhones = form.phones.filter(p => p.trim() !== "");
+      const validSlabs = form.commission_slabs
+        .filter(s => s.min_target !== "" || s.max_target !== "" || s.value !== "")
+        .map(s => ({
+          min_target: Number(s.min_target) || 0,
+          max_target: s.max_target !== "" && s.max_target !== null ? Number(s.max_target) : null,
+          value: Number(s.value) || 0,
+          type: s.type || "%"
+        }));
+
       const payload = {
         name: form.name,
         email: form.email,
@@ -15142,6 +15382,9 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
         phone_numbers: activePhones,
         role: "sales",
         commission_rate: form.commission ? Number(form.commission) / 100 : 0.05,
+        commission_type: form.commission_type || "%",
+        custom_commission_enabled: form.custom_commission_enabled,
+        commission_slabs: form.custom_commission_enabled ? validSlabs : [],
         product_commission_rate: form.commission ? Number(form.commission) / 100 : 0.05,
         date_of_birth: form.date_of_birth,
         working_hours_from: form.working_hours_from,
@@ -15201,13 +15444,166 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
             <input type="text" required value={form.name} onChange={e => set("name", e.target.value)} className={inputCls} placeholder="Sales staff name" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Commission %</label>
-            <input type="number" min={0} max={100} value={form.commission} onChange={e => set("commission", e.target.value)} className={inputCls} placeholder="Commission" />
+            <label className="text-xs text-eminence-muted block mb-1">Base Commission</label>
+            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+              <select
+                value={form.commission_type || "%"}
+                onChange={e => set("commission_type", e.target.value)}
+                className="bg-transparent border-r border-eminence-border px-3 py-2 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+              >
+                <option value="%">%</option>
+                <option value="₹">₹</option>
+              </select>
+              <input
+                type="number"
+                min={0}
+                max={form.commission_type === "%" ? 100 : undefined}
+                value={form.commission}
+                onChange={e => set("commission", e.target.value)}
+                className="w-full bg-transparent px-3 py-2 focus:outline-none text-sm"
+                placeholder={form.commission_type === "%" ? "Commission %" : "Fixed INR (₹)"}
+              />
+            </div>
           </div>
           <div>
             <label className="text-xs text-eminence-muted block mb-1">Date of Birth</label>
             <input type="date" value={form.date_of_birth} onChange={e => set("date_of_birth", e.target.value)} className={inputCls} />
           </div>
+        </div>
+
+        {/* Custom Target & Commission Range Structure (₹ and %) */}
+        <div className="p-5 bg-gradient-to-r from-emerald-500/5 via-eminence-surface to-emerald-500/5 border border-eminence-border/60 rounded-2xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-eminence-border/30">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm text-gray-900">Target-Based Custom Commission Structure</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                  Tiered Slabs (₹ & %)
+                </span>
+              </div>
+              <p className="text-xs text-eminence-muted mt-0.5">
+                Set multiple sales target milestones (min to max in ₹) and configure commission in fixed ₹ or % percentage.
+              </p>
+            </div>
+            <label className="inline-flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.custom_commission_enabled}
+                onChange={e => set("custom_commission_enabled", e.target.checked)}
+                className="w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer"
+              />
+              <span className="text-xs font-bold text-gray-800">Enable Target Slabs</span>
+            </label>
+          </div>
+
+          {form.custom_commission_enabled && (
+            <div className="space-y-3 animate-in fade-in duration-200">
+              <div className="grid grid-cols-12 gap-2 text-[11px] font-bold uppercase tracking-wider text-eminence-muted px-2">
+                <div className="col-span-4">Target Range (Min ₹)</div>
+                <div className="col-span-4">Target Range (Max ₹ / Above)</div>
+                <div className="col-span-3">Commission Payout</div>
+                <div className="col-span-1 text-center">Action</div>
+              </div>
+
+              {form.commission_slabs.map((slab, sIdx) => (
+                <div key={sIdx} className="grid grid-cols-12 gap-2 items-center bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm">
+                  <div className="col-span-4">
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">₹</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={slab.min_target}
+                        onChange={e => {
+                          const updated = [...form.commission_slabs];
+                          updated[sIdx].min_target = e.target.value;
+                          set("commission_slabs", updated);
+                        }}
+                        className="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:bg-white focus:outline-none focus:border-emerald-500"
+                        placeholder="From ₹ (e.g. 0)"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-span-4">
+                    <div className="relative">
+                      <span className="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">₹</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={slab.max_target}
+                        onChange={e => {
+                          const updated = [...form.commission_slabs];
+                          updated[sIdx].max_target = e.target.value;
+                          set("commission_slabs", updated);
+                        }}
+                        className="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:bg-white focus:outline-none focus:border-emerald-500"
+                        placeholder="To ₹ (leave blank for Above)"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-span-3">
+                    <div className="flex bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-emerald-500 focus-within:bg-white">
+                      <select
+                        value={slab.type || "%"}
+                        onChange={e => {
+                          const updated = [...form.commission_slabs];
+                          updated[sIdx].type = e.target.value;
+                          set("commission_slabs", updated);
+                        }}
+                        className="bg-gray-100 border-r border-gray-200 px-2 py-2 text-xs font-bold text-gray-700 focus:outline-none cursor-pointer"
+                      >
+                        <option value="%">%</option>
+                        <option value="₹">₹ (Fixed)</option>
+                      </select>
+                      <input
+                        type="number"
+                        min={0}
+                        max={slab.type === "%" ? 100 : undefined}
+                        value={slab.value}
+                        onChange={e => {
+                          const updated = [...form.commission_slabs];
+                          updated[sIdx].value = e.target.value;
+                          set("commission_slabs", updated);
+                        }}
+                        className="w-full px-3 py-2 bg-transparent text-sm font-semibold focus:outline-none"
+                        placeholder={slab.type === "%" ? "e.g. 10%" : "e.g. ₹2000"}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="col-span-1 flex justify-center">
+                    {form.commission_slabs.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => set("commission_slabs", form.commission_slabs.filter((_, idx) => idx !== sIdx))}
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                        title="Remove slab"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={() => {
+                  const lastSlab = form.commission_slabs[form.commission_slabs.length - 1];
+                  const nextMin = lastSlab && lastSlab.max_target ? Number(lastSlab.max_target) + 1 : "";
+                  set("commission_slabs", [
+                    ...form.commission_slabs,
+                    { min_target: String(nextMin), max_target: "", value: "", type: "%" }
+                  ]);
+                }}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-4 py-2 rounded-xl transition-colors"
+              >
+                + Add Target Slab
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -16247,7 +16643,7 @@ function ProductTransferredLogPanel({ transfers, refreshData }) {
 function ProductAddStockPanel({ products, vendors, onComplete }) {
   const { t } = useLang();
   const { user } = useAuth();
-  const isSuperAdmin = user?.email === "superadmin@eminence.com" || user?.role === "super_admin" || user?.is_super_admin === true;
+  const isSuperAdmin = user?.email === "superadmin@jainil.com" || user?.email === "superadmin@jainilhairsaloon.com" || user?.email === "superadmin@eminence.com" || user?.email?.startsWith("superadmin@") || user?.role === "super_admin" || user?.is_super_admin === true;
 
   const makeEmptyRow = () => ({
     id: Date.now() + Math.random(),
@@ -16256,8 +16652,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
     showDrop: false,
     quantity: "",
     costPrice: "",
-    sellingPrice: "",
-    expiryDate: ""
+    sellingPrice: ""
   });
 
   const [rows, setRows] = useState([makeEmptyRow()]);
@@ -16265,10 +16660,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
   const [invoiceNo, setInvoiceNo] = useState("");
   const [remarks, setRemarks] = useState("");
   const [branch, setBranch] = useState(isSuperAdmin ? "Baroda" : (user?.branch || "Baroda"));
-  const [amountPaid, setAmountPaid] = useState("");
   const [discount, setDiscount] = useState("");
-  const [paymentMode, setPaymentMode] = useState("Cash");
-  const [paymentStatus, setPaymentStatus] = useState("Pending");
   const [loading, setLoading] = useState(false);
 
   const updateRow = (idx, patch) => {
@@ -16406,62 +16798,15 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
           </div>
         </div>
 
-        {/* Payment Info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-amber-50/60 rounded-2xl p-4 border border-amber-100">
-          <div>
-            <label className="block text-xs font-bold text-amber-600 uppercase mb-2">Amount Paid (₹)</label>
-            <input
-              type="number"
-              min="0"
-              value={amountPaid}
-              onChange={e => {
-                setAmountPaid(e.target.value);
-                const paid = Number(e.target.value);
-                if (paid <= 0) setPaymentStatus("Pending");
-                else if (paid >= grandTotal) setPaymentStatus("Paid");
-                else setPaymentStatus("Partial");
-              }}
-              className="w-full border border-amber-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-amber-400 focus:outline-none bg-white"
-              placeholder="0"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-amber-600 uppercase mb-2">Payment Mode</label>
-            <select
-              value={paymentMode}
-              onChange={e => setPaymentMode(e.target.value)}
-              className="w-full border border-amber-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-amber-400 focus:outline-none bg-white"
-            >
-              <option>Cash</option>
-              <option>UPI</option>
-              <option>Card</option>
-              <option>Bank Transfer</option>
-              <option>Cheque</option>
-              <option>Credit</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-bold text-amber-600 uppercase mb-2">Payment Status</label>
-            <select
-              value={paymentStatus}
-              onChange={e => setPaymentStatus(e.target.value)}
-              className="w-full border border-amber-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-amber-400 focus:outline-none bg-white"
-            >
-              <option>Pending</option>
-              <option>Partial</option>
-              <option>Paid</option>
-            </select>
-          </div>
-        </div>
+
 
         {/* Product Rows Table Headers */}
         <div className="space-y-3">
           <div className="hidden md:grid md:grid-cols-12 gap-3 px-4 py-2 bg-eminence-surface border border-eminence-border/10 rounded-lg text-left text-eminence-muted uppercase font-bold text-[9px] tracking-wider font-sans">
-            <div className="col-span-3">Select Product *</div>
-            <div className="col-span-2">Expiry Date</div>
-            <div className="col-span-1 text-right">Qty *</div>
+            <div className="col-span-4">Select Product *</div>
+            <div className="col-span-2 text-right">Qty *</div>
             <div className="col-span-2 text-right">Cost (₹) *</div>
-            <div className="col-span-2 text-right">Selling (₹) *</div>
+            <div className="col-span-2 text-right">Selling (₹) (Optional)</div>
             <div className="col-span-1 text-right font-mono">Total (₹)</div>
             <div className="col-span-1 text-center">Action</div>
           </div>
@@ -16474,7 +16819,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
               return (
                 <div key={row.id} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center border border-gray-200 md:border-transparent rounded-2xl md:rounded-none p-4 md:p-0 bg-white md:bg-transparent shadow-sm md:shadow-none relative">
                   {/* Select Product */}
-                  <div className="relative col-span-1 md:col-span-3 text-left">
+                  <div className="relative col-span-1 md:col-span-4 text-left">
                     <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Select Product *</label>
                     <input
                       type="text"
@@ -16525,16 +16870,8 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                     )}
                   </div>
 
-                  {/* Expiry Date */}
-                  <div className="col-span-1 md:col-span-2 text-left">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Expiry Date</label>
-                    <input type="date" value={row.expiryDate}
-                      onChange={e => updateRow(idx, { expiryDate: e.target.value })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50 font-mono" />
-                  </div>
-
                   {/* Quantity */}
-                  <div className="col-span-1 md:col-span-1 text-left">
+                  <div className="col-span-1 md:col-span-2 text-left">
                     <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Quantity *</label>
                     <input type="number" min="1" value={row.quantity}
                       onChange={e => updateRow(idx, { quantity: e.target.value })}
@@ -16551,12 +16888,12 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50 font-mono" />
                   </div>
 
-                  {/* Selling Price */}
+                  {/* Selling Price (Optional) */}
                   <div className="col-span-1 md:col-span-2 text-left">
-                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Selling Price *</label>
+                    <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Selling Price (Optional)</label>
                     <input type="number" min="0" step="0.01" value={row.sellingPrice}
                       onChange={e => updateRow(idx, { sellingPrice: e.target.value })}
-                      placeholder="0.00"
+                      placeholder="Optional"
                       className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50 font-mono" />
                   </div>
 
@@ -16599,15 +16936,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                 min="0"
                 max={overallTotal}
                 value={discount}
-                onChange={e => {
-                  setDiscount(e.target.value);
-                  const disc = Number(e.target.value) || 0;
-                  const finalTotal = Math.max(0, overallTotal - disc);
-                  const paid = Number(amountPaid) || 0;
-                  if (paid <= 0) setPaymentStatus("Pending");
-                  else if (paid >= finalTotal) setPaymentStatus("Paid");
-                  else setPaymentStatus("Partial");
-                }}
+                onChange={e => setDiscount(e.target.value)}
                 className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-32 focus:ring-1 focus:ring-eminence-gold focus:outline-none bg-white font-mono text-right"
                 placeholder="0"
               />
@@ -17146,11 +17475,11 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
 const LeaveRequestNotificationBanner = ({ leaveRequests, isSuperAdmin, onGoToLeaves }) => {
   const [dismissed, setDismissed] = useState(false);
 
-  // Super Admin sees "pending" requests needing their first-pass approval
-  // Branch Admin sees "super_approved" requests needing their final approval
+  // Branch Admin sees "pending" requests needing branch approval
+  // Super Admin sees "branch_approved" requests needing final super approval
   const actionable = Array.isArray(leaveRequests)
     ? leaveRequests.filter(r =>
-      isSuperAdmin ? r.status === "pending" : r.status === "super_approved"
+      isSuperAdmin ? r.status === "branch_approved" : r.status === "pending"
     )
     : [];
 

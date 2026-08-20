@@ -44,19 +44,19 @@ export default function Login() {
         <div>
           <label className="overline block mb-2">{t("email")}</label>
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} data-testid="login-email-input"
-            className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+            className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
         </div>
         <div>
           <label className="overline block mb-2">{t("password")}</label>
           <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} data-testid="login-password-input"
-            className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+            className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
         </div>
         <button type="submit" disabled={loading} className="btn-gold w-full" data-testid="login-submit-btn">
           {loading ? t("placing") : t("signInTitle")}
         </button>
       </form>
-      <p className="text-sm text-eminence-muted mt-8">
-        {t("newToEminence")} <Link to="/register" className="text-eminence-gold hover:text-eminence-goldHover" data-testid="login-register-link">{t("createAccount")}</Link>
+      <p className="text-sm text-jainil-muted mt-8">
+        {t("newToJainil")} <Link to="/register" className="text-jainil-gold hover:text-jainil-goldHover" data-testid="login-register-link">{t("createAccount")}</Link>
       </p>
     </div>
   );

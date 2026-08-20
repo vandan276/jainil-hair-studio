@@ -30,39 +30,39 @@ export default function Register() {
 
   return (
     <div className="max-w-md mx-auto px-6 py-32" data-testid="register-page">
-      <p className="overline mb-4">{t("joinEminence")}</p>
+      <p className="overline mb-4">{t("joinJainil")}</p>
       <h1 className="font-serif text-5xl font-light mb-10">{t("createAccount")}</h1>
       <form onSubmit={submit} className="space-y-6">
         <div>
           <label className="overline block mb-2">{t("fullName")}</label>
           <input type="text" required value={form.name} onChange={set("name")}
-            className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+            className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
         </div>
 
         <div>
           <label className="overline block mb-2">{t("email")}</label>
           <input type="email" required value={form.email} onChange={set("email")}
-            className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+            className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
         </div>
 
         <div>
           <label className="overline block mb-2">{t("phone")}</label>
           <input type="tel" value={form.phone} onChange={set("phone")}
-            className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+            className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
         </div>
 
         <div>
           <label className="overline block mb-2">{t("password")}</label>
           <input type="password" required value={form.password} onChange={set("password")}
-            className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+            className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
         </div>
 
         <button type="submit" disabled={loading} className="btn-gold w-full py-4 mt-4 disabled:opacity-50" data-testid="register-submit-btn">
           {loading ? t("placing") : t("createAccount")}
         </button>
       </form>
-      <p className="text-sm text-eminence-muted mt-8">
-        {t("haveAccount")} <Link to="/login" className="text-eminence-gold" data-testid="register-login-link">{t("signInTitle")}</Link>
+      <p className="text-sm text-jainil-muted mt-8">
+        {t("haveAccount")} <Link to="/login" className="text-jainil-gold" data-testid="register-login-link">{t("signInTitle")}</Link>
       </p>
     </div>
   );

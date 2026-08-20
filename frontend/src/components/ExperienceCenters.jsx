@@ -6,22 +6,12 @@ const LOCATIONS = [
   {
     id: "vadodara",
     city: "Vadodara",
-    address: ["Shreenath Complex, GF6,", "High Tension Rd, near Reliance & Indian Petrol Pump,", "Subhanpura, Vadodara, Gujarat 390023"],
-    phone: "+91 87992 88809",
-    whatsapp: "+918799288809",
+    address: ["FF-06/07, Earth Eon, opp. Urmi School,", "Sama Savli Road, Near Urmi School Over Bridge,", "Vadodara, Gujarat 390024"],
+    phone: "+91 77790 55771",
+    whatsapp: "+917779055771",
     mapUrl: "https://maps.app.goo.gl/N9Sm2PNJnKVLyGsQ6",
     // Premium salon interior — warm gold tones, mirrors, styling chairs
     img: "/assets/vadodara_salon.png",
-  },
-  {
-    id: "surat",
-    city: "Surat",
-    address: ["The Galleria Business Hub, 61,", "New Pal Rd, nr. Sanjeev Kumar Auditorium Road,", "Adajan Gam, Adajan, Surat, Gujarat 395009"],
-    phone: "+91 87992 88809",
-    whatsapp: "+919512188809",
-    mapUrl: "https://maps.app.goo.gl/Xj73RqJicvp6MWfMA",
-    // Premium salon interior — modern minimalist design, clean lines, bright lighting
-    video: "/assets/surat_video.mp4",
   },
 ];
 

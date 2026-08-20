@@ -27,16 +27,17 @@ export default function ProtectedRoute({ children, adminOnly = false, serviceOnl
   if (serviceOnly && user.role !== "service" && user.role !== "admin") return <Navigate to="/dashboard" replace />;
   if (receptionistOnly && user.role !== "receptionist" && user.role !== "admin") return <Navigate to="/dashboard" replace />;
 
-  // Attendance Interceptor — use sessionVerified so it survives client-side navigation
-  const isStaffRoute = location.pathname.startsWith("/admin") ||
-                       location.pathname.startsWith("/sales-panel") ||
-                       location.pathname.startsWith("/consultancy") ||
-                       location.pathname.startsWith("/service-panel") ||
-                       location.pathname.startsWith("/receptionist-panel") ||
-                       location.pathname.startsWith("/billing");
-  if (isStaffRoute && !sessionVerified && location.pathname !== "/attendance-verify") {
-    return <Navigate to="/attendance-verify" state={{ from: location }} replace />;
-  }
+  // Attendance Interceptor - Allow direct panel access without timing/verification blockages
+  // (Staff can still optionally verify attendance if navigated directly)
+  // const isStaffRoute = location.pathname.startsWith("/admin") ||
+  //                      location.pathname.startsWith("/sales-panel") ||
+  //                      location.pathname.startsWith("/consultancy") ||
+  //                      location.pathname.startsWith("/service-panel") ||
+  //                      location.pathname.startsWith("/receptionist-panel") ||
+  //                      location.pathname.startsWith("/billing");
+  // if (isStaffRoute && !sessionVerified && location.pathname !== "/attendance-verify") {
+  //   return <Navigate to="/attendance-verify" state={{ from: location }} replace />;
+  // }
 
   return children;
 }

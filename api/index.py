@@ -3,7 +3,7 @@ from pathlib import Path
 import os
 import time
 import logging
-logger = logging.getLogger("eminence")
+logger = logging.getLogger("jainil")
 import uuid
 import bcrypt
 import jwt
@@ -17,6 +17,8 @@ from io import BytesIO
 
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+from reportlab.graphics import renderPDF
+from svglib.svglib import svg2rlg
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -29,36 +31,24 @@ import firebase_admin
 from firebase_admin import credentials, firestore, storage
 from pydantic import BaseModel, Field, EmailStr
 
-import razorpay
-
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # ----- Config -----
 JWT_SECRET = os.environ.get('JWT_SECRET', 'dev-secret-key')
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@eminence.com').lower()
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@jainil.com').lower()
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Admin@123')
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 JWT_ALGO = "HS256"
-STORAGE_BUCKET = os.environ.get("FIREBASE_STORAGE_BUCKET", "eminence-e436f.firebasestorage.app")
+STORAGE_BUCKET = os.environ.get("FIREBASE_STORAGE_BUCKET", "jainil-e436f.firebasestorage.app")
 IS_VERCEL = "VERCEL" in os.environ
-
-RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
-RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
-
-razorpay_client = None
-if RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET:
-    try:
-        razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
-    except Exception as e:
-        logger.error(f"Failed to initialize Razorpay: {e}")
 
 # SMTP Config
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASS = os.environ.get("SMTP_PASS", "")
-EMAIL_FROM = os.environ.get("EMAIL_FROM", "Eminence Salon <noreply@eminence.com>")
+EMAIL_FROM = os.environ.get("EMAIL_FROM", "Jainil Hair Studio <noreply@jainil.com>")
 
 # ----- Firebase Init -----
 firebase_creds_json = os.environ.get("FIREBASE_SERVICE_ACCOUNT_JSON")
@@ -108,21 +98,21 @@ except Exception as e:
     db = None
 
 # ----- App Setup -----
-app = FastAPI(title="Eminence Salon API")
+app = FastAPI(title="Jainil Hair Studio API")
 
 def get_fb_config():
     doc = db.collection("settings").document("fb_config").get()
     if doc.exists:
         data = doc.to_dict()
         return {
-            "verify_token": data.get("verify_token") or os.environ.get("FB_VERIFY_TOKEN", "eminence_salon_verify_2026"),
+            "verify_token": data.get("verify_token") or os.environ.get("FB_VERIFY_TOKEN", "jainil_studio_verify_2026"),
             "page_access_token": data.get("page_access_token") or os.environ.get("FB_PAGE_ACCESS_TOKEN", ""),
-            "webhook_secret": data.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+            "webhook_secret": data.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
         }
     return {
-        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "eminence_salon_verify_2026"),
+        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "jainil_studio_verify_2026"),
         "page_access_token": os.environ.get("FB_PAGE_ACCESS_TOKEN", ""),
-        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     }
 
 @firestore.transactional
@@ -442,17 +432,17 @@ def admin_get_fb_config(user: dict = Depends(require_admin)):
     if doc.exists:
         return doc.to_dict()
     return {
-        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "eminence_salon_verify_2026"),
+        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "jainil_studio_verify_2026"),
         "page_access_token": os.environ.get("FB_PAGE_ACCESS_TOKEN", ""),
-        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     }
 
 @api.post("/admin/fb-config")
 def admin_set_fb_config(data: dict, user: dict = Depends(require_admin)):
     db.collection("settings").document("fb_config").set({
-        "verify_token": data.get("verify_token", "eminence_salon_verify_2026"),
+        "verify_token": data.get("verify_token", "jainil_studio_verify_2026"),
         "page_access_token": data.get("page_access_token", ""),
-        "webhook_secret": data.get("webhook_secret", "eminence_secret_123"),
+        "webhook_secret": data.get("webhook_secret", "jainil_secret_123"),
         "updated_at": now_iso(),
         "updated_by": user["id"]
     })
@@ -503,6 +493,11 @@ class RegisterIn(BaseModel):
     product_commission_rate: Optional[float] = None
     username: Optional[str] = None
     monthly_target: Optional[float] = None
+    wigfitting_commission_rate: Optional[float] = None
+    wigfitting_commission_inr: Optional[float] = None
+    commission_type: Optional[str] = "percent"
+    commission_slabs: Optional[List[dict]] = None
+    custom_commission_enabled: Optional[bool] = False
 
 
 
@@ -643,7 +638,7 @@ class SalonProductIn(BaseModel):
     description: Optional[str] = ""
 class ReviewIn(BaseModel): rating: int = Field(ge=1, le=5); comment: str
 class BookingIn(BaseModel): service_id: str; stylist_id: Optional[str] = None; date: str; time: str; notes: Optional[str] = ""
-class CartItem(BaseModel): product_id: str; quantity: int; package_id: Optional[str] = None; service_provider: Optional[str] = None; service_provider_2: Optional[str] = None; extra_providers: Optional[List[str]] = []; discount: Optional[float] = 0.0; discount_type: Optional[str] = "INR"
+class CartItem(BaseModel): product_id: str; quantity: int; package_id: Optional[str] = None; service_provider: Optional[str] = None; service_provider_2: Optional[str] = None; extra_providers: Optional[List[str]] = []; discount: Optional[float] = 0.0; discount_type: Optional[str] = "INR"; is_wigfitting_done: Optional[bool] = False
 class OrderIn(BaseModel): items: List[CartItem]; full_name: str; phone: str; address: str; city: str = "Vadodara"; pincode: str; notes: Optional[str] = ""; points_used: Optional[int] = 0; employee_id: Optional[str] = None; employee_name: Optional[str] = None; payment_method: Optional[str] = None; split_payments: Optional[List[dict]] = None; add_to_wallet: Optional[bool] = False; discount: Optional[float] = 0.0; branch: Optional[str] = None; created_at: Optional[str] = None; shipment_date: Optional[str] = None; shipped_date: Optional[str] = None; courier_name: Optional[str] = None; tracking_number: Optional[str] = None
 class StatusUpdate(BaseModel): status: str
 class ManualSaleIn(BaseModel):
@@ -860,7 +855,7 @@ def admin_create_leave_request(data: AdminLeaveRequestIn, admin: dict = Depends(
 @api.get("/admin/leaves")
 def get_admin_leaves(admin: dict = Depends(require_admin)):
     branch = admin.get("branch")
-    is_super = admin.get("email", "").lower() == "superadmin@eminence.com" or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
+    is_super = admin.get("email", "").lower() in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"] or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
     
     docs = db.collection("leave_requests").stream()
     results = []
@@ -881,7 +876,7 @@ def approve_leave_request(rid: str, admin: dict = Depends(require_admin)):
         raise HTTPException(404, "Leave request not found")
     r = doc.to_dict()
     
-    is_super = admin.get("email", "").lower() == "superadmin@eminence.com" or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
+    is_super = admin.get("email", "").lower() in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"] or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
     current_status = r.get("status", "pending")
     
     if not is_super:
@@ -1149,7 +1144,7 @@ async def list_products(request: Request, category: Optional[str] = None, search
 
     # Scoping branch-wise
     user = await get_optional_user(request)
-    if user and user.get("role") == "admin" and user.get("email", "").lower() != "superadmin@eminence.com":
+    if user and user.get("role") == "admin" and user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         if not branch:
             branch = user.get("branch")
 
@@ -1406,7 +1401,8 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
             "extra_providers": item.extra_providers or [],
             "type": "service" if is_service else ("package" if is_package else "product"),
             "discount": item.discount or 0.0,
-            "discount_type": item.discount_type or "INR"
+            "discount_type": item.discount_type or "INR",
+            "is_wigfitting_done": bool(item.is_wigfitting_done)
         })
         
         # Package purchase logic
@@ -1498,7 +1494,7 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
         </div>
         """
         try:
-            send_email(ADMIN_EMAIL, "LOW STOCK ALERT - Eminence Salon", email_body)
+            send_email(ADMIN_EMAIL, "LOW STOCK ALERT - Jainil Hair Studio", email_body)
         except:
             logger.error("Failed to send low stock notification")
 
@@ -1720,7 +1716,7 @@ def get_order_invoice(oid: str):
         row_heights_sum += num_lines * 9 + 4
 
     page_width = 280
-    page_height = 360 + row_heights_sum
+    page_height = 405 + row_heights_sum
 
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=(page_width, page_height))
@@ -1733,32 +1729,63 @@ def get_order_invoice(oid: str):
         c.line(12, y_pos, page_width - 12, y_pos)
         c.setDash()
 
+    # ── JAINIL LOGO AT TOP ────────────────────────────────────────────────
+    hy = page_height - 8
+    logo_file = "frontend/public/assets/logo.svg"
+    if not os.path.exists(logo_file):
+        logo_file = os.path.join(os.path.dirname(__file__), "../frontend/public/assets/logo.svg")
+    if not os.path.exists(logo_file):
+        logo_file = os.path.join(os.path.dirname(__file__), "logo.svg")
+
+    try:
+        if os.path.exists(logo_file):
+            drawing = svg2rlg(logo_file)
+            target_width = 54.0
+            factor = target_width / drawing.width
+            drawing.width = drawing.width * factor
+            drawing.height = drawing.height * factor
+            drawing.scale(factor, factor)
+            logo_x = (page_width - drawing.width) / 2
+            logo_y = hy - drawing.height
+            renderPDF.draw(drawing, c, logo_x, logo_y)
+            hy = logo_y - 6
+        else:
+            hy -= 6
+    except Exception as e:
+        logger.error(f"Error drawing invoice logo: {e}")
+        hy -= 6
+
     # ── HEADER (Centered) ──────────────────────────────────────────────────
-    c.setFont("Helvetica", 7.5)
-    c.setFillColorRGB(0.1, 0.1, 0.1)
+    c.setFont("Helvetica-Bold", 9.5)
+    c.setFillColorRGB(0.06, 0.35, 0.23) # Jainil Emerald
+    c.drawCentredString(page_width / 2, hy, "JAINIL HAIR STUDIO")
+    hy -= 10
+
+    c.setFont("Helvetica", 7.2)
+    c.setFillColorRGB(0.15, 0.15, 0.15)
     header_lines = [
-        "GF-7 SHRINATH COMPLEX, NR RELIANCE",
-        "PETROL PUMP, HIGH TENSION ROAD,",
-        "SUBHANPURA VADODARA",
-        f"Contact : {branch_contact}",
-        "Email : eminencesalon0@gmail.com",
-        "Website : www.eminencehair.com",
+        "FF-06/07, Earth Eon, opp. Urmi School,",
+        "Sama Savli Road, Near Urmi School Over Bridge,",
+        "Vadodara, Gujarat 390024",
+        "Contact : +91 84889 05757",
+        "Email : jainilhairstudio@gmail.com",
+        "Website : jainilhairstudio.com",
         "GST No : 24AGAPV1520E1ZX"
     ]
-    hy = page_height - 15
     for line in header_lines:
         c.drawCentredString(page_width / 2, hy, line)
-        hy -= 10
+        hy -= 9.5
 
-    hy -= 4
-    c.setFont("Helvetica-Bold", 10.5)
+    hy -= 3
+    c.setFont("Helvetica-Bold", 10)
+    c.setFillColorRGB(0.1, 0.1, 0.1)
     c.drawCentredString(page_width / 2, hy, "SALES INVOICE")
-    hy -= 11
-    c.setFont("Helvetica", 8)
+    hy -= 10
+    c.setFont("Helvetica", 7.5)
     c.drawCentredString(page_width / 2, hy, f"(Branch : {branch_name})")
 
     # ── CUSTOMER DETAILS ───────────────────────────────────────────────────
-    y = page_height - 120
+    y = hy - 14
     c.setFont("Helvetica", 8)
 
     c.drawString(12, y, "Customer Name")
@@ -1901,7 +1928,7 @@ def get_order_invoice(oid: str):
     return FResponse(
         content=buffer.getvalue(),
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=Eminence_Invoice_{}.pdf".format(order.get("id","")[:8].upper())}
+        headers={"Content-Disposition": "attachment; filename=Jainil_Invoice_{}.pdf".format(order.get("id","")[:8].upper())}
     )
 
 
@@ -1947,6 +1974,11 @@ def create_employee(data: RegisterIn, user: dict = Depends(require_admin)):
         "product_commission_rate": data.product_commission_rate if data.product_commission_rate is not None else 0,
         "username": data.username or "",
         "monthly_target": data.monthly_target if data.monthly_target is not None else 0,
+        "wigfitting_commission_rate": data.wigfitting_commission_rate if data.wigfitting_commission_rate is not None else 0,
+        "wigfitting_commission_inr": data.wigfitting_commission_inr if data.wigfitting_commission_inr is not None else 0,
+        "commission_type": data.commission_type or "percent",
+        "commission_slabs": data.commission_slabs or [],
+        "custom_commission_enabled": data.custom_commission_enabled if data.custom_commission_enabled is not None else (True if data.commission_slabs else False),
     }
     db.collection("users").document(uid).set(user_doc)
     user_doc.pop("password_hash", None)
@@ -2212,7 +2244,7 @@ async def whatsapp_webhook(request: Request):
 def get_duplicate_leads(user: dict = Depends(require_employee)):
     cfg_doc = db.collection("settings").document("meta_config").get()
     cfg = cfg_doc.to_dict() if cfg_doc.exists else {}
-    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
 
     leads = db.collection("leads").stream()
     by_phone = {}
@@ -2237,7 +2269,7 @@ def get_duplicate_leads(user: dict = Depends(require_employee)):
 @app.get("/webhooks/meta-sync")
 def webhook_meta_sync(key: Optional[str] = None):
     cfg = get_fb_config()
-    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     if key != secret:
         raise HTTPException(401, "Unauthorized: Invalid Webhook Key")
         
@@ -2366,7 +2398,7 @@ def webhook_meta_sync(key: Optional[str] = None):
 def webhook_get_duplicate_leads(key: Optional[str] = None, request: Request = None):
     cfg_doc = db.collection("settings").document("meta_config").get()
     cfg = cfg_doc.to_dict() if cfg_doc.exists else {}
-    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     
     auth_key = (request.headers.get("X-Webhook-Key") if request else None) or key
     if auth_key != secret:
@@ -2399,7 +2431,7 @@ def list_leads(all: Optional[bool] = False, branch: Optional[str] = None, user: 
     check_and_reassign_dead_leads()
     coll = db.collection("leads")
 
-    if user.get("role") == "admin" and user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("role") == "admin" and user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
 
     def enrich_lead(lead_dict):
@@ -2602,6 +2634,47 @@ def update_lead_visit(lid: str, data: LeadVisitUpdate, user: dict = Depends(requ
     return doc_ref.get().to_dict()
 
 
+
+@api.get("/leads/lookup-by-phone")
+def lookup_lead_by_phone(phone: str, user: dict = Depends(require_employee)):
+    if not phone:
+        return {"found": False}
+    clean_digits = "".join(filter(str.isdigit, phone))
+    if len(clean_digits) < 5:
+        return {"found": False}
+    phone_suffix = clean_digits[-10:] if len(clean_digits) >= 10 else clean_digits
+
+    leads_docs = db.collection("leads").limit(200).stream()
+    matched = None
+    for d in leads_docs:
+        ld = d.to_dict()
+        lp = "".join(filter(str.isdigit, ld.get("phone", "")))
+        if lp and (lp.endswith(phone_suffix) or phone_suffix in lp):
+            matched = ld
+            break
+
+    if not matched:
+        # Also check clients collection
+        clients_docs = db.collection("clients").limit(200).stream()
+        for d in clients_docs:
+            cd = d.to_dict()
+            cp = "".join(filter(str.isdigit, cd.get("phone", "")))
+            if cp and (cp.endswith(phone_suffix) or phone_suffix in cp):
+                matched = {
+                    "id": cd.get("id"),
+                    "name": cd.get("name"),
+                    "phone": cd.get("phone"),
+                    "branch": cd.get("branch", "Baroda"),
+                    "grade": "Hot",
+                    "status": "visited",
+                    "source": cd.get("source", "Direct"),
+                }
+                break
+
+    if matched:
+        return {"found": True, "lead": matched}
+    return {"found": False}
+
 @api.post("/consultations")
 def create_consultation(data: dict, user: dict = Depends(require_employee)):
     cid = new_id()
@@ -2623,15 +2696,25 @@ def create_consultation(data: dict, user: dict = Depends(require_employee)):
     note_text = f"Consultation Form Submitted.\nConsulted By: {data.get('consulted_by')}\nExpected Look: {data.get('expected_look')}\nBudget: {data.get('budget_range')}\nNotes: {data.get('notes')}"
     note = {"text": note_text, "author": user["name"], "timestamp": now_iso()}
     
+    # Determine appropriate lead status & grade from consulting status
+    cons_status = data.get("status", "Warm")
+    lead_status = "converted" if cons_status == "Closed" else "visited"
+    lead_grade = cons_status
+
     if existing:
         lead_ref = existing[0].reference
-        lead_ref.update({
-            "status": "visited",
-            "grade": data.get("status", existing[0].to_dict().get("grade")),
+        update_fields = {
+            "status": lead_status,
+            "grade": lead_grade,
+            "name": data.get("name") or existing[0].to_dict().get("name"),
+            "branch": data.get("location") or existing[0].to_dict().get("branch"),
             "follow_up_date": data.get("follow_up_date") or existing[0].to_dict().get("follow_up_date"),
             "notes": firestore.ArrayUnion([note]),
             "updated_at": now_iso()
-        })
+        }
+        if data.get("source"):
+            update_fields["source"] = data.get("source")
+        lead_ref.update(update_fields)
     else:
         lid = new_id()
         lead_doc = {
@@ -2754,6 +2837,11 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Visit Scheduled":
         update_data["status"] = "visit"
+        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
+        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
+    elif data.outcome in ["Visit Scheduled Dead", "Visit Scheduled Dead (Not Visited / Retarget)"]:
+        update_data["status"] = "visit scheduled dead"
+        update_data["previous_status"] = "visit"
         if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
         if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Visited":
@@ -3110,7 +3198,7 @@ def get_clients_segmentation(user: dict = Depends(require_employee)):
 
 @api.get("/admin/stats")
 def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
 
     # Return from cache if fresh (5-minute TTL)
@@ -3499,7 +3587,7 @@ def receive_pending_payment(lead_id: str, payload: dict, user: dict = Depends(ge
 
 @api.get("/admin/orders")
 def admin_orders(limit: int = 200, branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    is_super = user.get("email", "").lower() == "superadmin@eminence.com"
+    is_super = user.get("email", "").lower() in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]
     active_branch = branch if is_super else user.get("branch")
 
     q = db.collection("orders")
@@ -3630,16 +3718,32 @@ def get_consultation_media():
         if "before_after" not in data:
             old_images = data.get("images", [])
             old_videos = data.get("videos", [])
-            data = {
-                "before_after": {
-                    "images": old_images[:3] if len(old_images) >= 3 else old_images,
-                    "videos": old_videos[:2] if len(old_videos) >= 2 else old_videos
-                },
-                "client_reviews": {
-                    "images": old_images[3:] if len(old_images) >= 3 else [],
-                    "videos": old_videos[2:] if len(old_videos) >= 2 else []
-                }
+            data["before_after"] = {
+                "images": old_images[:3] if len(old_images) >= 3 else old_images,
+                "videos": old_videos[:2] if len(old_videos) >= 2 else old_videos
             }
+            data["client_reviews"] = {
+                "images": old_images[3:] if len(old_images) >= 3 else [],
+                "videos": old_videos[2:] if len(old_videos) >= 2 else []
+            }
+            
+        # Build gallery items from before_after_list and before_after images if not present
+        if "gallery" not in data or not data["gallery"]:
+            gallery = []
+            for ba in data.get("before_after_list", []):
+                if ba.get("before_img"):
+                    gallery.append({"type": "before", "gender": "men", "url": ba["before_img"], "title": ba.get("title", "Before")})
+                if ba.get("after_img"):
+                    gallery.append({"type": "after", "gender": "men", "url": ba["after_img"], "title": ba.get("title", "After")})
+            
+            raw_imgs = data.get("before_after", {}).get("images", [])
+            for idx, img in enumerate(raw_imgs):
+                if idx % 2 == 0:
+                    gallery.append({"type": "before", "gender": "men", "url": img, "title": f"Before Transformation {idx+1}"})
+                else:
+                    gallery.append({"type": "after", "gender": "men", "url": img, "title": f"After Transformation {idx+1}"})
+            data["gallery"] = gallery
+            
         return data
     return {
         "before_after": {
@@ -3710,7 +3814,7 @@ def get_admin_permissions(_: dict = Depends(require_admin)):
 
 @api.post("/admin/permissions")
 def set_admin_permissions(data: dict, user: dict = Depends(require_admin)):
-    is_super = user.get("email", "").lower() == "superadmin@eminence.com"
+    is_super = user.get("email", "").lower() in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]
     if not is_super:
         doc = db.collection("settings").document("admin_permissions").get()
         perms = doc.to_dict().get("allowed_tabs", []) if doc.exists else "__ALL__"
@@ -3736,7 +3840,7 @@ def get_branches(_: dict = Depends(require_admin)):
         default_branches = ["Surat", "Baroda"]
         for b_name in default_branches:
             b_id = b_name.lower()
-            email = f"admin_{b_id}@eminence.com"
+            email = f"admin_{b_id}@jainil.com"
             password = f"{b_name}@123"
             
             # check if user already exists
@@ -3785,7 +3889,7 @@ def create_branch(data: BranchIn, _: dict = Depends(require_admin)):
     if existing.exists:
         raise HTTPException(400, "Branch already exists")
         
-    email = f"admin_{b_id}@eminence.com"
+    email = f"admin_{b_id}@jainil.com"
     
     # Generate unique random password
     import string
@@ -3831,7 +3935,7 @@ def admin_attendance(_: dict = Depends(require_admin)):
 
 @api.get("/admin/payroll")
 def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
         
     filter_val = month or now_iso()[:7]
@@ -3960,15 +4064,134 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
         package_commission_inr = emp.get("package_commission_inr", 0)
         member_commission_rate = emp.get("member_commission_rate", 0.0)
         member_commission_inr = emp.get("member_commission_inr", 0)
-        
+
+        # Track daily breakdown of services and commissions for service providers
+        daily_commissions_map = {}
+        for o in all_orders:
+            o_date = (o.get("created_at") or "")[:10]
+            if not o_date:
+                continue
+            for it in o.get("items", []):
+                if it.get("service_provider") == emp_id or it.get("service_provider_2") == emp_id:
+                    it_name = it.get("name", "Service")
+                    it_qty = it.get("quantity", 1)
+                    it_price = float(it.get("price", 0.0))
+                    it_line_total = float(it.get("line_total", it_price * it_qty))
+                    it_type = it.get("type", "service")
+
+                    # Calculate commission for this individual item (including Wig Fitting only if done)
+                    it_comm = 0.0
+                    wigfitting_commission_rate = emp.get("wigfitting_commission_rate", 0.0)
+                    wigfitting_commission_inr = emp.get("wigfitting_commission_inr", 0.0)
+                    is_wig = "wig" in it_name.lower() or "patch" in it_name.lower() or "fitting" in it_name.lower()
+                    is_wig_done = bool(it.get("is_wigfitting_done", False)) or (is_wig and it.get("is_wigfitting_done") is None)
+
+                    if is_wig:
+                        # Only award wig fitting commission if is_wigfitting_done is checked / true
+                        if is_wig_done and (wigfitting_commission_inr > 0 or wigfitting_commission_rate > 0):
+                            it_comm = (wigfitting_commission_inr * it_qty) if wigfitting_commission_inr > 0 else (it_line_total * wigfitting_commission_rate)
+                        elif is_wig_done:
+                            it_comm = (service_commission_inr * it_qty) if service_commission_inr > 0 else (it_line_total * comm_rate)
+                        else:
+                            it_comm = 0.0
+                    elif it_type == "product":
+                        it_comm = (product_commission_inr * it_qty) if product_commission_inr > 0 else (it_line_total * product_commission_rate)
+                    elif it_type == "package":
+                        it_comm = (package_commission_inr * it_qty) if package_commission_inr > 0 else (it_line_total * package_commission_rate)
+                    elif it_type == "membership":
+                        it_comm = (member_commission_inr * it_qty) if member_commission_inr > 0 else (it_line_total * member_commission_rate)
+                    else:
+                        it_comm = (service_commission_inr * it_qty) if service_commission_inr > 0 else (it_line_total * comm_rate)
+
+                    if o_date not in daily_commissions_map:
+                        daily_commissions_map[o_date] = {
+                            "date": o_date,
+                            "total_sales": 0.0,
+                            "total_commission": 0.0,
+                            "services_count": 0,
+                            "items": []
+                        }
+                    daily_commissions_map[o_date]["total_sales"] += it_line_total
+                    daily_commissions_map[o_date]["total_commission"] += it_comm
+                    daily_commissions_map[o_date]["services_count"] += it_qty
+                    daily_commissions_map[o_date]["items"].append({
+                        "name": it_name,
+                        "type": it_type,
+                        "quantity": it_qty,
+                        "price": it_price,
+                        "commission": round(it_comm, 2)
+                    })
+
+        # For sales employees, build daily sales breakdown from payments and orders
         if emp.get("role") == "sales":
-            # For sales employees, calculate main commission based on lead payments and manual sales
+            sales_daily_map = {}
+            for p in emp_payments:
+                p_date = (p.get("timestamp") or "")[:10]
+                if not p_date: continue
+                if p_date not in sales_daily_map:
+                    sales_daily_map[p_date] = {"date": p_date, "total_sales": 0.0, "total_commission": 0.0, "services_count": 0, "items": []}
+                amt = float(p.get("amount", 0))
+                sales_daily_map[p_date]["total_sales"] += amt
+                sales_daily_map[p_date]["services_count"] += 1
+                sales_daily_map[p_date]["items"].append({"name": f"Payment ({p.get('method', 'UPI')})", "type": "sale", "quantity": 1, "price": amt, "commission": 0.0})
+            
+            for s in emp_manual:
+                s_date = (s.get("date") or "")[:10]
+                if not s_date: continue
+                if s_date not in sales_daily_map:
+                    sales_daily_map[s_date] = {"date": s_date, "total_sales": 0.0, "total_commission": 0.0, "services_count": 0, "items": []}
+                amt = float(s.get("amount", 0))
+                sales_daily_map[s_date]["total_sales"] += amt
+                sales_daily_map[s_date]["services_count"] += 1
+                sales_daily_map[s_date]["items"].append({"name": "Manual Sale Entry", "type": "sale", "quantity": 1, "price": amt, "commission": 0.0})
+
+            # Calculate commission with tiered target slabs (INR or %) or default
             service_sales = total_sales
-            service_commission = service_sales * comm_rate
+            slabs = emp.get("commission_slabs") or []
+            is_custom = emp.get("custom_commission_enabled", False) or bool(slabs)
+            
+            if is_custom and slabs:
+                calculated_comm = 0.0
+                matched_slab = None
+                for slab in slabs:
+                    min_t = float(slab.get("min_target", 0) or 0)
+                    max_t = slab.get("max_target")
+                    max_t_val = float(max_t) if (max_t is not None and str(max_t).strip() != "" and str(max_t).lower() != "none") else float("inf")
+                    if min_t <= service_sales <= max_t_val:
+                        matched_slab = slab
+                        break
+                
+                if matched_slab:
+                    c_type = matched_slab.get("type", "%")
+                    c_val = float(matched_slab.get("value", 0) or 0)
+                    if c_type == "₹" or c_type == "INR":
+                        calculated_comm = c_val
+                    else:
+                        calculated_comm = service_sales * (c_val / 100.0)
+                else:
+                    calculated_comm = service_sales * comm_rate
+                service_commission = calculated_comm
+            else:
+                c_type = emp.get("commission_type", "%")
+                if c_type == "₹" or c_type == "INR":
+                    service_commission = float(emp.get("commission_inr", 0) or 0)
+                else:
+                    service_commission = service_sales * comm_rate
+
+            # Distribute commission proportionally or as calculated across daily sales
+            effective_comm_rate = (service_commission / service_sales) if service_sales > 0 else 0.0
+            for d_val in sales_daily_map.values():
+                d_comm = round(d_val["total_sales"] * effective_comm_rate, 2)
+                d_val["total_commission"] = d_comm
+                for it in d_val["items"]:
+                    it["commission"] = round(it["price"] * effective_comm_rate, 2)
+
+            daily_commissions_list = sorted(sales_daily_map.values(), key=lambda x: x["date"], reverse=True)
             product_commission = 0.0
             package_commission = 0.0
             membership_commission = 0.0
         else:
+            daily_commissions_list = sorted(daily_commissions_map.values(), key=lambda x: x["date"], reverse=True)
             # For service employees, calculate commissions from orders
             target = emp.get("monthly_target", 0)
             if target > 0 and service_sales < target:
@@ -4054,7 +4277,11 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
         
         late_penalty = max(0, late_days - 3) * 100
         
-        total_payout = base + commission - attendance_deduction - late_penalty
+                # For service providers, commission is paid out daily / separately and NOT added into monthly salary
+        if emp.get("role") == "service":
+            total_payout = base - attendance_deduction - late_penalty
+        else:
+            total_payout = base + commission - attendance_deduction - late_penalty
         
         payroll_data.append({
             "id": emp_id,
@@ -4080,6 +4307,8 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
             "membership_commission_rate": member_commission_rate,
             "attendance_deduction": attendance_deduction,
             "late_penalty": late_penalty,
+            "daily_commissions": daily_commissions_list,
+            "total_daily_commission": sum(d["total_commission"] for d in daily_commissions_list),
             "attendance_details": {
                 "late_days": late_days,
                 "unpaid_leaves": unpaid_leaves,
@@ -4093,7 +4322,7 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
 
 @api.get("/admin/reports")
 def admin_reports(month: Optional[str] = None, branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
         
     filter_val = month or now_iso()[:7]
@@ -4351,7 +4580,7 @@ def update_employee(uid: str, data: dict, _: dict = Depends(require_admin)):
         "is_active", "base_salary", "pancard_image", "adhaar_card_image",
         "date_of_birth", "working_hours_from", "working_hours_to", "service_provider_type",
         "emergency_contact_number", "emergency_contact_person", "address", "gender",
-        "date_of_joining", "id_proof_image", "photo", "product_commission_rate", "username",
+        "date_of_joining", "id_proof_image", "photo", "product_commission_rate", "username", "commission_type", "commission_slabs", "custom_commission_enabled", "wigfitting_commission_rate", "wigfitting_commission_inr",
         "allowed_weekoffs"
     ]
     update_data = {k: v for k, v in data.items() if k in allowed}
@@ -4450,7 +4679,7 @@ def admin_create_product(data: ProductIn, user: dict = Depends(require_admin)):
     ensure_category_exists(data.category)
     pid = new_id()
     prod_branch = getattr(data, "branch", None)
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         prod_branch = user.get("branch") or "Baroda"
     elif not prod_branch:
         prod_branch = "Baroda"
@@ -4468,7 +4697,7 @@ def admin_update_product(pid: str, data: ProductIn, user: dict = Depends(require
         raise HTTPException(404, "Product not found")
 
     prod_branch = getattr(data, "branch", None)
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         prod_branch = user.get("branch") or "Baroda"
     elif not prod_branch:
         prod_branch = "Baroda"
@@ -4637,7 +4866,7 @@ class ProductAddStockIn(BaseModel):
     vendor_name: str
     invoice_no: Optional[str] = ""
     cost_price: float
-    selling_price: float
+    selling_price: Optional[float] = None
     expiry_date: Optional[str] = ""
     remarks: Optional[str] = ""
     amount_paid: Optional[float] = 0.0
@@ -4696,8 +4925,9 @@ def admin_add_product_stock(data: ProductAddStockIn, _: dict = Depends(require_a
     update_data = {
         "stock": current_stock + data.quantity,
         "branch_stock": b_stock,
-        "price": data.selling_price
     }
+    if data.selling_price is not None and data.selling_price > 0:
+        update_data["price"] = data.selling_price
     if data.branch:
         update_data["branch"] = data.branch
 
@@ -4740,7 +4970,7 @@ def admin_update_stock_log_payment(lid: str, data: UpdateStockLogPaymentIn, _: d
 
 @api.get("/admin/products/stock-logs")
 def admin_list_stock_logs(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
 
     q = db.collection("stock_logs")
@@ -4762,7 +4992,7 @@ class ProductUseIn(BaseModel):
 
 @api.get("/admin/products/usages")
 def admin_list_usages(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
 
     q = db.collection("product_usages")
@@ -5005,7 +5235,7 @@ class ExpenseIn(BaseModel):
 
 @api.get("/admin/expenses")
 def admin_list_expenses(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() not in ["superadmin@jainil.com", "superadmin@jainilhairsaloon.com", "superadmin@eminence.com"]:
         branch = user.get("branch")
 
     docs = db.collection("expenses").stream()
@@ -5531,56 +5761,18 @@ def receptionist_assign_stylist(bid: str, data: AssignStylistIn, _: dict = Depen
     return {"ok": True}
 
 
-class RazorpayOrderReq(BaseModel):
-    amount: float
-
-class RazorpayVerifyReq(BaseModel):
-    razorpay_payment_id: str
-    razorpay_order_id: str
-    razorpay_signature: str
-
 @api.get("/razorpay/config")
 def get_razorpay_config():
-    if not RAZORPAY_KEY_ID:
-        raise HTTPException(500, "Razorpay is not configured on the server.")
-    return {"key_id": RAZORPAY_KEY_ID}
+    return {"key_id": None}
 
 @api.post("/razorpay/create_order")
-def create_razorpay_order(req: RazorpayOrderReq):
-    if not razorpay_client:
-        raise HTTPException(500, "Razorpay is not configured.")
-    try:
-        # Razorpay amount is in paise (INR)
-        amount_in_paise = int(req.amount * 100)
-        order_data = {
-            "amount": amount_in_paise,
-            "currency": "INR",
-            "receipt": f"receipt_{uuid.uuid4().hex[:8]}"
-        }
-        order = razorpay_client.order.create(data=order_data)
-        return order
-    except Exception as e:
-        logger.error(f"Razorpay Create Order Error: {e}")
-        raise HTTPException(500, str(e))
+def create_razorpay_order(data: dict):
+    return {"ok": False, "message": "Online payment is disabled."}
 
 @api.post("/razorpay/verify")
-def verify_razorpay_payment(req: RazorpayVerifyReq):
-    if not razorpay_client:
-        raise HTTPException(500, "Razorpay is not configured.")
-    try:
-        # Verification throws a SignatureVerificationError if invalid
-        razorpay_client.utility.verify_payment_signature({
-            'razorpay_order_id': req.razorpay_order_id,
-            'razorpay_payment_id': req.razorpay_payment_id,
-            'razorpay_signature': req.razorpay_signature
-        })
-        return {"ok": True, "status": "verified"}
-    except razorpay.errors.SignatureVerificationError as e:
-        logger.error(f"Razorpay Verify Error: {e}")
-        raise HTTPException(400, "Invalid payment signature")
-    except Exception as e:
-        logger.error(f"Razorpay Verify Unknown Error: {e}")
-        raise HTTPException(500, "Payment verification failed")
+def verify_razorpay_payment(data: dict):
+    return {"ok": True, "status": "verified"}
+
 
 @api.get("/files/{filename:path}")
 def serve_file(filename: str):
@@ -5712,7 +5904,7 @@ def update_appointment_status(bid: str, data: AppointmentStatusUpdate, admin: di
     return {"status": "ok"}
 
 @api.get("/")
-def root(): return {"app": "Eminence Salon API", "vercel": IS_VERCEL}
+def root(): return {"app": "Jainil Hair Studio API", "vercel": IS_VERCEL}
 
 app.include_router(api)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])

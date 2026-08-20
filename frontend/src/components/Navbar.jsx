@@ -36,17 +36,15 @@ export default function Navbar() {
     { to: "/billing", label: t("billing") || "Billing" }
   ] : [
     { to: "/", label: t("home") },
-    { to: "/men", label: t("men") },
-    { to: "/shop", label: t("shop") },
   ];
 
-  const solid = !isHero || scrolled || open;
+  const solid = true;
   const isMenPage = location.pathname === "/men";
-  const txt = solid ? "text-eminence-text" : (isMenPage ? "text-eminence-text" : "text-white");
+  const txt = "text-eminence-text";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <div className={`transition-all duration-500 ${solid ? "bg-white/95 backdrop-blur-md border-b border-eminence-border" : "bg-transparent"}`}>
+      <div className="transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-eminence-border shadow-sm">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
           <nav className="hidden lg:flex items-center gap-10 flex-1">
             {links.map((l) => {

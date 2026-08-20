@@ -37,8 +37,8 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
 JWT_ALGO = "HS256"
 
 # ----- Object Storage (Firebase) -----
-STORAGE_BUCKET = os.environ.get("FIREBASE_STORAGE_BUCKET", "eminence-e436f.appspot.com")
-APP_NAME = os.environ.get("APP_NAME", "eminence-salon")
+STORAGE_BUCKET = os.environ.get("FIREBASE_STORAGE_BUCKET", "jainil-e436f.appspot.com")
+APP_NAME = os.environ.get("APP_NAME", "jainil-salon")
 
 
 # ----- Local disk storage (replaces Firebase Storage) -----
@@ -77,10 +77,10 @@ else:
 
 db = firestore.client()
 
-app = FastAPI(title="Eminence Salon API")
+app = FastAPI(title="Jainil Hair Studio API")
 api = APIRouter(prefix="/api")
 
-logger = logging.getLogger("eminence")
+logger = logging.getLogger("jainil")
 logging.basicConfig(level=logging.INFO)
 
 
@@ -661,7 +661,7 @@ def admin_create_leave_request(data: AdminLeaveRequestIn, admin: dict = Depends(
 @api.get("/admin/leaves")
 def get_admin_leaves(admin: dict = Depends(require_admin)):
     branch = admin.get("branch")
-    is_super = admin.get("email", "").lower() == "superadmin@eminence.com" or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
+    is_super = admin.get("email", "").lower() == "superadmin@jainil.com" or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
     
     docs = db.collection("leave_requests").stream()
     results = []
@@ -682,7 +682,7 @@ def approve_leave_request(rid: str, admin: dict = Depends(require_admin)):
         raise HTTPException(404, "Leave request not found")
     r = doc.to_dict()
     
-    is_super = admin.get("email", "").lower() == "superadmin@eminence.com" or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
+    is_super = admin.get("email", "").lower() == "superadmin@jainil.com" or admin.get("role") == "super_admin" or admin.get("is_super_admin") is True
     current_status = r.get("status", "pending")
     
     if is_super:
@@ -885,7 +885,7 @@ async def list_products(request: Request, category: Optional[str] = None, search
 
     # Scoping branch-wise
     user = await get_optional_user(request)
-    if user and user.get("role") == "admin" and user.get("email", "").lower() != "superadmin@eminence.com":
+    if user and user.get("role") == "admin" and user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
     items = [fix_urls(item) for item in cached_products]
@@ -1487,8 +1487,8 @@ def get_order_invoice(oid: str):
         "PETROL PUMP, HIGH TENSION ROAD,",
         "SUBHANPURA VADODARA",
         f"Contact : {branch_contact}",
-        "Email : eminencesalon0@gmail.com",
-        "Website : www.eminencehair.com",
+        "Email : info@jainilhairstudio.com",
+        "Website : jainil-hair-studio.vercel.app",
         "GST No : 24AGAPV1520E1ZX"
     ]
     hy = page_height - 15
@@ -1647,7 +1647,7 @@ def get_order_invoice(oid: str):
     return FResponse(
         content=buffer.getvalue(),
         media_type="application/pdf",
-        headers={"Content-Disposition": "attachment; filename=Eminence_Invoice_{}.pdf".format(order.get("id","")[:8].upper())}
+        headers={"Content-Disposition": "attachment; filename=Jainil_Invoice_{}.pdf".format(order.get("id","")[:8].upper())}
     )
 
 
@@ -1817,7 +1817,7 @@ def get_clients_segmentation(user: dict = Depends(require_employee)):
 
 @api.get("/admin/stats")
 def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
     # Return from cache if fresh (5-minute TTL)
@@ -2061,7 +2061,7 @@ def admin_update_booking(bid: str, data: StatusUpdate, _: dict = Depends(require
 
 @api.get("/admin/orders")
 def admin_orders(limit: int = 200, branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
     q = db.collection("orders")
@@ -2293,7 +2293,7 @@ def admin_create_product(data: ProductIn, user: dict = Depends(require_admin)):
     ensure_category_exists(data.category)
     pid = new_id()
     prod_branch = getattr(data, "branch", None)
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         prod_branch = user.get("branch") or "Baroda"
     elif not prod_branch:
         prod_branch = "Baroda"
@@ -2312,7 +2312,7 @@ def admin_update_product(pid: str, data: ProductIn, user: dict = Depends(require
         raise HTTPException(404, "Product not found")
 
     prod_branch = getattr(data, "branch", None)
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         prod_branch = user.get("branch") or "Baroda"
     elif not prod_branch:
         prod_branch = "Baroda"
@@ -2364,7 +2364,7 @@ class UpdateStockLogPaymentIn(BaseModel):
 
 @api.get("/admin/products/usages")
 def admin_list_usages(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
     q = db.collection("product_usages")
@@ -2532,7 +2532,7 @@ class ExpenseIn(BaseModel):
 
 @api.get("/admin/expenses")
 def admin_list_expenses(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
     docs = db.collection("expenses").stream()
@@ -2595,7 +2595,7 @@ def delete_expense_category(name: str, _: dict = Depends(require_admin)):
 
 @api.get("/admin/products/stock-logs")
 def admin_list_stock_logs(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
     q = db.collection("stock_logs")
@@ -2984,7 +2984,7 @@ def get_admin_permissions(_: dict = Depends(require_admin)):
 @api.post("/admin/permissions")
 def set_admin_permissions(data: dict, user: dict = Depends(require_admin)):
     """Only the Super Admin (identified by email) may configure admin permissions."""
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         raise HTTPException(403, "Only Super Admin can modify access permissions")
     allowed_tabs = data.get("allowed_tabs", "__ALL__")
     db.collection("settings").document("admin_permissions").set({
@@ -3005,7 +3005,7 @@ def get_branches(_: dict = Depends(require_admin)):
         default_branches = ["Surat", "Baroda"]
         for b_name in default_branches:
             b_id = b_name.lower()
-            email = f"admin_{b_id}@eminence.com"
+            email = f"admin_{b_id}@jainil.com"
             password = f"{b_name}@123"
             
             # check if user already exists
@@ -3054,7 +3054,7 @@ def create_branch(data: BranchIn, _: dict = Depends(require_admin)):
     if existing.exists:
         raise HTTPException(400, "Branch already exists")
         
-    email = f"admin_{b_id}@eminence.com"
+    email = f"admin_{b_id}@jainil.com"
     
     # Generate unique random password
     import string
@@ -3257,7 +3257,7 @@ def serve_file(filename: str):
 
 @api.get("/")
 async def root():
-    return {"app": "Eminence Salon API", "city": "Vadodara"}
+    return {"app": "Jainil Hair Studio API", "city": "Vadodara"}
 
 
 # ----- Employees -----
@@ -3271,7 +3271,7 @@ def list_employees(user: dict = Depends(require_employee)):
 
 @api.get("/admin/reports")
 def admin_reports(month: Optional[str] = Query(None), branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@eminence.com":
+    if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
         
     filter_val = month if month else now_iso()[:7]
@@ -3402,7 +3402,7 @@ def update_employee(uid: str, data: dict, user: dict = Depends(require_admin)):
         "is_active", "base_salary", "pancard_image", "adhaar_card_image",
         "date_of_birth", "working_hours_from", "working_hours_to", "service_provider_type",
         "emergency_contact_number", "emergency_contact_person", "address", "gender",
-        "date_of_joining", "id_proof_image", "photo", "product_commission_rate", "username", "service_commission_inr", "product_commission_inr", "package_commission_rate", "package_commission_inr", "member_commission_rate", "member_commission_inr"
+        "date_of_joining", "id_proof_image", "photo", "product_commission_rate", "username", "service_commission_inr", "product_commission_inr", "package_commission_rate", "package_commission_inr", "member_commission_rate", "member_commission_inr", "commission_type", "commission_slabs", "custom_commission_enabled", "wigfitting_commission_rate", "wigfitting_commission_inr"
     ]
     update_data = {k: v for k, v in data.items() if k in allowed}
     
@@ -3671,14 +3671,14 @@ def get_fb_config():
     if doc.exists:
         data = doc.to_dict()
         return {
-            "verify_token": data.get("verify_token") or os.environ.get("FB_VERIFY_TOKEN", "eminence_salon_verify_2026"),
+            "verify_token": data.get("verify_token") or os.environ.get("FB_VERIFY_TOKEN", "jainil_studio_verify_2026"),
             "page_access_token": data.get("page_access_token") or os.environ.get("FB_PAGE_ACCESS_TOKEN", ""),
-            "webhook_secret": data.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+            "webhook_secret": data.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
         }
     return {
-        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "eminence_salon_verify_2026"),
+        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "jainil_studio_verify_2026"),
         "page_access_token": os.environ.get("FB_PAGE_ACCESS_TOKEN", ""),
-        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     }
 
 @firestore.transactional
@@ -3744,17 +3744,17 @@ def admin_get_fb_config(user: dict = Depends(require_admin)):
     if doc.exists:
         return doc.to_dict()
     return {
-        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "eminence_salon_verify_2026"),
+        "verify_token": os.environ.get("FB_VERIFY_TOKEN", "jainil_studio_verify_2026"),
         "page_access_token": os.environ.get("FB_PAGE_ACCESS_TOKEN", ""),
-        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+        "webhook_secret": os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     }
 
 @api.post("/admin/fb-config")
 def admin_set_fb_config(data: dict, user: dict = Depends(require_admin)):
     db.collection("settings").document("fb_config").set({
-        "verify_token": data.get("verify_token", "eminence_salon_verify_2026"),
+        "verify_token": data.get("verify_token", "jainil_studio_verify_2026"),
         "page_access_token": data.get("page_access_token", ""),
-        "webhook_secret": data.get("webhook_secret", "eminence_secret_123"),
+        "webhook_secret": data.get("webhook_secret", "jainil_secret_123"),
         "updated_at": now_iso(),
         "updated_by": user["id"]
     })
@@ -4044,7 +4044,7 @@ async def whatsapp_webhook(request: Request):
 def get_duplicate_leads(user: dict = Depends(require_employee)):
     cfg_doc = db.collection("settings").document("meta_config").get()
     cfg = cfg_doc.to_dict() if cfg_doc.exists else {}
-    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
 
     leads = db.collection("leads").stream()
     by_phone = {}
@@ -4069,7 +4069,7 @@ def get_duplicate_leads(user: dict = Depends(require_employee)):
 @app.get("/webhooks/meta-sync")
 def webhook_meta_sync(key: Optional[str] = None):
     cfg = get_fb_config()
-    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     if key != secret:
         raise HTTPException(401, "Unauthorized: Invalid Webhook Key")
         
@@ -4192,7 +4192,7 @@ def webhook_meta_sync(key: Optional[str] = None):
 def webhook_get_duplicate_leads(key: Optional[str] = None, request: Request = None):
     cfg_doc = db.collection("settings").document("meta_config").get()
     cfg = cfg_doc.to_dict() if cfg_doc.exists else {}
-    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "eminence_secret_123")
+    secret = cfg.get("webhook_secret") or os.environ.get("WEBHOOK_SECRET", "jainil_secret_123")
     
     auth_key = (request.headers.get("X-Webhook-Key") if request else None) or key
     if auth_key != secret:
@@ -4883,7 +4883,7 @@ def seed():
         uid = new_id()
         db.collection("users").document(uid).set({
             "id": uid,
-            "name": "Eminence Admin",
+            "name": "Jainil Hair Studio Admin",
             "email": ADMIN_EMAIL,
             "password_hash": hash_password(ADMIN_PASSWORD),
             "phone": "+91 99999 99999",
@@ -4900,7 +4900,7 @@ def seed():
             })
 
     # Demo user
-    demo_email = "demo@eminence.com"
+    demo_email = "demo@jainil.com"
     if not db.collection("users").where("email", "==", demo_email).limit(1).get():
         uid = new_id()
         db.collection("users").document(uid).set({

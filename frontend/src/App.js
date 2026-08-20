@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, BrowserRouter, Routes, Route } from "react-router-dom";
+import { useLocation, BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "@/App.css";
 import { Toaster } from "sonner";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
@@ -105,12 +105,12 @@ function AppContent() {
     <Routes location={location} key={location.pathname}>
       <Route path="/" element={<Layout><Landing /></Layout>} />
       <Route path="/services" element={<Layout><Landing /></Layout>} />
-      <Route path="/men" element={<Layout><Men /></Layout>} />
+      <Route path="/men" element={<Navigate to="/" replace />} />
       <Route path="/book" element={<Layout><ProtectedRoute><Book /></ProtectedRoute></Layout>} />
-      <Route path="/shop" element={<Layout><Shop /></Layout>} />
-      <Route path="/shop/:id" element={<Layout><ProductDetail /></Layout>} />
-      <Route path="/cart" element={<Layout><Cart /></Layout>} />
-      <Route path="/checkout" element={<Layout><ProtectedRoute><Checkout /></ProtectedRoute></Layout>} />
+      <Route path="/shop" element={<Navigate to="/" replace />} />
+      <Route path="/shop/:id" element={<Navigate to="/" replace />} />
+      <Route path="/cart" element={<Navigate to="/" replace />} />
+      <Route path="/checkout" element={<Navigate to="/" replace />} />
       <Route path="/login" element={<Layout><Login /></Layout>} />
       <Route path="/register" element={<Layout><Register /></Layout>} />
       <Route path="/dashboard" element={<Layout><ProtectedRoute><Dashboard /></ProtectedRoute></Layout>} />

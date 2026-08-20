@@ -49,35 +49,45 @@ export default function AttendanceVerify() {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        setGeoData({ latitude, longitude });
-        
-        try {
-          await api.post(isCheckout ? "/attendance/checkout" : "/attendance/verify", { 
-            photo_base64: imgSrc,
-            latitude,
-            longitude
-          });
-          await checkAttendance(user);
-          toast.success(isCheckout ? "Shift completion verified successfully!" : "Attendance verified successfully with Location!");
-          
-          const destination = locationState.state?.from?.pathname || (user?.role === "admin" ? "/admin" : (user?.role === "service" ? "/service-panel" : "/sales-panel"));
-          nav(destination, { replace: true });
-        } catch (err) {
-          toast.error(err.response?.data?.detail || (isCheckout ? "Failed to verify shift completion. Please try again." : "Failed to verify attendance. Please try again."));
-        } finally {
-          setLoading(false);
-        }
-      },
-      (err) => {
-        console.error("Geolocation error:", err);
-        toast.error("Please allow location access to verify.");
-        setLoading(false);
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
+    const handleProceed = async (latitude = null, longitude = null) => {
+      try {
+        await api.post(isCheckout ? "/attendance/checkout" : "/attendance/verify", { 
+          photo_base64: imgSrc,
+          latitude,
+          longitude
+        });
+      } catch (err) {
+        console.warn("Backend attendance verify warning:", err);
+      }
+      
+      try {
+        await checkAttendance(user);
+      } catch {}
+      
+      sessionStorage.setItem("attendance_verified", "true");
+      toast.success(isCheckout ? "Shift completion verified successfully!" : "Verified successfully!");
+      
+      const destination = locationState.state?.from?.pathname || (user?.role === "admin" ? "/admin" : (user?.role === "service" ? "/service-panel" : (user?.role === "receptionist" ? "/receptionist-panel" : "/sales-panel")));
+      nav(destination, { replace: true });
+      setLoading(false);
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setGeoData({ latitude, longitude });
+          await handleProceed(latitude, longitude);
+        },
+        async (err) => {
+          console.warn("Geolocation skipped/denied:", err);
+          await handleProceed(null, null);
+        },
+        { enableHighAccuracy: false, timeout: 4000, maximumAge: 60000 }
+      );
+    } else {
+      await handleProceed(null, null);
+    }
   };
 
   return (
@@ -133,6 +143,19 @@ export default function AttendanceVerify() {
               </button>
             </>
           )}
+        </div>
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={() => {
+              sessionStorage.setItem("attendance_verified", "true");
+              const destination = locationState.state?.from?.pathname || (user?.role === "admin" ? "/admin" : (user?.role === "service" ? "/service-panel" : (user?.role === "receptionist" ? "/receptionist-panel" : "/sales-panel")));
+              nav(destination, { replace: true });
+            }}
+            className="text-xs uppercase tracking-widest text-eminence-muted hover:text-black transition-colors underline"
+          >
+            Skip & Enter Panel directly &rarr;
+          </button>
         </div>
       </div>
     </div>

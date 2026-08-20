@@ -10,7 +10,7 @@ export const downloadOrderInvoice = async (api, oid) => {
   const url = window.URL.createObjectURL(new Blob([resp.data]));
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', `Eminence_Invoice_${oid.slice(0, 8).toUpperCase()}.pdf`);
+  link.setAttribute('download', `Jainil_Hair_Studio_Invoice_${oid.slice(0, 8).toUpperCase()}.pdf`);
   document.body.appendChild(link);
   link.click();
   link.remove();

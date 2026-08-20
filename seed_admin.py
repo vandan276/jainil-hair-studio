@@ -32,7 +32,7 @@ def now_iso():
     return datetime.now(timezone.utc).isoformat()
 
 def seed_admin():
-    email = "admin@eminence.com"
+    email = "admin@jainil.com"
     password = "Admin@123"
     
     print(f"🚀 Seeding Admin user: {email}...")

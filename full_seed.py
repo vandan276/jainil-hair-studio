@@ -6,7 +6,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 # Use the service account file found in the root
-cred_file = "eminence-e436f-firebase-adminsdk-fbsvc-44d9c3978a.json"
+cred_file = "jainil-e436f-firebase-adminsdk-fbsvc-44d9c3978a.json"
 if os.path.exists(cred_file):
     cred = credentials.Certificate(cred_file)
     firebase_admin.initialize_app(cred)
@@ -28,10 +28,10 @@ def new_id():
     return str(uuid.uuid4())
 
 SAMPLE_EMPLOYEES = [
-    {"name": "Vikram Singh", "email": "vikram@eminence.com", "role": "sales", "branch": "Surat", "section": "Men"},
-    {"name": "Sanya Malhotra", "email": "sanya@eminence.com", "role": "sales", "branch": "Baroda", "section": "Female"},
-    {"name": "Arjun Kapoor", "email": "arjun@eminence.com", "role": "sales", "branch": "Surat", "section": "Men"},
-    {"name": "Priya Sharma", "email": "priya@eminence.com", "role": "sales", "branch": "Baroda", "section": "Female"},
+    {"name": "Vikram Singh", "email": "vikram@jainil.com", "role": "sales", "branch": "Surat", "section": "Men"},
+    {"name": "Sanya Malhotra", "email": "sanya@jainil.com", "role": "sales", "branch": "Baroda", "section": "Female"},
+    {"name": "Arjun Kapoor", "email": "arjun@jainil.com", "role": "sales", "branch": "Surat", "section": "Men"},
+    {"name": "Priya Sharma", "email": "priya@jainil.com", "role": "sales", "branch": "Baroda", "section": "Female"},
 ]
 
 def seed_everything():

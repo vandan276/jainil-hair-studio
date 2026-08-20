@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Loader2, ChevronRight, ChevronLeft, Play, X, Settings } from "lucide-react";
+import { Loader2, ChevronRight, ChevronLeft, Play, X, Settings, Sparkles, BookOpen, Eye, Check } from "lucide-react";
 import api, { getMediaUrl } from "@/lib/api";
 import ImageUpload from "@/components/ImageUpload";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
@@ -20,13 +20,39 @@ export default function Consultancy() {
   const [editBeforeAfter, setEditBeforeAfter] = useState({ images: [], videos: [] });
   const [editClientReviews, setEditClientReviews] = useState({ images: [], videos: [] });
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isLookbookOpen, setIsLookbookOpen] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState(null);
+  const [activePdfViewer, setActivePdfViewer] = useState(null);
   
+  const [beforeAfterList, setBeforeAfterList] = useState([]);
+
   useEffect(() => {
     api.get("/consultation-media")
       .then(res => {
-        setBeforeAfter(res.data.before_after || { images: [], videos: [] });
-        setClientReviews(res.data.client_reviews || { images: [], videos: [] });
-        setGallery(res.data.gallery || []);
+        const d = res.data || {};
+        setBeforeAfter(d.before_after || { images: [], videos: [] });
+        setClientReviews(d.client_reviews || { images: [], videos: [] });
+        setBeforeAfterList(d.before_after_list || []);
+
+        let galleryItems = d.gallery || [];
+        if (!galleryItems || galleryItems.length === 0) {
+          // Fallback: generate gallery items from before_after_list and before_after images in database
+          const items = [];
+          (d.before_after_list || []).forEach((ba) => {
+            if (ba.before_img) items.push({ type: "before", gender: "men", url: ba.before_img, title: ba.title || "Before" });
+            if (ba.after_img) items.push({ type: "after", gender: "men", url: ba.after_img, title: ba.title || "After" });
+          });
+          const rawImgs = d.before_after?.images || [];
+          rawImgs.forEach((img, i) => {
+            if (i % 2 === 0) {
+              items.push({ type: "before", gender: "men", url: img, title: "Before Transformation " + (i + 1) });
+            } else {
+              items.push({ type: "after", gender: "men", url: img, title: "After Transformation " + (i + 1) });
+            }
+          });
+          galleryItems = items;
+        }
+        setGallery(galleryItems);
       })
       .catch(err => {
         console.error("Failed to load consultation media:", err);
@@ -69,9 +95,40 @@ export default function Consultancy() {
     });
   };
 
+  const [isFetchingLead, setIsFetchingLead] = useState(false);
+
+  const fetchLeadByPhone = async (phoneVal) => {
+    const cleanDigits = phoneVal.replace(/\D/g, '');
+    if (cleanDigits.length < 10) return;
+    
+    setIsFetchingLead(true);
+    try {
+      const res = await api.get('/leads/lookup-by-phone', { params: { phone: phoneVal } });
+      if (res.data && res.data.found && res.data.lead) {
+        const ld = res.data.lead;
+        setFormData(prev => ({
+          ...prev,
+          name: prev.name || ld.name || "",
+          location: ld.branch || prev.location || "Baroda",
+          source: ld.source || prev.source || "Direct",
+          status: ld.grade || (ld.status === "converted" ? "Closed" : "Warm"),
+          follow_up_date: ld.follow_up_date || prev.follow_up_date || ""
+        }));
+        toast.info("Auto-fetched details for " + (ld.name || "Client") + " (Status: " + (ld.grade || ld.status || "Warm") + ")");
+      }
+    } catch (err) {
+      console.warn('Lead lookup error:', err);
+    } finally {
+      setIsFetchingLead(false);
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'phone' && value.replace(/\D/g, '').length >= 10) {
+      fetchLeadByPhone(value);
+    }
   };
 
   const goToNext = () => {
@@ -166,8 +223,8 @@ export default function Consultancy() {
                 <div>
                   <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Location</label>
                   <select name="location" value={formData.location} onChange={handleChange} className={`${inputCls} appearance-none`}>
-                    <option value="Baroda">Baroda</option>
-                    <option value="Surat">Surat</option>
+                    <option value="Sama Savli">Sama Savli (Baroda)</option>
+                    <option value="Sevasi">Sevasi (Baroda)</option>
                   </select>
                 </div>
                 <div>
@@ -175,8 +232,20 @@ export default function Consultancy() {
                   <input type="text" name="name" value={formData.name} onChange={handleChange} required className={inputCls} placeholder="Full Name" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">WhatsApp Number *</label>
-                  <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required className={inputCls} placeholder="+91..." />
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs uppercase tracking-widest text-eminence-muted">WhatsApp Number *</label>
+                    {isFetchingLead && <span className="text-[10px] text-emerald-600 font-bold animate-pulse">Auto-fetching lead...</span>}
+                  </div>
+                  <input 
+                    type="tel" 
+                    name="phone" 
+                    value={formData.phone} 
+                    onChange={handleChange} 
+                    onBlur={() => { if (formData.phone) fetchLeadByPhone(formData.phone); }}
+                    required 
+                    className={inputCls} 
+                    placeholder="+91..." 
+                  />
                 </div>
               </div>
             </div>
@@ -201,12 +270,51 @@ export default function Consultancy() {
               {/* Q2 */}
               <div>
                 <p className="text-sm font-medium mb-3">2 - Aaj Kaisa Look Expect Kar Rahe Hain?</p>
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  {["Natural (Daily Use)", "Professional (Formal)", "Stylish (Fashionable)", "Not Sure (Please Guide)"].map(opt => (
-                    <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="expected_look" value={opt} checked={formData.expected_look === opt} onChange={handleChange} className="accent-eminence-gold" />
-                      <span className="text-eminence-muted hover:text-eminence-text transition-colors">{opt}</span>
-                    </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  {[
+                    { label: "Natural (Daily Use)", value: "Natural (Daily Use)" },
+                    { label: "Professional (Formal)", value: "Professional (Formal)" },
+                    { label: "Stylish (Fashionable)", value: "Stylish (Fashionable)" },
+                    { label: "Custom Styling", value: "Custom Styling" },
+                  ].map(opt => (
+                    <div key={opt.value} className="space-y-2">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="expected_look"
+                          value={opt.value}
+                          checked={formData.expected_look === opt.value || (opt.value === "Custom Styling" && formData.expected_look?.startsWith("Custom Styling"))}
+                          onChange={(e) => {
+                            handleChange(e);
+                            if (opt.value === "Custom Styling") {
+                              setIsLookbookOpen(true);
+                            }
+                          }}
+                          className="w-4 h-4 text-emerald-800 focus:ring-emerald-700 accent-emerald-800 cursor-pointer"
+                        />
+                        <span className="text-gray-700 font-medium hover:text-gray-900 transition-colors">
+                          {opt.label}
+                        </span>
+                      </label>
+
+                      {opt.value === "Custom Styling" && (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => setIsLookbookOpen(true)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-900 hover:bg-emerald-950 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-sm hover:shadow active:scale-95"
+                          >
+                            <Sparkles size={14} className="text-yellow-400 animate-pulse" />
+                            Browse Custom Styling Catalog
+                          </button>
+                          {formData.expected_look?.startsWith("Custom Styling:") && (
+                            <p className="text-xs text-emerald-700 font-semibold mt-1.5 flex items-center gap-1">
+                              <Check size={14} /> Selected: {formData.expected_look.replace("Custom Styling: ", "")}
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>
@@ -255,9 +363,9 @@ export default function Consultancy() {
                 <p className="text-sm font-medium mb-3">6 - Budget Range</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { label: "Basic", range: "₹10,000 to ₹18,000" },
-                    { label: "Recommended Standard", range: "₹23,000 to ₹30,000" },
-                    { label: "Premium", range: "More Than ₹30,000" }
+                    { label: "Basic", range: "₹9,000 to ₹15,000" },
+                    { label: "Recommended Standard", range: "₹18,000 to ₹26,000" },
+                    { label: "Premium", range: "Above ₹30,000" }
                   ].map(opt => (
                     <label key={opt.label} className={`border p-4 text-center cursor-pointer transition-all ${formData.budget_range === opt.label ? 'border-eminence-gold bg-eminence-gold/5' : 'border-eminence-border hover:border-eminence-gold/50'}`}>
                       <input type="radio" name="budget_range" value={opt.label} checked={formData.budget_range === opt.label} onChange={handleChange} className="hidden" />
@@ -269,50 +377,46 @@ export default function Consultancy() {
               </div>
             </div>
 
-            {/* Media Gallery Folder View */}
+            {/* Media Gallery Folder View - 2 Large Cards Matching Design */}
             {!openFolder ? (
               <div className="space-y-6 pt-6">
                 <div className="flex items-center justify-between border-b border-eminence-border pb-2">
-                  <h2 className="text-lg uppercase tracking-[0.15em]">Videos & Images Gallery</h2>
+                  <h2 className="text-lg uppercase tracking-[0.15em] font-serif">VIDEOS & IMAGES GALLERY</h2>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Folder: Men Before */}
-                  {[{type:"before",gender:"men",label:"Men — Before",color:"bg-blue-50 border-blue-200 text-blue-700"},{type:"after",gender:"men",label:"Men — After",color:"bg-emerald-50 border-emerald-200 text-emerald-700"},{type:"before",gender:"women",label:"Women — Before",color:"bg-pink-50 border-pink-200 text-pink-700"},{type:"after",gender:"women",label:"Women — After",color:"bg-rose-50 border-rose-200 text-rose-700"}].map(folder => {
-                    const folderItems = gallery.filter(item => item.type === folder.type && item.gender === folder.gender);
-                    return (
-                      <div
-                        key={`${folder.type}_${folder.gender}`}
-                        onClick={() => setOpenFolder(`${folder.type}_${folder.gender}`)}
-                        className={`border ${folder.color} rounded-2xl p-5 flex flex-col items-center justify-center text-center cursor-pointer hover:shadow-lg transition-all group py-7`}
-                      >
-                        <div className={`w-14 h-14 rounded-2xl ${folder.color} flex items-center justify-center group-hover:scale-110 transition-transform mb-3 border`}>
-                          <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                          </svg>
-                        </div>
-                        <h3 className="font-serif text-base text-gray-800 font-bold mb-1">{folder.label}</h3>
-                        <p className="text-xs text-eminence-muted">{folderItems.length} photos inside</p>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Client Reviews (legacy) */}
-                {(clientReviews.images.length > 0 || clientReviews.videos.length > 0) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Card 1: Before & After Images */}
                   <div
-                    onClick={() => setOpenFolder("client_reviews")}
-                    className="bg-white border border-eminence-border rounded-2xl p-5 flex flex-col items-center justify-center text-center cursor-pointer hover:border-eminence-gold hover:shadow-lg transition-all group py-7"
+                    onClick={() => setOpenFolder("before_after")}
+                    className="bg-[#FAFDFB] border-2 border-emerald-800/40 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-emerald-800 hover:shadow-xl transition-all group py-12"
                   >
-                    <div className="w-14 h-14 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform mb-3">
-                      <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                    <div className="w-16 h-16 rounded-2xl bg-[#E8F3EE] flex items-center justify-center group-hover:scale-110 transition-transform mb-4 border border-emerald-900/10 text-emerald-800">
+                      <svg className="w-8 h-8 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                       </svg>
                     </div>
-                    <h3 className="font-serif text-base text-gray-800 font-bold mb-1">Client Reviews</h3>
-                    <p className="text-xs text-eminence-muted">{clientReviews.images.length + clientReviews.videos.length} items inside</p>
+                    <h3 className="font-serif text-lg text-gray-900 font-bold mb-1.5">Before & After Images</h3>
+                    <p className="text-xs text-gray-500 font-medium">
+                      {(beforeAfter?.images?.length || 0) + (beforeAfterList?.length ? beforeAfterList.length * 2 : 0) || (gallery?.length || 6)} items inside
+                    </p>
                   </div>
-                )}
+
+                  {/* Card 2: Client Reviews */}
+                  <div
+                    onClick={() => setOpenFolder("client_reviews")}
+                    className="bg-[#FAFDFB] border-2 border-emerald-800/40 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer hover:border-emerald-800 hover:shadow-xl transition-all group py-12"
+                  >
+                    <div className="w-16 h-16 rounded-2xl bg-[#E8F3EE] flex items-center justify-center group-hover:scale-110 transition-transform mb-4 border border-emerald-900/10 text-emerald-800">
+                      <svg className="w-8 h-8 stroke-[1.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-serif text-lg text-gray-900 font-bold mb-1.5">Client Reviews</h3>
+                    <p className="text-xs text-gray-500 font-medium">
+                      {(clientReviews?.images?.length || 0) + (clientReviews?.videos?.length || 0)} items inside
+                    </p>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="space-y-6 pt-6">
@@ -323,94 +427,26 @@ export default function Consultancy() {
                       onClick={() => setOpenFolder(null)}
                       className="flex items-center gap-1 text-xs uppercase tracking-widest font-bold text-eminence-muted hover:text-black transition-colors"
                     >
-                      <ChevronLeft size={16} /> Back
+                      <ChevronLeft size={16} /> Back to Gallery
                     </button>
                     <span className="text-eminence-border">|</span>
-                    <h2 className="text-lg uppercase tracking-[0.15em]">
-                      {openFolder === "client_reviews"
-                        ? "Client Reviews"
-                        : openFolder === "before_men" ? "Men — Before"
-                        : openFolder === "after_men" ? "Men — After"
-                        : openFolder === "before_women" ? "Women — Before"
-                        : openFolder === "after_women" ? "Women — After"
-                        : "Gallery"}
+                    <h2 className="text-lg uppercase tracking-[0.15em] font-serif font-bold text-gray-900">
+                      {openFolder === "client_reviews" ? "Client Reviews" : "Before & After Images"}
                     </h2>
                   </div>
                 </div>
 
-                {(() => {
-                  // Legacy folder: client_reviews
-                  if (openFolder === "client_reviews") {
-                    const folderData = clientReviews;
-                    return (
-                      <div className="space-y-8 animate-fade-in">
-                        <div>
-                          <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold text-center">Photos</p>
-                          {folderData.images.length > 0 ? (
-                            <Carousel className="w-full max-w-md mx-auto relative px-8" opts={{ align: "start", loop: true }}>
-                              <CarouselContent className="-ml-3">
-                                {folderData.images.map((src, idx) => (
-                                  <CarouselItem key={idx} className="pl-3 basis-full">
-                                    <div onClick={() => setLightbox({ type: "image", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg">
-                                      <img src={getMediaUrl(src)} alt={`Review ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </div>
-                                  </CarouselItem>
-                                ))}
-                              </CarouselContent>
-                              <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                              <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                            </Carousel>
-                          ) : (
-                            <p className="text-xs text-eminence-muted italic text-center">No photos in this folder.</p>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold text-center">Videos</p>
-                          {folderData.videos.length > 0 ? (
-                            <Carousel className="w-full max-w-xl mx-auto relative px-8" opts={{ align: "start", loop: true }}>
-                              <CarouselContent className="-ml-3">
-                                {folderData.videos.map((src, idx) => (
-                                  <CarouselItem key={idx} className="pl-3 basis-full">
-                                    <div onClick={() => setLightbox({ type: "video", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-video overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg bg-black/5">
-                                      <video src={getMediaUrl(src)} className="w-full h-full object-cover" muted preload="metadata" />
-                                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
-                                        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                                          <Play size={20} className="text-eminence-gold ml-0.5" fill="currentColor" />
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </CarouselItem>
-                                ))}
-                              </CarouselContent>
-                              <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                              <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                            </Carousel>
-                          ) : (
-                            <p className="text-xs text-eminence-muted italic text-center">No videos in this folder.</p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  // New gallery-based folders (before_men, after_men, before_women, after_women)
-                  const [type, gender] = openFolder.split("_");
-                  const folderItems = gallery.filter(item => item.type === type && item.gender === gender);
-                  return (
-                    <div className="space-y-4 animate-fade-in">
-                      {folderItems.length === 0 ? (
-                        <p className="text-xs text-eminence-muted italic text-center py-8">No photos in this folder yet.</p>
-                      ) : (
+                {openFolder === "client_reviews" ? (
+                  <div className="space-y-8 animate-fade-in py-4">
+                    <div>
+                      <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold text-center">Client Review Photos</p>
+                      {clientReviews.images.length > 0 ? (
                         <Carousel className="w-full max-w-md mx-auto relative px-8" opts={{ align: "start", loop: true }}>
                           <CarouselContent className="-ml-3">
-                            {folderItems.map((item, idx) => (
+                            {clientReviews.images.map((src, idx) => (
                               <CarouselItem key={idx} className="pl-3 basis-full">
-                                <div
-                                  onClick={() => setLightbox({ type: "image", src: getMediaUrl(item.url) })}
-                                  className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg"
-                                >
-                                  <img src={getMediaUrl(item.url)} alt={`${type} ${gender} ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                <div onClick={() => setLightbox({ type: "image", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg">
+                                  <img src={getMediaUrl(src)} alt={`Review ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                               </CarouselItem>
@@ -419,10 +455,95 @@ export default function Consultancy() {
                           <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
                           <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
                         </Carousel>
+                      ) : (
+                        <p className="text-xs text-eminence-muted italic text-center py-6">No review photos uploaded yet.</p>
                       )}
                     </div>
-                  );
-                })()}
+                    {clientReviews.videos.length > 0 && (
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold text-center">Client Review Videos</p>
+                        <Carousel className="w-full max-w-xl mx-auto relative px-8" opts={{ align: "start", loop: true }}>
+                          <CarouselContent className="-ml-3">
+                            {clientReviews.videos.map((src, idx) => (
+                              <CarouselItem key={idx} className="pl-3 basis-full">
+                                <div onClick={() => setLightbox({ type: "video", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-video overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg bg-black/5">
+                                  <video src={getMediaUrl(src)} className="w-full h-full object-cover" muted preload="metadata" />
+                                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                                    <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+                                      <Play size={20} className="text-eminence-gold ml-0.5" fill="currentColor" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                        </Carousel>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-6 animate-fade-in py-4">
+                    {/* Before & After List Pairs */}
+                    {beforeAfterList.length > 0 && (
+                      <div className="space-y-4">
+                        <p className="text-xs uppercase tracking-widest text-emerald-800 font-bold text-center">Transformations Showcase</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                          {beforeAfterList.map((ba, idx) => (
+                            <div key={idx} className="bg-white rounded-2xl border border-emerald-900/10 p-3 shadow-sm flex flex-col space-y-2">
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <span className="text-[9px] uppercase tracking-wider font-bold text-gray-500 block mb-1">Before</span>
+                                  <img 
+                                    src={getMediaUrl(ba.before_img)} 
+                                    alt="Before" 
+                                    onClick={() => setLightbox({ type: "image", src: getMediaUrl(ba.before_img) })} 
+                                    className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity border"
+                                  />
+                                </div>
+                                <div>
+                                  <span className="text-[9px] uppercase tracking-wider font-bold text-emerald-700 block mb-1">After</span>
+                                  <img 
+                                    src={getMediaUrl(ba.after_img)} 
+                                    alt="After" 
+                                    onClick={() => setLightbox({ type: "image", src: getMediaUrl(ba.after_img) })} 
+                                    className="w-full aspect-square object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity border border-emerald-200"
+                                  />
+                                </div>
+                              </div>
+                              <p className="text-xs font-bold text-gray-800 text-center pt-1">{ba.title || ("Transformation " + (idx + 1))}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Raw Before & After Images Carousel */}
+                    {beforeAfter?.images?.length > 0 && (
+                      <div className="pt-4">
+                        <p className="text-xs uppercase tracking-widest text-gray-500 font-bold text-center mb-3">All Transformation Photos</p>
+                        <Carousel className="w-full max-w-md mx-auto relative px-8" opts={{ align: "start", loop: true }}>
+                          <CarouselContent className="-ml-3">
+                            {beforeAfter.images.map((src, idx) => (
+                              <CarouselItem key={idx} className="pl-3 basis-full">
+                                <div
+                                  onClick={() => setLightbox({ type: "image", src: getMediaUrl(src) })}
+                                  className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg"
+                                >
+                                  <img src={getMediaUrl(src)} alt={"Transformation " + (idx + 1)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                </div>
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                        </Carousel>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -766,6 +887,194 @@ export default function Consultancy() {
           </div>
         </div>
       )}
-    </div>
+    
+      {/* Signature Hair Catalog - Custom Styling Lookbooks Modal */}
+      {isLookbookOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-emerald-100">
+            {/* Header */}
+            <div className="p-6 md:p-8 bg-gradient-to-b from-emerald-50/70 to-white border-b border-emerald-100/80 relative">
+              <button
+                type="button"
+                onClick={() => setIsLookbookOpen(false)}
+                className="absolute top-6 right-6 p-2 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <X size={20} />
+              </button>
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-4 h-0.5 bg-emerald-700" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.25em] text-emerald-800">Signature Hair Catalog</span>
+              </div>
+              <h2 className="font-serif text-2xl md:text-3xl text-gray-900 font-bold tracking-tight">
+                Custom Styling Lookbooks
+              </h2>
+              <p className="text-xs md:text-sm text-gray-500 mt-1">
+                Select a signature hairstyle option or open the lookbook PDF catalogs below.
+              </p>
+            </div>
+
+            {/* Content Cards Grid */}
+            <div className="p-6 md:p-8 overflow-y-auto max-h-[60vh] bg-gray-50/50">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {[
+                  {
+                    optionNum: "OPTION 1",
+                    title: "1st Hairstyle Lookbook",
+                    subtitle: "Signature Haircut & Volume Bonding Style",
+                    pdfUrl: "/pdfs/1st%20hairstyle.pdf"
+                  },
+                  {
+                    optionNum: "OPTION 2",
+                    title: "2nd Hairstyle Lookbook",
+                    subtitle: "Classic Executive & Silicon Patch Texture",
+                    pdfUrl: "/pdfs/2nd%20hairstyle.pdf"
+                  },
+                  {
+                    optionNum: "OPTION 3",
+                    title: "3rd Hairstyle Lookbook",
+                    subtitle: "Modern Fade & Crown Weaving Craftsmanship",
+                    pdfUrl: "/pdfs/3rd%20haistyle.pdf"
+                  },
+                  {
+                    optionNum: "OPTION 4",
+                    title: "4th Hairstyle Lookbook",
+                    subtitle: "Premium Custom Human Hair Wig Style",
+                    pdfUrl: "/pdfs/4rth%20hair%20style.pdf"
+                  },
+                ].map((item, idx) => {
+                  const isSelected = formData.expected_look === ("Custom Styling: " + item.title) || (formData.expected_look === "Custom Styling" && selectedStyle === item.title);
+
+                  return (
+                    <div
+                      key={idx}
+                      className={"bg-white rounded-2xl p-6 border transition-all duration-200 flex flex-col justify-between space-y-4 shadow-sm hover:shadow-md " + (isSelected ? "border-emerald-700 ring-2 ring-emerald-700/20 bg-emerald-50/20" : "border-gray-200 hover:border-emerald-300")}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            {item.optionNum}
+                          </span>
+                          <span className="text-[11px] font-medium text-gray-400 flex items-center gap-1">
+                            <BookOpen size={12} /> PDF Catalog
+                          </span>
+                        </div>
+                        <h3 className="font-serif text-lg font-bold text-gray-900">
+                          {item.title}
+                        </h3>
+                        <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                          {item.subtitle}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 pt-2">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setActivePdfViewer({ title: item.title, url: item.pdfUrl });
+                          }}
+                          className="w-full py-2.5 px-4 bg-gray-100 hover:bg-emerald-50 hover:text-emerald-800 hover:border-emerald-300 text-gray-800 font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 border border-gray-200"
+                        >
+                          <Eye size={14} /> VIEW PDF LOOKBOOK
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({ ...prev, expected_look: "Custom Styling: " + item.title }));
+                            setSelectedStyle(item.title);
+                            toast.success("Selected " + item.title);
+                            setIsLookbookOpen(false);
+                          }}
+                          className={"w-full py-2.5 px-4 font-bold text-xs uppercase tracking-wider rounded-xl transition-all flex items-center justify-center gap-2 " + (isSelected ? "bg-emerald-800 text-white shadow-md" : "bg-emerald-900 hover:bg-emerald-950 text-white shadow-sm")}
+                        >
+                          <Check size={14} /> {isSelected ? "✓ SELECTED" : "✓ SELECT THIS STYLE"}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 md:p-5 bg-white border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
+              <span>Need custom assistance? Consult with our master stylist on-site.</span>
+              <button
+                type="button"
+                onClick={() => setIsLookbookOpen(false)}
+                className="px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold uppercase tracking-wider rounded-lg text-xs transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* In-App Interactive PDF Viewer Modal */}
+      {activePdfViewer && (
+        <div 
+          className="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center p-2 md:p-6 animate-fade-in"
+          onClick={() => setActivePdfViewer(null)}
+        >
+          <div 
+            className="bg-white rounded-3xl w-full max-w-5xl h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-white/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="px-6 py-4 bg-gray-900 text-white flex items-center justify-between border-b border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-emerald-700/40 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                  <BookOpen size={16} />
+                </div>
+                <div>
+                  <h3 className="font-serif text-base font-bold">{activePdfViewer.title}</h3>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest">Interactive Lookbook Catalog</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={activePdfViewer.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <Eye size={13} /> Open Fullscreen / New Tab
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setActivePdfViewer(null)}
+                  className="w-9 h-9 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-300 hover:text-white transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="flex-1 w-full h-full bg-gray-100 relative">
+              <object
+                data={`${activePdfViewer.url}#toolbar=1&navpanes=0`}
+                type="application/pdf"
+                className="w-full h-full border-none"
+              >
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center bg-gray-50">
+                  <BookOpen size={48} className="text-emerald-700 mb-4" />
+                  <p className="text-sm font-semibold text-gray-800 mb-2">Previewing PDF Lookbook</p>
+                  <p className="text-xs text-gray-500 mb-6 max-w-sm">If your browser prevents in-app embedding, click below to open the catalog directly.</p>
+                  <a
+                    href={activePdfViewer.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-6 py-3 bg-emerald-800 text-white text-xs uppercase font-bold tracking-wider rounded-xl shadow-md hover:bg-emerald-900 transition-all"
+                  >
+                    Open {activePdfViewer.title}
+                  </a>
+                </div>
+              </object>
+            </div>
+          </div>
+        </div>
+      )}
+
+</div>
   );
 }

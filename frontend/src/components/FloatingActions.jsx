@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { MessageCircle, Instagram, Video, X } from "lucide-react";
 import ConsultationModal from "./ConsultationModal";
 
-const PHONE = "912652468800";
-const INSTA_URL = "https://www.instagram.com/eminencehairwig/"; 
-const CONSULT_MSG = "Hi Eminence! I'd like to book a live video consultancy with an expert.";
+const PHONE = "917779055771";
+const INSTA_URL = "https://www.instagram.com/jainil_hair_studio/"; 
+const CONSULT_MSG = "Hi Jainil Hair Studio! I'd like to book a live video consultancy with an expert.";
 
 export default function FloatingActions() {
   const [waOpen, setWaOpen] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
-  const [msg, setMsg] = useState("Hi Eminence Salon! I'd like to book an appointment.");
+  const [msg, setMsg] = useState("Hi Jainil Hair Studio! I'd like to book an appointment.");
 
   const sendWa = () => {
     const url = `https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
@@ -33,7 +33,7 @@ export default function FloatingActions() {
                   <MessageCircle size={18} />
                 </div>
                 <div>
-                  <div className="font-semibold text-xs">Eminence Salon</div>
+                  <div className="font-semibold text-xs">Jainil Hair Studio</div>
                   <div className="text-[10px] opacity-90">Online Now</div>
                 </div>
               </div>

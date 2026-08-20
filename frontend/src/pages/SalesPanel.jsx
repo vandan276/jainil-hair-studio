@@ -12,7 +12,7 @@ import BillingPanel from "@/components/BillingPanel";
 import RecessControls from "@/components/RecessControls";
 
 const STATUSES = ["new", "in process", "visit", "visited", "token received", "recycled", "dead", "converted"];
-const TABS = ["All", "New", "In Process", "Visit", "Visited", "Token Received", "Recycled", "Dead", "Converted", "Retargeting", "Consulting Form"];
+const TABS = ["All", "New", "In Process", "Visit", "Visited", "Visit Scheduled Dead", "Token Received", "Recycled", "Dead", "Converted", "Retargeting", "Consulting Form"];
 
 const STATUS_COLORS = {
   "new": "bg-blue-50 text-blue-700 border-blue-200",
@@ -283,8 +283,8 @@ export default function SalesPanel() {
     }
   };
 
-  const saveCallLog = async (e) => {
-    e.preventDefault();
+  const saveCallLog = async (e, shareInvoice = false) => {
+    if (e && e.preventDefault) e.preventDefault();
     try {
       let finalDuration = callDurationRef.current;
       if (callActive && callStartTimeRef.current) {
@@ -314,7 +314,27 @@ export default function SalesPanel() {
         });
       }
 
-      toast.success("Call logged successfully");
+      if (shareInvoice) {
+        const cleanPhone = (selectedLead.phone || "").replace(/[^0-9]/g, "");
+        const clientName = selectedLead.name || "Valued Client";
+        const amtStr = callForm.saleAmount ? ("₹" + parseFloat(callForm.saleAmount).toLocaleString("en-IN")) : "";
+        const invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
+          "Dear " + clientName + ",\n\n" +
+          "Thank you for choosing Jainil Hair Studio.\n" +
+          "*Outcome / Status:* " + callOutcome + "\n" +
+          (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
+          "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
+          "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n" +
+          "For any assistance or questions regarding your booking, please reach out to us.\n\n" +
+          "*Jainil Hair Studio*";
+        
+        const waUrl = "https://wa.me/91" + cleanPhone.slice(-10) + "?text=" + encodeURIComponent(invoiceMsg);
+        window.open(waUrl, "_blank");
+        toast.success("Invoice & payment acknowledgment opened in WhatsApp!");
+      } else {
+        toast.success("Call logged successfully");
+      }
+
       setCallingMode(false);
       setCallActive(false);
       callDurationRef.current = 0;
@@ -487,13 +507,14 @@ export default function SalesPanel() {
       }
     } else {
       // Apply Tab Filter only if no stat filter is active
-      if (activeTab !== "All" && activeTab !== "Retargeting") {
-        filtered = filtered.filter(l => l.status === activeTab.toLowerCase());
-      }
-      if (activeTab === "Retargeting") {
-        filtered = filtered.filter(l => ["recycled", "dead"].includes(l.status));
+      if (activeTab === "Visit Scheduled Dead") {
+        filtered = filtered.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit"));
+      } else if (activeTab === "Retargeting") {
+        filtered = filtered.filter(l => ["recycled", "dead", "visit scheduled dead"].includes(l.status));
         if (retargetingStatusFilter !== "all") filtered = filtered.filter(l => l.status === retargetingStatusFilter);
         if (retargetingGradeFilter !== "all") filtered = filtered.filter(l => l.grade === retargetingGradeFilter);
+      } else if (activeTab !== "All") {
+        filtered = filtered.filter(l => l.status === activeTab.toLowerCase());
       }
     }
 
@@ -1073,9 +1094,10 @@ export default function SalesPanel() {
         <div className="glass-card rounded-2xl p-1.5 mb-8 flex gap-2 flex-wrap bg-gray-100/30 w-fit backdrop-blur-md border border-gray-200">
           {TABS.map(tab => {
             const count = tab === "All" ? sectionLeads.length : 
-                          (tab === "Retargeting" ? sectionLeads.filter(l => ["recycled", "dead"].includes(l.status)).length : 
+                          (tab === "Retargeting" ? sectionLeads.filter(l => ["recycled", "dead", "visit scheduled dead"].includes(l.status)).length : 
                            (tab === "Consulting Form" ? consultations.length : 
-                            sectionLeads.filter(l => l.status === tab.toLowerCase()).length));
+                            (tab === "Visit Scheduled Dead" ? sectionLeads.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit")).length :
+                             sectionLeads.filter(l => l.status === tab.toLowerCase()).length)));
             const isActive = activeTab === tab;
             return (
               <button
@@ -1502,6 +1524,7 @@ export default function SalesPanel() {
                             <option value="Interested (Follow-up)">Interested (Follow-up)</option>
                             <option value="Visit Scheduled">Visit Scheduled</option>
                             <option value="Visited">Visited</option>
+                            <option value="Visit Scheduled Dead">Visit Scheduled Dead (Not Visited / Retarget)</option>
                             <option value="Token Received">Token Received</option>
                             <option value="Converted">Converted</option>
                             <option value="Not Picked Up">Not Picked Up / Busy</option>
@@ -1632,13 +1655,23 @@ export default function SalesPanel() {
                         ></textarea>
                       </div>
 
-                      <button 
-                        type="submit" 
-                        disabled={callActive}
-                        className="w-full bg-blue-600 text-white py-3 mt-5 rounded-md font-medium hover:bg-blue-700 transition-colors shadow-lg disabled:bg-gray-300 disabled:shadow-none"
-                      >
-                        Save Log & Update Lead
-                      </button>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+                        <button 
+                          type="submit" 
+                          disabled={callActive}
+                          className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none"
+                        >
+                          Save Log & Update
+                        </button>
+                        <button 
+                          type="button" 
+                          disabled={callActive}
+                          onClick={(e) => saveCallLog(e, true)}
+                          className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none flex items-center justify-center gap-1.5"
+                        >
+                          <MessageSquare size={15} /> Save & Share Invoice
+                        </button>
+                      </div>
                     </form>
                   </div>
                 ) : (
