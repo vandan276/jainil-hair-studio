@@ -1951,8 +1951,8 @@ export default function SalesPanel() {
                     onChange={e => setNewLeadForm({...newLeadForm, branch: e.target.value})}
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
                   >
-                    <option value="Baroda">Baroda</option>
-                    <option value="Surat">Surat</option>
+                    <option value="Sama Savli">Sama Savli</option>
+                    <option value="Sevasi">Sevasi</option>
                     <option value="Not Decided">Not Decided</option>
                   </select>
                 </div>
@@ -2088,8 +2088,8 @@ export default function SalesPanel() {
                     onChange={e => setEditLeadForm({...editLeadForm, branch: e.target.value})}
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
                   >
-                    <option value="Baroda">Baroda</option>
-                    <option value="Surat">Surat</option>
+                    <option value="Sama Savli">Sama Savli</option>
+                    <option value="Sevasi">Sevasi</option>
                     <option value="Not Decided">Not Decided</option>
                   </select>
                 </div>

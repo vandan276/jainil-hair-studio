@@ -1117,7 +1117,7 @@ export default function Admin() {
   const [opsDropdownOpen, setOpsDropdownOpen] = useState(false);
   const [reportsData, setReportsData] = useState([]);
   const [attendanceLogs, setAttendanceLogs] = useState([]);
-  const [branches, setBranches] = useState(["Surat", "Baroda"]);
+  const [branches, setBranches] = useState(["Sama Savli", "Sevasi"]);
   const [adminPermissions, setAdminPermissions] = useState("__ALL__"); // "__ALL__" or array of tab keys
   const [offers, setOffers] = useState([
     { id: "o1", title: "Summer Hair Extension Special", discount: "20% OFF", description: "Get premium extensions at discount", expires: "2026-07-31", active: true },
