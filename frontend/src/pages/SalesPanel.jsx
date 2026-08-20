@@ -513,6 +513,8 @@ export default function SalesPanel() {
       // Apply Tab Filter only if no stat filter is active
       if (activeTab === "Visit Scheduled Dead") {
         filtered = filtered.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit"));
+      } else if (activeTab === "Dead") {
+        filtered = filtered.filter(l => l.status === "dead" || l.status === "visit scheduled dead");
       } else if (activeTab === "Retargeting") {
         filtered = filtered.filter(l => ["recycled", "dead", "visit scheduled dead"].includes(l.status));
         if (retargetingStatusFilter !== "all") filtered = filtered.filter(l => l.status === retargetingStatusFilter);
@@ -1101,7 +1103,8 @@ export default function SalesPanel() {
                           (tab === "Retargeting" ? sectionLeads.filter(l => ["recycled", "dead", "visit scheduled dead"].includes(l.status)).length : 
                            (tab === "Consulting Form" ? consultations.length : 
                             (tab === "Visit Scheduled Dead" ? sectionLeads.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit")).length :
-                             sectionLeads.filter(l => l.status === tab.toLowerCase()).length)));
+                             (tab === "Dead" ? sectionLeads.filter(l => l.status === "dead" || l.status === "visit scheduled dead").length :
+                              sectionLeads.filter(l => l.status === tab.toLowerCase()).length))));
             const isActive = activeTab === tab;
             return (
               <button
