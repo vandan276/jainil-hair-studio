@@ -1618,8 +1618,8 @@ export default function SalesPanel() {
                             
                             <div>
                               <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Payment Mode *</label>
-                              <div className="grid grid-cols-3 gap-2">
-                                {["UPI", "Cash", "Card"].map(mode => (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {["UPI", "Cash", "UPI + Cash", "Card"].map(mode => (
                                   <button
                                     type="button"
                                     key={mode}
@@ -1666,8 +1666,8 @@ export default function SalesPanel() {
                             
                             <div>
                               <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">Payment Mode *</label>
-                              <div className="grid grid-cols-3 gap-2">
-                                {["UPI", "Cash", "Card"].map(mode => (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {["UPI", "Cash", "UPI + Cash", "Card"].map(mode => (
                                   <button
                                     type="button"
                                     key={mode}
