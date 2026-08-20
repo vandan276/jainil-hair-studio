@@ -334,6 +334,7 @@ export default function SalesPanel() {
           "*Outcome / Status:* " + callOutcome + "\n" +
           (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
           (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
+          (callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
           "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
           "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
 
@@ -1690,7 +1691,8 @@ export default function SalesPanel() {
                           </div>
                         )}
 
-                        {["Interested (Follow-up)", "Visit Scheduled", "Not Picked Up"].includes(callOutcome) && (() => {
+                        {/* Next Follow-up / Appointment Schedule */}
+                        {callOutcome && (() => {
                           const TIME_SLOTS = [];
                           for (let h = 9; h <= 20; h++) {
                             for (let m of ["00", "30"]) {
@@ -1702,21 +1704,36 @@ export default function SalesPanel() {
                             }
                           }
                           const busySlots = getBusyTimeSlots(callForm.nextDate);
+                          const isAppointment = ["Token Received", "Converted", "Visit Scheduled"].includes(callOutcome);
+                          const isReminder = callOutcome === "Not Picked Up";
+                          const labelText = isAppointment ? "Next Appointment Date" : (isReminder ? "Reminder Date" : "Next Follow-up Date");
+
                           return (
-                            <div className="grid grid-cols-2 gap-3 mb-5">
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
-                                  {callOutcome === "Visit Scheduled" ? "Visit Date" : (callOutcome === "Not Picked Up" ? "Reminder Date" : "Next Follow-up")}
+                            <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100/80 mb-5 shadow-sm space-y-2">
+                              <div className="flex items-center justify-between">
+                                <label className="block text-xs font-bold text-emerald-900 uppercase tracking-wider">
+                                  {labelText} {["Token Received", "Visit Scheduled"].includes(callOutcome) ? "*" : "(Optional)"}
                                 </label>
-                                <input type="date" value={callForm.nextDate} onChange={e => setCallForm({ ...callForm, nextDate: e.target.value })} className="w-full border rounded p-2 text-sm" />
+                                {isAppointment && (
+                                  <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                                    Appointment
+                                  </span>
+                                )}
                               </div>
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">Time</label>
-                                {callOutcome === "Visit Scheduled" ? (
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                  <input
+                                    type="date"
+                                    value={callForm.nextDate}
+                                    onChange={e => setCallForm({ ...callForm, nextDate: e.target.value })}
+                                    className="w-full border border-emerald-200 rounded-lg p-2.5 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                                  />
+                                </div>
+                                <div>
                                   <select
                                     value={callForm.nextTime}
                                     onChange={e => setCallForm({ ...callForm, nextTime: e.target.value })}
-                                    className="w-full border rounded p-2 text-sm bg-white"
+                                    className="w-full border border-emerald-200 rounded-lg p-2.5 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                                   >
                                     <option value="">Select Time Slot</option>
                                     {TIME_SLOTS.map(slot => {
@@ -1728,9 +1745,7 @@ export default function SalesPanel() {
                                       );
                                     })}
                                   </select>
-                                ) : (
-                                  <input type="time" value={callForm.nextTime} onChange={e => setCallForm({ ...callForm, nextTime: e.target.value })} className="w-full border rounded p-2 text-sm" />
-                                )}
+                                </div>
                               </div>
                             </div>
                           );

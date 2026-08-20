@@ -1786,6 +1786,17 @@ def get_order_invoice(oid: str):
     c.setFont("Helvetica", 7.5)
     c.drawCentredString(page_width / 2, hy, f"(Branch : {branch_name})")
 
+    # Resolve Next Appointment / Follow-up date
+    next_appt_str = order.get("next_appointment_date") or ""
+    if not next_appt_str and phone:
+        if leads:
+            lead_data = leads[0].to_dict()
+            next_appt_str = lead_data.get("next_appointment_date") or lead_data.get("follow_up_date") or ""
+            if next_appt_str and lead_data.get("follow_up_time"):
+                next_appt_str += f" ({lead_data.get('follow_up_time')})"
+    elif next_appt_str and order.get("next_appointment_time"):
+        next_appt_str += f" ({order.get('next_appointment_time')})"
+
     # ── CUSTOMER DETAILS ───────────────────────────────────────────────────
     y = hy - 14
     c.setFont("Helvetica", 8)
@@ -1797,6 +1808,13 @@ def get_order_invoice(oid: str):
     c.drawString(12, y, "Mobile No")
     c.drawString(90, y, ": " + str(phone_number))
     y -= 11
+
+    if next_appt_str:
+        c.setFont("Helvetica-Bold", 8)
+        c.drawString(12, y, "Next Appt Date")
+        c.drawString(90, y, ": " + str(next_appt_str))
+        c.setFont("Helvetica", 8)
+        y -= 11
 
     c.drawString(12, y, "Wallet Balance")
     c.drawString(90, y, f": INR {lead_wallet:.2f} /-")
@@ -2826,26 +2844,25 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
     elif data.grade:
         update_data["grade"] = data.grade
 
+    if data.next_followup_date:
+        update_data["follow_up_date"] = data.next_followup_date
+        update_data["next_appointment_date"] = data.next_followup_date
+    if data.next_followup_time:
+        update_data["follow_up_time"] = data.next_followup_time
+        update_data["next_appointment_time"] = data.next_followup_time
+
     if data.outcome == "Not Picked Up":
         if update_data.get("status") != "dead":
             update_data["status"] = "in process"
-        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
-        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome in ["Said No", "Not Interested"]:
         update_data["status"] = "dead"
     elif data.outcome == "Interested (Follow-up)":
         update_data["status"] = "in process"
-        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
-        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Visit Scheduled":
         update_data["status"] = "visit"
-        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
-        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome in ["Visit Scheduled Dead", "Visit Scheduled Dead (Not Visited / Retarget)"]:
         update_data["status"] = "visit scheduled dead"
         update_data["previous_status"] = "visit"
-        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
-        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Visited":
         update_data["status"] = "visited"
         if data.consulted_by:
@@ -2910,6 +2927,8 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
                 "type": "service"
             }],
             "notes": f"CRM {data.outcome} | Pending Due: ₹{data.pending_amount or 0:,.2f}",
+            "next_appointment_date": data.next_followup_date or "",
+            "next_appointment_time": data.next_followup_time or "",
             "created_at": now_iso()
         }
         db.collection("orders").document(created_order_id).set(order_doc)
@@ -2918,8 +2937,9 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         ptype = "Token" if data.outcome == "Token Received" else "Closure Amount"
         pmode = data.payment_mode or "Not Specified"
         pending_str = f" | Pending Due: ₹{data.pending_amount:,.2f}" if (data.pending_amount is not None and data.pending_amount > 0) else ""
+        appt_str = f" | Next Appt: {data.next_followup_date}" if data.next_followup_date else ""
         notes_to_add.append({
-            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str} (Invoice #{created_order_id[:8].upper()})", 
+            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str}{appt_str} (Invoice #{created_order_id[:8].upper()})", 
             "author": "System", 
             "timestamp": now_iso()
         })
