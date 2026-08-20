@@ -292,12 +292,6 @@ export default function SalesPanel() {
         finalDuration = Math.floor((Date.now() - callStartTimeRef.current) / 1000);
       }
 
-      let waWindow = null;
-      if (shareInvoice) {
-        // Pre-open window synchronously to prevent Safari/Chrome popup blocker
-        waWindow = window.open("", "_blank");
-      }
-
       const isToken = callOutcome === "Token Received";
       const isConverted = callOutcome === "Converted";
 
@@ -342,12 +336,18 @@ export default function SalesPanel() {
           "*Jainil Hair Studio*";
         
         const phoneDigits = cleanPhone.length > 10 ? cleanPhone : ("91" + cleanPhone.slice(-10));
-        const waUrl = "https://wa.me/" + phoneDigits + "?text=" + encodeURIComponent(invoiceMsg);
+        const waUrl = "https://api.whatsapp.com/send?phone=" + phoneDigits + "&text=" + encodeURIComponent(invoiceMsg);
         
-        if (waWindow) {
-          waWindow.location.href = waUrl;
-        } else {
-          window.open(waUrl, "_blank");
+        try {
+          const link = document.createElement("a");
+          link.href = waUrl;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (e) {
+          window.location.href = waUrl;
         }
         toast.success("Invoice & payment acknowledgment opened in WhatsApp!");
       } else {
