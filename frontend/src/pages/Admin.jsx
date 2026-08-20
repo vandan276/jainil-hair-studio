@@ -16803,11 +16803,11 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
 
         {/* Product Rows Table Headers */}
         <div className="space-y-3">
-          <div className="hidden md:grid md:grid-cols-12 gap-3 px-4 py-2 bg-eminence-surface border border-eminence-border/10 rounded-lg text-left text-eminence-muted uppercase font-bold text-[9px] tracking-wider font-sans">
-            <div className="col-span-4">Select Product *</div>
-            <div className="col-span-2 text-right">Qty *</div>
-            <div className="col-span-2 text-right">Cost (₹) *</div>
-            <div className="col-span-2 text-right">Selling (₹) (Optional)</div>
+          <div className="hidden md:grid md:grid-cols-12 gap-3 px-3 py-2.5 bg-emerald-50/60 border border-emerald-100 rounded-xl text-emerald-900 uppercase font-bold text-[10px] tracking-wider items-center">
+            <div className="col-span-4 text-left">Select Product *</div>
+            <div className="col-span-2 text-left">Qty *</div>
+            <div className="col-span-2 text-left">Cost (₹) *</div>
+            <div className="col-span-2 text-left">Selling (₹) (Optional)</div>
             <div className="col-span-1 text-right font-mono">Total (₹)</div>
             <div className="col-span-1 text-center">Action</div>
           </div>
@@ -16829,7 +16829,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                       onChange={e => updateRow(idx, { productSearch: e.target.value, productId: "", showDrop: true })}
                       onFocus={() => updateRow(idx, { showDrop: true })}
                       onBlur={() => updateRow(idx, { showDrop: false })}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
                       autoComplete="off"
                     />
                     {row.productId && (() => {
@@ -16877,7 +16877,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                     <input type="number" min="1" value={row.quantity}
                       onChange={e => updateRow(idx, { quantity: e.target.value })}
                       placeholder="0"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50 font-mono" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono" />
                   </div>
 
                   {/* Cost Price */}
@@ -16886,7 +16886,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                     <input type="number" min="0" step="0.01" value={row.costPrice}
                       onChange={e => updateRow(idx, { costPrice: e.target.value })}
                       placeholder="0.00"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50 font-mono" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono" />
                   </div>
 
                   {/* Selling Price (Optional) */}
@@ -16895,22 +16895,22 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                     <input type="number" min="0" step="0.01" value={row.sellingPrice}
                       onChange={e => updateRow(idx, { sellingPrice: e.target.value })}
                       placeholder="Optional"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-right focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50 font-mono" />
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono" />
                   </div>
 
                   {/* Row Total */}
-                  <div className="col-span-1 md:col-span-1 text-left md:text-right font-mono text-xs font-bold text-gray-700 bg-gray-50 md:bg-transparent px-3 py-2 md:p-0 rounded-lg md:rounded-none">
+                  <div className="col-span-1 md:col-span-1 text-left md:text-right font-mono text-sm font-bold text-emerald-800 bg-gray-50 md:bg-transparent px-3 py-2 md:p-0 rounded-lg md:rounded-none">
                     <label className="block md:hidden text-xs font-bold text-gray-400 uppercase mb-1">Total</label>
                     ₹{((Number(row.quantity) || 0) * (Number(row.costPrice) || 0)).toLocaleString("en-IN")}
                   </div>
 
                   {/* Delete Button */}
-                  <div className="col-span-1 md:col-span-1 text-center mt-2 md:mt-0">
+                  <div className="col-span-1 md:col-span-1 text-center mt-2 md:mt-0 flex items-center justify-center">
                     {rows.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeRow(idx)}
-                        className="text-red-400 hover:text-red-600 transition-colors p-2 md:p-1 hover:bg-red-50 rounded"
+                        className="text-rose-400 hover:text-rose-600 transition-colors p-2 md:p-1.5 hover:bg-rose-50 rounded-lg"
                         title="Remove row"
                       >
                         <X size={16} />
