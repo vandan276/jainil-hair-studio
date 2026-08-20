@@ -101,18 +101,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       setAvailablePackages(pkg.data || []);
     }).catch(() => toast.error("Failed to load catalog"));
 
-    // Try to load service employees
+    // Load service employees
     api.get("/admin/employees").then(r => {
       let svcEmps = (r.data || []).filter(e =>
-        (e.role === "service" || e.role === "sales" || e.role === "employee") &&
         e.is_active !== false &&
         e.status !== "inactive" &&
         e.status !== "deactivated"
       );
-      const isSuper = user?.email === "superadmin@eminence.com" || user?.role === "super_admin" || user?.is_super_admin === true;
-      if (!isSuper && user?.branch) {
-        svcEmps = svcEmps.filter(e => e.branch === user.branch);
-      }
       setServiceEmployees(svcEmps);
     }).catch(() => { });
   }, [user]);
@@ -945,9 +940,9 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                               className="bg-eminence-surface border border-eminence-border rounded px-1 py-1 text-xs flex-1 min-w-[95px] focus:outline-none focus:border-eminence-gold">
                               <option value="">Provider</option>
                               {serviceEmployees
-                                .filter(emp => emp.role === "service" || emp.role === "employee")
+                                .filter(emp => emp.role === "service" || emp.role === "employee" || emp.role === "sales" || !emp.role)
                                 .map(emp => (
-                                  <option key={emp.id} value={emp.id}>{emp.name}</option>
+                                  <option key={emp.id} value={emp.id}>{emp.name}{emp.branch ? ` (${emp.branch})` : ""}</option>
                                 ))
                               }
                             </select>
