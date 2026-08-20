@@ -2870,6 +2870,7 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         notes_to_add.append({"text": f"Call Outcome: {data.outcome} - {data.comment}", "author": user["name"], "timestamp": now_iso()})
         
     # Handle Sale Amount & Pending Amount
+    created_order_id = None
     if data.sale_amount:
         payment = {
             "amount": data.sale_amount,
@@ -2881,12 +2882,44 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         update_data["payments"] = firestore.firestore.ArrayUnion([payment])
         update_data["total_sale_amount"] = firestore.firestore.Increment(data.sale_amount)
         
+        # Create an official Order & Invoice Record so PDF can be viewed and downloaded
+        created_order_id = new_id()
+        order_doc = {
+            "id": created_order_id,
+            "lead_id": lid,
+            "full_name": lead_dict.get("name", "Valued Client") if lead_snap.exists else "Valued Client",
+            "phone": lead_dict.get("phone", "") if lead_snap.exists else "",
+            "address": "In-Store / Direct",
+            "city": lead_dict.get("city", "Vadodara") if lead_snap.exists else "Vadodara",
+            "branch": lead_dict.get("branch", user.get("branch", "Sama Savli")) if lead_snap.exists else "Sama Savli",
+            "employee_id": user["id"],
+            "employee_name": user["name"],
+            "total": float(data.sale_amount),
+            "payment_method": data.payment_mode or "UPI",
+            "split_payments": [{
+                "method": data.payment_mode or "UPI",
+                "amount": float(data.sale_amount)
+            }],
+            "status": "completed",
+            "items": [{
+                "name": f"Hair Service / {data.outcome}",
+                "price": float(data.sale_amount),
+                "qty": 1,
+                "line_total": float(data.sale_amount),
+                "service_provider": user["id"],
+                "type": "service"
+            }],
+            "notes": f"CRM {data.outcome} | Pending Due: ₹{data.pending_amount or 0:,.2f}",
+            "created_at": now_iso()
+        }
+        db.collection("orders").document(created_order_id).set(order_doc)
+
         # Add payment tracking note
         ptype = "Token" if data.outcome == "Token Received" else "Closure Amount"
         pmode = data.payment_mode or "Not Specified"
         pending_str = f" | Pending Due: ₹{data.pending_amount:,.2f}" if (data.pending_amount is not None and data.pending_amount > 0) else ""
         notes_to_add.append({
-            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str}", 
+            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str} (Invoice #{created_order_id[:8].upper()})", 
             "author": "System", 
             "timestamp": now_iso()
         })
@@ -2898,7 +2931,12 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         update_data["notes"] = firestore.firestore.ArrayUnion(notes_to_add)
 
     doc_ref.update(update_data)
-    return {"ok": True, "call_id": call_id}
+    return {
+        "ok": True, 
+        "call_id": call_id,
+        "order_id": created_order_id,
+        "invoice_pdf_url": f"/api/orders/{created_order_id}/invoice" if created_order_id else None
+    }
 
 
 @api.get("/sales/dashboard")

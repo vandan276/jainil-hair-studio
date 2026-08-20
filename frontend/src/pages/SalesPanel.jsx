@@ -309,7 +309,7 @@ export default function SalesPanel() {
         consulted_by: callOutcome === "Visited" ? callForm.consultedBy : null
       };
 
-      await api.post(`/leads/${selectedLead.id}/calls`, payload);
+      const callRes = await api.post(`/leads/${selectedLead.id}/calls`, payload);
 
       // Feature 1: If Picked Up and visit date is set, schedule visit
       if (callOutcome === "Picked Up" && callForm.nextDate) {
@@ -324,16 +324,24 @@ export default function SalesPanel() {
         const clientName = selectedLead.name || "Valued Client";
         const amtStr = callForm.saleAmount ? ("₹" + parseFloat(callForm.saleAmount).toLocaleString("en-IN")) : "";
         const pendingStr = (isToken && callForm.pendingAmount) ? ("₹" + parseFloat(callForm.pendingAmount).toLocaleString("en-IN")) : "";
-        const invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
+        
+        const createdOrderId = callRes.data?.order_id;
+        const pdfLink = createdOrderId ? `https://jainilhairstudio.com/api/orders/${createdOrderId}/invoice` : "";
+
+        let invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
           "Dear " + clientName + ",\n\n" +
           "Thank you for choosing Jainil Hair Studio.\n" +
           "*Outcome / Status:* " + callOutcome + "\n" +
           (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
           (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
           "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
-          "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n" +
-          "For any assistance or questions regarding your booking, please reach out to us.\n\n" +
-          "*Jainil Hair Studio*";
+          "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
+
+        if (pdfLink) {
+          invoiceMsg += "📄 *Download Invoice PDF:* \n" + pdfLink + "\n\n";
+        }
+
+        invoiceMsg += "For any assistance or questions regarding your booking, please reach out to us.\n\n*Jainil Hair Studio*";
         
         const phoneDigits = cleanPhone.length > 10 ? cleanPhone : ("91" + cleanPhone.slice(-10));
         const waUrl = "https://api.whatsapp.com/send?phone=" + phoneDigits + "&text=" + encodeURIComponent(invoiceMsg);
@@ -349,7 +357,7 @@ export default function SalesPanel() {
         } catch (e) {
           window.location.href = waUrl;
         }
-        toast.success("Invoice & payment acknowledgment opened in WhatsApp!");
+        toast.success("Invoice PDF & payment acknowledgment opened in WhatsApp!");
       } else {
         toast.success("Call logged successfully");
       }
