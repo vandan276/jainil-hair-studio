@@ -1682,12 +1682,37 @@ def get_order_invoice(oid: str):
 
     # Amount Paid and Due
     total_paid = 0.0
+    pending_due_explicit = float(order.get("pending_amount", 0.0) or 0.0)
     split_payments = order.get("split_payments", [])
-    if split_payments:
-        total_paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+    
+    if pending_due_explicit > 0:
+        amount_due = pending_due_explicit
+        if order.get("amount_paid"):
+            total_paid = float(order.get("amount_paid"))
+        elif split_payments:
+            total_paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+        else:
+            total_paid = max(0.0, grand_total - amount_due)
+    elif "Pending Due: ₹" in notes_str:
+        try:
+            p_part = notes_str.split("Pending Due: ₹")[1].split(" | ")[0].replace(",", "").strip()
+            amount_due = float(p_part)
+            if split_payments:
+                total_paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+            else:
+                total_paid = max(0.0, grand_total - amount_due)
+        except Exception:
+            if split_payments:
+                total_paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+            else:
+                total_paid = grand_total
+            amount_due = max(0.0, grand_total - total_paid)
     else:
-        total_paid = grand_total
-    amount_due = max(0.0, grand_total - total_paid)
+        if split_payments:
+            total_paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+        else:
+            total_paid = grand_total
+        amount_due = max(0.0, grand_total - total_paid)
 
     # Dynamic page height calculation based on item name and provider text lengths
     def wrap_text(text, max_chars):
@@ -2901,6 +2926,10 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         
         # Create an official Order & Invoice Record so PDF can be viewed and downloaded
         created_order_id = new_id()
+        sale_paid = float(data.sale_amount or 0)
+        pending_due = float(data.pending_amount or 0) if (data.outcome == "Token Received" and data.pending_amount is not None) else 0.0
+        service_total = sale_paid + pending_due
+
         order_doc = {
             "id": created_order_id,
             "lead_id": lid,
@@ -2911,22 +2940,24 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             "branch": lead_dict.get("branch", user.get("branch", "Sama Savli")) if lead_snap.exists else "Sama Savli",
             "employee_id": user["id"],
             "employee_name": user["name"],
-            "total": float(data.sale_amount),
+            "total": service_total,
+            "amount_paid": sale_paid,
+            "pending_amount": pending_due,
             "payment_method": data.payment_mode or "UPI",
             "split_payments": [{
                 "method": data.payment_mode or "UPI",
-                "amount": float(data.sale_amount)
+                "amount": sale_paid
             }],
-            "status": "completed",
+            "status": "completed" if pending_due <= 0 else "partial",
             "items": [{
                 "name": f"Hair Service / {data.outcome}",
-                "price": float(data.sale_amount),
+                "price": service_total,
                 "qty": 1,
-                "line_total": float(data.sale_amount),
+                "line_total": service_total,
                 "service_provider": user["id"],
                 "type": "service"
             }],
-            "notes": f"CRM {data.outcome} | Pending Due: ₹{data.pending_amount or 0:,.2f}",
+            "notes": f"CRM {data.outcome} | Amount Paid: ₹{sale_paid:,.2f} | Pending Due: ₹{pending_due:,.2f}",
             "next_appointment_date": data.next_followup_date or "",
             "next_appointment_time": data.next_followup_time or "",
             "created_at": now_iso()
