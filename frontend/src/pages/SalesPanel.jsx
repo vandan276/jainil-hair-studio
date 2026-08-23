@@ -12,7 +12,7 @@ import BillingPanel from "@/components/BillingPanel";
 import RecessControls from "@/components/RecessControls";
 
 const STATUSES = ["new", "in process", "visit", "visited", "token received", "recycled", "dead", "converted"];
-const TABS = ["All", "New", "In Process", "Visit", "Visited", "Visit Scheduled Dead", "Token Received", "Recycled", "Dead", "Converted", "Retargeting", "Consulting Form"];
+const TABS = ["All", "New", "In Process", "Visit Scheduled", "Visited", "Visit Scheduled Dead", "Token Received", "Recycled", "Dead", "Converted", "Retargeting", "Consulting Form"];
 
 const STATUS_COLORS = {
   "new": "bg-blue-50 text-blue-700 border-blue-200",
@@ -567,7 +567,9 @@ export default function SalesPanel() {
       }
     } else {
       // Apply Tab Filter only if no stat filter is active
-      if (activeTab === "Visit Scheduled Dead") {
+      if (activeTab === "Visit Scheduled") {
+        filtered = filtered.filter(l => l.status === "visit");
+      } else if (activeTab === "Visit Scheduled Dead") {
         filtered = filtered.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit"));
       } else if (activeTab === "Dead") {
         filtered = filtered.filter(l => l.status === "dead" || l.status === "visit scheduled dead");
@@ -1160,9 +1162,10 @@ export default function SalesPanel() {
             const count = tab === "All" ? sectionLeads.length : 
                           (tab === "Retargeting" ? sectionLeads.filter(l => ["recycled", "dead", "visit scheduled dead"].includes(l.status)).length : 
                            (tab === "Consulting Form" ? consultations.length : 
-                            (tab === "Visit Scheduled Dead" ? sectionLeads.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit")).length :
-                             (tab === "Dead" ? sectionLeads.filter(l => l.status === "dead" || l.status === "visit scheduled dead").length :
-                              sectionLeads.filter(l => l.status === tab.toLowerCase()).length))));
+                            (tab === "Visit Scheduled" ? sectionLeads.filter(l => l.status === "visit").length :
+                             (tab === "Visit Scheduled Dead" ? sectionLeads.filter(l => l.status === "visit scheduled dead" || (l.status === "dead" && l.previous_status === "visit")).length :
+                              (tab === "Dead" ? sectionLeads.filter(l => l.status === "dead" || l.status === "visit scheduled dead").length :
+                               sectionLeads.filter(l => l.status === tab.toLowerCase()).length)))));
             const isActive = activeTab === tab;
             return (
               <button
