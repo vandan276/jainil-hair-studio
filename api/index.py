@@ -3217,12 +3217,13 @@ def get_sales_dashboard(
             if eff_ts.startswith(this_month):
                 monthly_sales += p.get("amount", 0.0)
 
+    inactive_statuses = ["converted", "closed", "dead", "visit scheduled dead", "recycled"]
     stats = {
         "open": {
-            "overdues": len([d for d in docs if d.get("follow_up_date") and d.get("follow_up_date") < target_date and d.get("status") not in ["converted", "dead"]]),
-            "due_today": len([d for d in docs if d.get("follow_up_date") == target_date and d.get("status") not in ["converted", "dead"]]),
+            "overdues": len([d for d in docs if d.get("follow_up_date") and d.get("follow_up_date") < target_date and d.get("status") not in inactive_statuses]),
+            "due_today": len([d for d in docs if d.get("follow_up_date") == target_date and d.get("status") not in inactive_statuses]),
             "total_assigned": len(docs),
-            "opportunities": len([d for d in docs if d.get("grade") in ["Hot", "Warm"] and d.get("status") not in ["converted", "dead"]]),
+            "opportunities": len([d for d in docs if d.get("grade") in ["Hot", "Warm"] and d.get("status") not in inactive_statuses]),
             "todays_sales": round(period_sales, 2), 
         },
         "periodic": {

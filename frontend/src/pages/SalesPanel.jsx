@@ -543,12 +543,13 @@ export default function SalesPanel() {
     // Apply Stat Filter
     if (activeStatFilter) {
       const today = new Date().toISOString().split("T")[0];
+      const INACTIVE_STATUSES = ["converted", "closed", "dead", "visit scheduled dead", "recycled"];
       if (activeStatFilter === "overdue") {
-        filtered = filtered.filter(d => d.follow_up_date && d.follow_up_date < today && !["converted", "dead"].includes(d.status));
+        filtered = filtered.filter(d => d.follow_up_date && d.follow_up_date < today && !INACTIVE_STATUSES.includes(d.status));
       } else if (activeStatFilter === "due_today") {
-        filtered = filtered.filter(d => d.follow_up_date === today && !["converted", "dead"].includes(d.status));
+        filtered = filtered.filter(d => d.follow_up_date === today && !INACTIVE_STATUSES.includes(d.status));
       } else if (activeStatFilter === "hot_warm") {
-        filtered = filtered.filter(d => ["Hot", "Warm"].includes(d.grade) && !["converted", "dead"].includes(d.status));
+        filtered = filtered.filter(d => ["Hot", "Warm"].includes(d.grade) && !INACTIVE_STATUSES.includes(d.status));
       } else if (activeStatFilter === "assigned") {
         filtered = filtered; // No additional filtering needed for assigned
       } else if (activeStatFilter === "converted") {
@@ -633,9 +634,10 @@ export default function SalesPanel() {
   const todayStr = new Date().toISOString().split("T")[0];
 
   // Per-lead follow-up dismissed state (localStorage-backed)
+  const INACTIVE_STATUSES = ["converted", "closed", "dead", "visit scheduled dead", "recycled"];
   const DISMISSED_KEY = (id, date) => `followup_dismissed_${id}_${date}`;
   const followUpLeads = sectionLeads.filter(
-    l => l.follow_up_date === todayStr && !["converted", "dead"].includes(l.status)
+    l => l.follow_up_date === todayStr && !INACTIVE_STATUSES.includes(l.status)
   );
   const [dismissedFollowUps, setDismissedFollowUps] = useState(() => {
     const r = {};
@@ -657,7 +659,7 @@ export default function SalesPanel() {
   };
   const visibleFollowUpLeads = followUpLeads.filter(l => !dismissedFollowUps[l.id]);
 
-  const overdueCount = sectionLeads.filter(d => d.follow_up_date && d.follow_up_date < todayStr && !["converted", "dead"].includes(d.status)).length;
+  const overdueCount = sectionLeads.filter(d => d.follow_up_date && d.follow_up_date < todayStr && !INACTIVE_STATUSES.includes(d.status)).length;
   const newLeadsToday = sectionLeads.filter(d => d.created_at?.startsWith(todayStr) && d.status === "new").length;
 
   // Badge count = summary items + undismissed per-lead follow-ups
@@ -666,10 +668,10 @@ export default function SalesPanel() {
 
   const currentStats = {
     open: {
-      overdues: sectionLeads.filter(d => d.follow_up_date && d.follow_up_date < todayStr && !["converted", "dead"].includes(d.status)).length,
-      due_today: sectionLeads.filter(d => d.follow_up_date === todayStr && !["converted", "dead"].includes(d.status)).length,
+      overdues: sectionLeads.filter(d => d.follow_up_date && d.follow_up_date < todayStr && !INACTIVE_STATUSES.includes(d.status)).length,
+      due_today: sectionLeads.filter(d => d.follow_up_date === todayStr && !INACTIVE_STATUSES.includes(d.status)).length,
       total_assigned: sectionLeads.length,
-      opportunities: sectionLeads.filter(d => ["Hot", "Warm"].includes(d.grade) && !["converted", "dead"].includes(d.status)).length,
+      opportunities: sectionLeads.filter(d => ["Hot", "Warm"].includes(d.grade) && !INACTIVE_STATUSES.includes(d.status)).length,
     },
     periodic: stats?.periodic || {
       leads: 0,
@@ -689,8 +691,9 @@ export default function SalesPanel() {
   };
 
   const getLeadRowClass = (lead) => {
+    if (INACTIVE_STATUSES.includes(lead.status)) return "bg-white hover:bg-gray-50";
     if (lead.follow_up_date === todayStr) return "bg-yellow-50"; // Due Today
-    if (lead.follow_up_date && lead.follow_up_date < todayStr && !["converted", "dead"].includes(lead.status)) return "bg-red-50"; // Overdue
+    if (lead.follow_up_date && lead.follow_up_date < todayStr) return "bg-red-50"; // Overdue
     return "bg-white hover:bg-gray-50";
   };
 

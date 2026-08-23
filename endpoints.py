@@ -231,13 +231,14 @@ def get_sales_dashboard(user: dict = Depends(require_employee)):
         docs = [d.to_dict() for d in coll.select(fields).order_by("created_at", direction="DESCENDING").limit(1000).stream()]
     
     today = now_iso()[:10]
+    inactive_statuses = ["converted", "closed", "dead", "visit scheduled dead", "recycled"]
     
     stats = {
         "open": {
-            "overdues": len([d for d in docs if d.get("follow_up_date") and d.get("follow_up_date") < today and d.get("status") not in ["converted", "dead"]]),
-            "due_today": len([d for d in docs if d.get("follow_up_date") == today and d.get("status") not in ["converted", "dead"]]),
+            "overdues": len([d for d in docs if d.get("follow_up_date") and d.get("follow_up_date") < today and d.get("status") not in inactive_statuses]),
+            "due_today": len([d for d in docs if d.get("follow_up_date") == today and d.get("status") not in inactive_statuses]),
             "total_assigned": len(docs),
-            "opportunities": len([d for d in docs if d.get("grade") in ["Hot", "Warm"] and d.get("status") not in ["converted", "dead"]]),
+            "opportunities": len([d for d in docs if d.get("grade") in ["Hot", "Warm"] and d.get("status") not in inactive_statuses]),
             "todays_calls": 0,
             "unread_whatsapp": 0
         },
