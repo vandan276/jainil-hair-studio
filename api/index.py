@@ -613,6 +613,7 @@ class ProductCategoryIn(BaseModel):
 
 class ProductIn(BaseModel):
     name: str
+    customer_display_name: Optional[str] = None
     category: str
     description: str
     price: float
@@ -1332,7 +1333,8 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
         prod_snap = prod_ref.get()
         if prod_snap.exists:
             prod = prod_snap.to_dict()
-            item_name = prod["name"]
+            display_name = prod.get("customer_display_name")
+            item_name = display_name if (display_name and display_name.strip()) else prod.get("name", "")
             item_price = prod.get("price", 0)
             
             # Stock management for physical products
@@ -5123,6 +5125,7 @@ class ProductAddStockIn(BaseModel):
     invoice_no: Optional[str] = ""
     cost_price: float
     selling_price: Optional[float] = None
+    customer_display_name: Optional[str] = None
     expiry_date: Optional[str] = ""
     remarks: Optional[str] = ""
     amount_paid: Optional[float] = 0.0
@@ -5184,6 +5187,8 @@ def admin_add_product_stock(data: ProductAddStockIn, _: dict = Depends(require_a
     }
     if data.selling_price is not None and data.selling_price > 0:
         update_data["price"] = data.selling_price
+    if data.customer_display_name is not None and data.customer_display_name.strip():
+        update_data["customer_display_name"] = data.customer_display_name.strip()
     if data.branch:
         update_data["branch"] = data.branch
 

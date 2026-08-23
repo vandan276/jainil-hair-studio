@@ -353,8 +353,9 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
       // Auto-fill price when item name matches or when qty/item_id changes
       if (field === "item_name") {
-        const selected = catalogItems.find(i => i.name === value);
+        const selected = catalogItems.find(i => i.name === value || i.internal_name === value || (i.sku && i.sku === value));
         if (selected) {
+          updated[idx].item_name = selected.name;
           updated[idx].item_id = selected.id;
           updated[idx].category = selected.category || "";
           updated[idx].type = selected.type || "Service";
@@ -476,7 +477,14 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       price: pkg.price,
       type: "Package"
     }));
-    return [...products, ...services, ...mappedPkgs];
+    const mappedProds = (products || []).map(prod => ({
+      ...prod,
+      name: prod.customer_display_name || prod.name,
+      internal_name: prod.name,
+      customer_display_name: prod.customer_display_name,
+      type: "Product"
+    }));
+    return [...mappedProds, ...services, ...mappedPkgs];
   }, [products, services, availablePackages]);
 
   const categories = useMemo(() => {

@@ -1967,6 +1967,7 @@ export default function Admin() {
           title={t("product")} testid="products" items={products} t={t}
           fields={[
             { k: "name", label: t("productName"), type: "text" },
+            { k: "customer_display_name", label: "Customer Display Name (Used in Billing)", type: "text" },
             { k: "sku", label: "SKU / Barcode", type: "text" },
             { k: "category", label: t("category"), type: "category_manager", options: productCategories, onAddCategory: handleAddCategory, onDeleteCategory: handleDeleteCategory, default: "" },
             { k: "description", label: t("description"), type: "textarea" },
@@ -16752,6 +16753,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
     id: Date.now() + Math.random(),
     productId: "",
     productSearch: "",
+    customerDisplayName: "",
     sku: "",
     showDrop: false,
     quantity: "",
@@ -16782,6 +16784,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
     updateRow(idx, {
       productId: p.id,
       productSearch: p.name,
+      customerDisplayName: p.customer_display_name || p.name || "",
       sku: p.sku || "",
       showDrop: false,
       sellingPrice: p.price !== undefined ? p.price.toString() : ""
@@ -16822,6 +16825,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
           invoice_no: invoiceNo,
           cost_price: Number(r.costPrice),
           selling_price: Number(r.sellingPrice),
+          customer_display_name: r.customerDisplayName,
           expiry_date: r.expiryDate,
           remarks,
           discount: rowDiscount,
@@ -16911,13 +16915,14 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
             <table className="w-full text-left border-collapse table-fixed">
               <thead>
                 <tr className="bg-emerald-50/80 border-b border-emerald-100 text-emerald-950 uppercase font-bold text-[10px] tracking-wider">
-                  <th className="py-3 px-3 w-[28%]">Product Name *</th>
-                  <th className="py-3 px-2 w-[14%]">SKU / Code</th>
-                  <th className="py-3 px-2 w-[11%]">Qty *</th>
-                  <th className="py-3 px-2 w-[13%]">Cost (₹) *</th>
-                  <th className="py-3 px-2 w-[13%]">Selling (₹)</th>
-                  <th className="py-3 px-2 w-[15%] text-right font-mono">Total (₹)</th>
-                  <th className="py-3 px-2 w-[6%] text-center">Action</th>
+                  <th className="py-3 px-3 w-[24%]">Product Name *</th>
+                  <th className="py-3 px-2 w-[20%]">Customer Display Name</th>
+                  <th className="py-3 px-2 w-[10%]">SKU / Code</th>
+                  <th className="py-3 px-2 w-[8%]">Qty *</th>
+                  <th className="py-3 px-2 w-[11%]">Cost (₹) *</th>
+                  <th className="py-3 px-2 w-[11%]">Selling (₹)</th>
+                  <th className="py-3 px-2 w-[11%] text-right font-mono">Total (₹)</th>
+                  <th className="py-3 px-2 w-[5%] text-center">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -16935,7 +16940,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                             type="text"
                             placeholder="Search name or SKU..."
                             value={row.productSearch}
-                            onChange={e => updateRow(idx, { productSearch: e.target.value, productId: "", sku: "", showDrop: true })}
+                            onChange={e => updateRow(idx, { productSearch: e.target.value, productId: "", sku: "", customerDisplayName: "", showDrop: true })}
                             onFocus={() => updateRow(idx, { showDrop: true })}
                             onBlur={() => updateRow(idx, { showDrop: false })}
                             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
@@ -16965,6 +16970,11 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                                     <span className="text-[10px] text-gray-400 ml-2">Stock: {p.stock || 0}</span>
                                   </div>
                                   <div className="flex items-center gap-2 mt-0.5">
+                                    {p.customer_display_name && (
+                                      <span className="text-[9px] text-emerald-700 font-medium">
+                                        Display: {p.customer_display_name}
+                                      </span>
+                                    )}
                                     {p.sku && (
                                       <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded bg-gray-100 text-gray-600 border border-gray-200">
                                         SKU: {p.sku}
@@ -16986,6 +16996,17 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                             </div>
                           )}
                         </div>
+                      </td>
+
+                      {/* Customer Display Name */}
+                      <td className="py-2.5 px-2 align-top">
+                        <input
+                          type="text"
+                          placeholder="Customer Display Name"
+                          value={row.customerDisplayName || ""}
+                          onChange={e => updateRow(idx, { customerDisplayName: e.target.value })}
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
+                        />
                       </td>
 
                       {/* SKU Input / Display */}
