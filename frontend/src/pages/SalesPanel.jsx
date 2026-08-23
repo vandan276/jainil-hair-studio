@@ -322,24 +322,35 @@ export default function SalesPanel() {
       if (shareInvoice) {
         const cleanPhone = (selectedLead.phone || "").replace(/[^0-9]/g, "");
         const clientName = selectedLead.name || "Valued Client";
-        const amtStr = callForm.saleAmount ? ("₹" + parseFloat(callForm.saleAmount).toLocaleString("en-IN")) : "";
+        const hasPayment = (isToken || isConverted) && callForm.saleAmount && parseFloat(callForm.saleAmount) > 0;
+        const amtStr = hasPayment ? ("₹" + parseFloat(callForm.saleAmount).toLocaleString("en-IN")) : "";
         const pendingStr = (isToken && callForm.pendingAmount) ? ("₹" + parseFloat(callForm.pendingAmount).toLocaleString("en-IN")) : "";
         
         const createdOrderId = callRes.data?.order_id;
-        const pdfLink = createdOrderId ? `https://jainilhairstudio.com/api/orders/${createdOrderId}/invoice` : "";
+        const pdfLink = (hasPayment && createdOrderId) ? `https://jainilhairstudio.com/api/orders/${createdOrderId}/invoice` : "";
 
-        let invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
-          "Dear " + clientName + ",\n\n" +
-          "Thank you for choosing Jainil Hair Studio.\n" +
-          "*Outcome / Status:* " + callOutcome + "\n" +
-          (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
-          (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
-          (callOutcome !== "Converted" && callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
-          "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
-          "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
+        let invoiceMsg = "";
+        if (hasPayment) {
+          invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
+            "Dear " + clientName + ",\n\n" +
+            "Thank you for choosing Jainil Hair Studio.\n" +
+            "*Outcome / Status:* " + callOutcome + "\n" +
+            (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
+            (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
+            (callOutcome !== "Converted" && callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
+            "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
+            "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
 
-        if (pdfLink) {
-          invoiceMsg += "📄 *Download Invoice PDF:* \n" + pdfLink + "\n\n";
+          if (pdfLink) {
+            invoiceMsg += "📄 *Download Invoice PDF:* \n" + pdfLink + "\n\n";
+          }
+        } else {
+          invoiceMsg = "*JAINIL HAIR STUDIO — APPOINTMENT CONFIRMATION*\n\n" +
+            "Dear " + clientName + ",\n\n" +
+            "Thank you for choosing Jainil Hair Studio.\n" +
+            "*Outcome / Status:* " + callOutcome + "\n" +
+            (callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
+            "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
         }
 
         invoiceMsg += "For any assistance or questions regarding your booking, please reach out to us.\n\n*Jainil Hair Studio*";
@@ -358,7 +369,7 @@ export default function SalesPanel() {
         } catch (e) {
           window.location.href = waUrl;
         }
-        toast.success("Invoice PDF & payment acknowledgment opened in WhatsApp!");
+        toast.success(hasPayment ? "Invoice PDF & payment acknowledgment opened in WhatsApp!" : "Appointment confirmation opened in WhatsApp!");
       } else {
         toast.success("Call logged successfully");
       }
@@ -1814,7 +1825,7 @@ export default function SalesPanel() {
                           onClick={(e) => saveCallLog(e, true)}
                           className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none flex items-center justify-center gap-1.5"
                         >
-                          <MessageSquare size={15} /> Save & Share Invoice
+                          <MessageSquare size={15} /> {["Token Received", "Converted"].includes(callOutcome) ? "Save & Share Invoice" : "Save & Share on WhatsApp"}
                         </button>
                       </div>
                     </form>
