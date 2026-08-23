@@ -525,6 +525,7 @@ class LeadUpdate(BaseModel):
     secondary_phone: Optional[str] = None
     branch: Optional[str] = None
     section: Optional[str] = None
+    source: Optional[str] = None
     city: Optional[str] = None
     status: Optional[str] = None
     follow_up_date: Optional[str] = None # YYYY-MM-DD
@@ -2628,6 +2629,7 @@ def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employe
     if data.phone is not None: update_data["phone"] = data.phone
     if data.branch is not None: update_data["branch"] = data.branch
     if data.section is not None: update_data["section"] = data.section
+    if data.source is not None: update_data["source"] = data.source
     if data.city is not None: update_data["city"] = data.city
     if data.status is not None:
         update_data["status"] = data.status

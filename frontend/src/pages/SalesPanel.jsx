@@ -518,6 +518,7 @@ export default function SalesPanel() {
       secondary_phone: lead.secondary_phone || "",
       branch: lead.branch,
       section: lead.section,
+      source: lead.source || "Manual",
       city: lead.city || "",
       hair_condition: lead.hair_condition || "",
       status: lead.status,
@@ -2237,6 +2238,26 @@ export default function SalesPanel() {
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
                   >
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Source</label>
+                  <select
+                    value={editLeadForm.source || "Manual"}
+                    onChange={e => setEditLeadForm({...editLeadForm, source: e.target.value})}
+                    className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
+                  >
+                    <option value="Manual">Manual Entry</option>
+                    <option value="Walk-in">Walk-in</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Referral">Referral</option>
+                    <option value="Facebook">Facebook Ads</option>
+                    <option value="Facebook Ads">Facebook Ads (Meta)</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="WhatsApp Ads">WhatsApp Ads</option>
+                    <option value="Website">Website</option>
+                    <option value="Google Ads">Google Ads</option>
+                    <option value="Consulting Form">Consulting Form</option>
                   </select>
                 </div>
                 <div>
