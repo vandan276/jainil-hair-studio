@@ -1972,7 +1972,7 @@ export default function Admin() {
             { k: "category", label: t("category"), type: "category_manager", options: productCategories, onAddCategory: handleAddCategory, onDeleteCategory: handleDeleteCategory, default: "" },
             { k: "description", label: t("description"), type: "textarea" },
             { k: "target_audience", label: t("targetAudience"), type: "select", options: ["Women", "Men", "Unisex", "Accessories"], default: "Women" },
-            { k: "measurement_unit", label: "Measurement Unit", type: "select", options: ["L", "ml", "Grm", "pcs", "pkt"], default: "pcs" },
+            { k: "measurement_unit", label: "Measurement Unit", type: "select", options: ["L", "ml", "Grm", "pcs", "pkt", "Bottle", "Box", "Tube", "Set"], default: "pcs" },
             { k: "in_saloon", label: "In saloon", type: "checkbox", default: false },
           ]}
           create={(d) => api.post("/admin/products", d)}
