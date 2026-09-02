@@ -32,6 +32,17 @@ const GRADE_COLORS = {
   "Cold": "bg-blue-500"
 };
 
+const APPOINTMENT_TIME_SLOTS = [];
+for (let h = 9; h <= 20; h++) {
+  for (let m of ["00", "30"]) {
+    const hour12 = h > 12 ? h - 12 : h;
+    const ampm = h >= 12 ? "PM" : "AM";
+    const value24 = `${String(h).padStart(2, "0")}:${m}`;
+    const label12 = `${String(hour12).padStart(2, "0")}:${m} ${ampm}`;
+    APPOINTMENT_TIME_SLOTS.push({ value: value24, label: label12 });
+  }
+}
+
 // Sub-component to prevent the entire SalesPanel from re-rendering every second
 const LiveTimer = ({ isActive, initialSeconds = 0 }) => {
   const [seconds, setSeconds] = useState(initialSeconds);
@@ -2413,13 +2424,21 @@ export default function SalesPanel() {
                     </div>
                     <div className="animate-fade-in">
                       <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Time Slot</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. 10:00 AM"
+                      <select
                         value={editLeadForm.follow_up_time || ""}
                         onChange={e => setEditLeadForm({...editLeadForm, follow_up_time: e.target.value})}
                         className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
-                      />
+                      >
+                        <option value="">Select Time Slot</option>
+                        {editLeadForm.follow_up_time && !APPOINTMENT_TIME_SLOTS.some(s => s.value === editLeadForm.follow_up_time || s.label === editLeadForm.follow_up_time) && (
+                          <option value={editLeadForm.follow_up_time}>{editLeadForm.follow_up_time}</option>
+                        )}
+                        {APPOINTMENT_TIME_SLOTS.map(slot => (
+                          <option key={slot.value} value={slot.value}>
+                            {slot.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </>
                 )}
