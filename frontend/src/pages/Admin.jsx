@@ -9486,7 +9486,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Daily CRM & Lead Sales Card */}
           <div
             onClick={() => setSelectedDailyDetail(selectedDailyDetail === "SALES" ? null : "SALES")}
@@ -9526,27 +9526,6 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
             <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
               <span>{stats?.daily_services_details?.length || 0} Bills</span>
               <span className="text-emerald-600 uppercase tracking-wider">View Details</span>
-            </div>
-          </div>
-
-          {/* Daily Online Product Sales Card */}
-          <div
-            onClick={() => setSelectedDailyDetail(selectedDailyDetail === "ONLINE_PRODUCTS" ? null : "ONLINE_PRODUCTS")}
-            className={`glass-card p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col justify-between hover:translate-y-[-2px] ${selectedDailyDetail === "ONLINE_PRODUCTS"
-              ? "border-indigo-500 bg-indigo-50/10 shadow-[0_4px_20px_rgba(99,102,241,0.15)] scale-102"
-              : "border-gray-100 bg-white hover:border-indigo-500/40 shadow-sm"
-              }`}
-          >
-            <div>
-              <div className="flex justify-between items-center mb-1">
-                <span className="overline text-[10px] text-indigo-500 font-bold">Daily Online Product Sales</span>
-                <span className="text-[9px] font-bold text-eminence-muted uppercase">Today</span>
-              </div>
-              <h4 className="font-serif text-2xl text-indigo-700">₹{(stats?.daily_website_products || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h4>
-            </div>
-            <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
-              <span>{stats?.daily_website_products_details?.length || 0} Orders</span>
-              <span className="text-indigo-500 uppercase tracking-wider">View Details</span>
             </div>
           </div>
 
@@ -9688,47 +9667,6 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       {(!stats?.daily_services_details || stats.daily_services_details.length === 0) && (
                         <tr>
                           <td colSpan="7" className="text-center py-8 text-eminence-muted italic">No service bills generated today.</td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* Details for Online Products */}
-            {selectedDailyDetail === "ONLINE_PRODUCTS" && (
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-serif text-lg text-gray-800">Daily Website Online Product Sales</h4>
-                  <p className="text-xs text-eminence-muted">E-commerce store orders placed online by guests or users today</p>
-                </div>
-                <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
-                  <table className="w-full text-xs text-left">
-                    <thead>
-                      <tr className="text-[10px] uppercase text-eminence-muted tracking-wider bg-eminence-surface/50 border-b border-eminence-border/10">
-                        <th className="px-4 py-2.5">Order Time</th>
-                        <th className="px-4 py-2.5">Order ID</th>
-                        <th className="px-4 py-2.5">Client Name</th>
-                        <th className="px-4 py-2.5">Summary / Notes</th>
-                        <th className="px-4 py-2.5 text-right">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {stats?.daily_website_products_details?.map((item, idx) => (
-                        <tr key={idx} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10">
-                          <td className="px-4 py-3 font-mono text-[10px] text-gray-500">
-                            {item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : "N/A"}
-                          </td>
-                          <td className="px-4 py-3 font-mono text-[10px] text-gray-600 truncate max-w-[100px]">{item.id}</td>
-                          <td className="px-4 py-3 font-bold text-gray-800">{item.name}</td>
-                          <td className="px-4 py-3 text-gray-600">{item.details}</td>
-                          <td className="px-4 py-3 text-right font-serif font-bold text-indigo-700">+₹{item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
-                        </tr>
-                      ))}
-                      {(!stats?.daily_website_products_details || stats.daily_website_products_details.length === 0) && (
-                        <tr>
-                          <td colSpan="5" className="text-center py-8 text-eminence-muted italic">No online product orders placed today.</td>
                         </tr>
                       )}
                     </tbody>
