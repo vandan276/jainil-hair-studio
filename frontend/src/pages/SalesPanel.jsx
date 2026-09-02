@@ -294,6 +294,7 @@ export default function SalesPanel() {
 
       const isToken = callOutcome === "Token Received";
       const isConverted = callOutcome === "Converted";
+      const isDeadOutcome = ["Visit Scheduled Dead", "Said No"].includes(callOutcome);
 
       const payload = {
         duration: finalDuration,
@@ -301,8 +302,8 @@ export default function SalesPanel() {
         outcome: callOutcome,
         comment: callForm.comment,
         grade: callForm.grade || selectedLead.grade,
-        next_followup_date: callForm.nextDate,
-        next_followup_time: callForm.nextTime,
+        next_followup_date: isDeadOutcome ? null : (callForm.nextDate || null),
+        next_followup_time: isDeadOutcome ? null : (callForm.nextTime || null),
         sale_amount: parseFloat(callForm.saleAmount) || null,
         pending_amount: isToken ? (parseFloat(callForm.pendingAmount) || 0) : null,
         payment_mode: (isToken || isConverted) ? callForm.paymentMode : null,
@@ -1746,7 +1747,7 @@ export default function SalesPanel() {
                         )}
 
                         {/* Next Follow-up / Appointment Schedule */}
-                        {callOutcome && (() => {
+                        {callOutcome && !["Visit Scheduled Dead", "Said No"].includes(callOutcome) && (() => {
                           const TIME_SLOTS = [];
                           for (let h = 9; h <= 20; h++) {
                             for (let m of ["00", "30"]) {

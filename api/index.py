@@ -3010,6 +3010,10 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             update_data["status"] = "in process"
     elif data.outcome in ["Said No", "Not Interested"]:
         update_data["status"] = "dead"
+        update_data["follow_up_date"] = None
+        update_data["next_appointment_date"] = None
+        update_data["follow_up_time"] = None
+        update_data["next_appointment_time"] = None
     elif data.outcome == "Interested (Follow-up)":
         update_data["status"] = "in process"
     elif data.outcome == "Visit Scheduled":
@@ -3017,6 +3021,10 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
     elif data.outcome in ["Visit Scheduled Dead", "Visit Scheduled Dead (Not Visited / Retarget)"]:
         update_data["status"] = "visit scheduled dead"
         update_data["previous_status"] = "visit"
+        update_data["follow_up_date"] = None
+        update_data["next_appointment_date"] = None
+        update_data["follow_up_time"] = None
+        update_data["next_appointment_time"] = None
     elif data.outcome == "Visited":
         update_data["status"] = "visited"
         if data.consulted_by:
