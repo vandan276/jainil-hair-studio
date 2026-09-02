@@ -512,6 +512,7 @@ class CallLogIn(BaseModel):
     next_followup_date: Optional[str] = None
     next_followup_time: Optional[str] = None
     converted_date: Optional[str] = None
+    token_received_date: Optional[str] = None
     sale_amount: Optional[float] = None
     pending_amount: Optional[float] = None
     payment_mode: Optional[str] = None
@@ -537,6 +538,7 @@ class LeadUpdate(BaseModel):
     hair_condition: Optional[str] = None
     total_sale_amount: Optional[float] = None
     converted_date: Optional[str] = None
+    token_received_date: Optional[str] = None
     is_favorite: Optional[bool] = None
     hair_condition: Optional[str] = None
     packages: Optional[List[dict]] = None
@@ -3036,6 +3038,8 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             notes_to_add.append(note)
     elif data.outcome == "Token Received":
         update_data["status"] = "token received"
+        update_data["token_received_date"] = data.token_received_date or now_iso()[:10]
+        update_data["token_received_at"] = (data.token_received_date + "T12:00:00Z") if data.token_received_date else now_iso()
     elif data.outcome == "Converted":
         update_data["status"] = "converted"
         update_data["converted_date"] = data.converted_date or now_iso()[:10]

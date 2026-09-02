@@ -129,6 +129,7 @@ export default function SalesPanel() {
     nextDate: "", 
     nextTime: "", 
     convertedDate: new Date().toISOString().split("T")[0],
+    tokenReceivedDate: new Date().toISOString().split("T")[0],
     saleAmount: "",
     pendingAmount: "",
     paymentMode: "UPI",
@@ -306,6 +307,7 @@ export default function SalesPanel() {
         next_followup_date: isNoFollowup ? null : (callForm.nextDate || null),
         next_followup_time: isNoFollowup ? null : (callForm.nextTime || null),
         converted_date: isConverted ? (callForm.convertedDate || new Date().toISOString().split("T")[0]) : null,
+        token_received_date: isToken ? (callForm.tokenReceivedDate || new Date().toISOString().split("T")[0]) : null,
         sale_amount: parseFloat(callForm.saleAmount) || null,
         pending_amount: isToken ? (parseFloat(callForm.pendingAmount) || 0) : null,
         payment_mode: (isToken || isConverted) ? callForm.paymentMode : null,
@@ -341,6 +343,7 @@ export default function SalesPanel() {
             (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
             (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
             (callOutcome === "Converted" && callForm.convertedDate ? ("*Converted Date:* " + callForm.convertedDate + "\n") : "") +
+            (callOutcome === "Token Received" && callForm.tokenReceivedDate ? ("*Token Received Date:* " + callForm.tokenReceivedDate + "\n") : "") +
             (callOutcome !== "Converted" && callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
             "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
             "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
@@ -381,7 +384,7 @@ export default function SalesPanel() {
       setCallingMode(false);
       setCallActive(false);
       callDurationRef.current = 0;
-      setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", convertedDate: new Date().toISOString().split("T")[0], saleAmount: "", pendingAmount: "", paymentMode: "UPI", consultedBy: "" });
+      setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", convertedDate: new Date().toISOString().split("T")[0], tokenReceivedDate: new Date().toISOString().split("T")[0], saleAmount: "", pendingAmount: "", paymentMode: "UPI", consultedBy: "" });
       setSelectedLead(null);
       fetchLeads();
       fetchStats();
@@ -1723,7 +1726,7 @@ export default function SalesPanel() {
 
                         {callOutcome === "Token Received" && (
                           <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 mb-5 shadow-sm space-y-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                               <div>
                                 <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
                                   Token Received (₹) *
@@ -1747,6 +1750,18 @@ export default function SalesPanel() {
                                   value={callForm.pendingAmount}
                                   onChange={e => setCallForm({ ...callForm, pendingAmount: e.target.value })}
                                   className="w-full border-amber-200 rounded-xl p-3 text-xl font-black text-amber-900 focus:ring-amber-500 focus:border-amber-500 bg-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
+                                  Token Received Date *
+                                </label>
+                                <input
+                                  type="date"
+                                  required
+                                  value={callForm.tokenReceivedDate || new Date().toISOString().split("T")[0]}
+                                  onChange={e => setCallForm({ ...callForm, tokenReceivedDate: e.target.value })}
+                                  className="w-full border-emerald-200 rounded-xl p-3 text-sm font-bold text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
                                 />
                               </div>
                             </div>
