@@ -16693,6 +16693,9 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
   const [remarks, setRemarks] = useState("");
   const [branch, setBranch] = useState(isSuperAdmin ? "Baroda" : (user?.branch || "Baroda"));
   const [discount, setDiscount] = useState("");
+  const [amountPaid, setAmountPaid] = useState("");
+  const [paymentMode, setPaymentMode] = useState("Cash");
+  const [paymentStatus, setPaymentStatus] = useState("Pending");
   const [loading, setLoading] = useState(false);
 
   const updateRow = (idx, patch) => {
@@ -16747,17 +16750,17 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
           quantity: Number(r.quantity),
           vendor_id: vendorId,
           vendor_name: v ? v.name : "Unknown",
-          invoice_no: invoiceNo,
+          invoice_no: invoiceNo || "",
           cost_price: Number(r.costPrice),
           selling_price: r.sellingPrice ? Number(r.sellingPrice) : 0,
-          customer_display_name: r.customerDisplayName,
-          expiry_date: r.expiryDate,
-          remarks,
+          customer_display_name: r.customerDisplayName || "",
+          expiry_date: r.expiryDate || "",
+          remarks: remarks || "",
           discount: rowDiscount,
           amount_paid: rowAmountPaid,
-          payment_mode: paymentMode,
-          payment_status: paymentStatus,
-          branch: branch
+          payment_mode: paymentMode || "Cash",
+          payment_status: paymentStatus || "Pending",
+          branch: branch || "Baroda"
         });
       }));
 
@@ -16772,7 +16775,8 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
       setPaymentStatus("Pending");
       onComplete();
     } catch (err) {
-      toast.error(err.response?.data?.detail || "Failed to add stock");
+      console.error("Failed to add stock:", err);
+      toast.error(err.response?.data?.detail || err.message || "Failed to add stock");
     } finally {
       setLoading(false);
     }

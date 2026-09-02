@@ -5167,27 +5167,33 @@ class UpdateStockLogPaymentIn(BaseModel):
     payment_status: str
 
 def sync_stock_log_expense(log_doc: dict):
-    lid = log_doc.get("id")
-    amount_paid = log_doc.get("amount_paid", 0.0)
-    
-    if amount_paid <= 0:
-        db.collection("expenses").document(lid).delete()
-    else:
-        created_at = log_doc.get("created_at", "")
-        date_str = created_at[:10] if len(created_at) >= 10 else now_iso()[:10]
+    try:
+        lid = log_doc.get("id")
+        amount_paid = log_doc.get("amount_paid", 0.0) or 0.0
         
-        expense_doc = {
-            "id": lid,
-            "category": "Supplies",
-            "amount": amount_paid,
-            "date": date_str,
-            "description": f"Vendor Purchase: {log_doc.get('vendor_name', '—')} (Invoice: {log_doc.get('invoice_no', '—')}) - {log_doc.get('product_name', 'Unknown Product')} x {log_doc.get('quantity', 0)}",
-            "paid_to": log_doc.get("vendor_name", ""),
-            "payment_mode": log_doc.get("payment_mode", "Cash"),
-            "branch": log_doc.get("branch") or "Baroda",
-            "created_at": created_at or now_iso()
-        }
-        db.collection("expenses").document(lid).set(expense_doc)
+        if amount_paid <= 0:
+            try:
+                db.collection("expenses").document(lid).delete()
+            except:
+                pass
+        else:
+            created_at = log_doc.get("created_at", "")
+            date_str = created_at[:10] if len(created_at) >= 10 else now_iso()[:10]
+            
+            expense_doc = {
+                "id": lid,
+                "category": "Supplies",
+                "amount": float(amount_paid),
+                "date": date_str,
+                "description": f"Vendor Purchase: {log_doc.get('vendor_name', '—')} (Invoice: {log_doc.get('invoice_no', '—')}) - {log_doc.get('product_name', 'Unknown Product')} x {log_doc.get('quantity', 0)}",
+                "paid_to": log_doc.get("vendor_name", ""),
+                "payment_mode": log_doc.get("payment_mode", "Cash") or "Cash",
+                "branch": log_doc.get("branch") or "Baroda",
+                "created_at": created_at or now_iso()
+            }
+            db.collection("expenses").document(lid).set(expense_doc)
+    except Exception as e:
+        print(f"Failed to sync stock log expense: {e}")
 
 
 @api.post("/admin/products/add-stock")
