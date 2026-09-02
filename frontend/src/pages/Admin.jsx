@@ -16728,7 +16728,6 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
       if (!r.productId) return toast.error(`Row ${i + 1}: Please select a product`);
       if (!r.quantity || Number(r.quantity) <= 0) return toast.error(`Row ${i + 1}: Enter a valid quantity`);
       if (!r.costPrice || Number(r.costPrice) <= 0) return toast.error(`Row ${i + 1}: Enter a valid cost price`);
-      if (!r.sellingPrice || Number(r.sellingPrice) <= 0) return toast.error(`Row ${i + 1}: Enter a valid selling price`);
     }
 
     setLoading(true);
@@ -16750,7 +16749,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
           vendor_name: v ? v.name : "Unknown",
           invoice_no: invoiceNo,
           cost_price: Number(r.costPrice),
-          selling_price: Number(r.sellingPrice),
+          selling_price: r.sellingPrice ? Number(r.sellingPrice) : 0,
           customer_display_name: r.customerDisplayName,
           expiry_date: r.expiryDate,
           remarks,
