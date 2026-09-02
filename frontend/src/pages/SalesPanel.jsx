@@ -334,19 +334,35 @@ export default function SalesPanel() {
         const createdOrderId = callRes.data?.order_id;
         const pdfLink = (hasPayment && createdOrderId) ? `https://jainilhairstudio.com/api/orders/${createdOrderId}/invoice` : "";
 
+        const formatTimeAmPm = (tStr) => {
+          if (!tStr) return "";
+          const t = tStr.trim();
+          if (t.toLowerCase().includes("am") || t.toLowerCase().includes("pm")) return t;
+          const parts = t.split(":");
+          if (parts.length >= 2) {
+            let h = parseInt(parts[0], 10);
+            const m = parts[1];
+            const ampm = h >= 12 ? "PM" : "AM";
+            if (h === 0) h = 12;
+            else if (h > 12) h -= 12;
+            return `${h}:${m} ${ampm}`;
+          }
+          return t;
+        };
+
         let invoiceMsg = "";
         if (hasPayment) {
           invoiceMsg = "*JAINIL HAIR STUDIO — PAYMENT ACKNOWLEDGEMENT / INVOICE*\n\n" +
             "Dear " + clientName + ",\n\n" +
             "Thank you for choosing Jainil Hair Studio.\n" +
-            "*Outcome / Status:* " + callOutcome + "\n" +
+            "*Status:* " + callOutcome + "\n" +
             (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
             (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
             (callOutcome === "Converted" && callForm.convertedDate ? ("*Converted Date:* " + callForm.convertedDate + "\n") : "") +
             (callOutcome === "Token Received" && callForm.tokenReceivedDate ? ("*Token Received Date:* " + callForm.tokenReceivedDate + "\n") : "") +
-            (callOutcome !== "Converted" && callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
-            "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
-            "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
+            (callOutcome !== "Converted" && callForm.nextDate ? ("*Appointment Date:* " + callForm.nextDate + "\n") : "") +
+            (callOutcome !== "Converted" && callForm.nextTime ? ("*Time:* " + formatTimeAmPm(callForm.nextTime) + "\n") : "") +
+            "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n\n";
 
           if (pdfLink) {
             invoiceMsg += "📄 *Download Invoice PDF:* \n" + pdfLink + "\n\n";
@@ -355,9 +371,10 @@ export default function SalesPanel() {
           invoiceMsg = "*JAINIL HAIR STUDIO — APPOINTMENT CONFIRMATION*\n\n" +
             "Dear " + clientName + ",\n\n" +
             "Thank you for choosing Jainil Hair Studio.\n" +
-            "*Outcome / Status:* " + callOutcome + "\n" +
-            (callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
-            "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
+            "*Status:* " + callOutcome + "\n" +
+            (callForm.nextDate ? ("*Appointment Date:* " + callForm.nextDate + "\n") : "") +
+            (callForm.nextTime ? ("*Time:* " + formatTimeAmPm(callForm.nextTime) + "\n") : "") +
+            "\n";
         }
 
         invoiceMsg += "For any assistance or questions regarding your booking, please reach out to us.\n\n*Jainil Hair Studio*";
