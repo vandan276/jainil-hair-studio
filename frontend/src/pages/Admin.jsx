@@ -1971,21 +1971,9 @@ export default function Admin() {
             { k: "sku", label: "SKU / Barcode", type: "text" },
             { k: "category", label: t("category"), type: "category_manager", options: productCategories, onAddCategory: handleAddCategory, onDeleteCategory: handleDeleteCategory, default: "" },
             { k: "description", label: t("description"), type: "textarea" },
-            { k: "price", label: `${t("total")} (₹)`, type: "number" },
-            { k: "stock", label: t("stock_label"), type: "number" },
             { k: "target_audience", label: t("targetAudience"), type: "select", options: ["Women", "Men", "Unisex", "Accessories"], default: "Women" },
             { k: "measurement_unit", label: "Measurement Unit", type: "select", options: ["L", "ml", "Grm", "pcs", "pkt"], default: "pcs" },
-            { k: "volume", label: "Volume / Capacity (e.g. 500, 1)", type: "text" },
-            { k: "length_inches", label: "Length (inches)", type: "text" },
-            { k: "colour", label: "Colour", type: "text" },
-            { k: "size", label: "Size Options", type: "text" },
-            { k: "image_url", label: t("mainImg"), type: "media_upload" },
-            { k: "video_url", label: t("videoUrl"), type: "media_upload" },
-            { k: "images", label: t("extraImages"), type: "text" },
-            { k: "show_in_online_shop", label: "Show in Online Shop", type: "checkbox", default: false },
             { k: "in_saloon", label: "In saloon", type: "checkbox", default: false },
-            { k: "is_retail", label: "Retail product", type: "checkbox", default: true },
-            ...(isSuperAdmin ? [{ k: "branch", label: "Branch Scoped", type: "select", options: branches.map(b => typeof b === "string" ? b : b.name), default: selectedBranch || "Baroda" }] : []),
           ]}
           create={(d) => api.post("/admin/products", d)}
           update={(id, d) => api.patch(`/admin/products/${id}`, d)}

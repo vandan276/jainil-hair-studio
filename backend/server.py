@@ -326,13 +326,16 @@ class ProductCategoryIn(BaseModel):
 
 class ProductIn(BaseModel):
     name: str
+    customer_display_name: Optional[str] = None
+    sku: Optional[str] = None
     category: str
-    description: str
-    price: float
+    description: Optional[str] = ""
+    price: Optional[float] = 0.0
     stock: int = 100
+    target_audience: Optional[str] = "Women"
     image_url: Optional[str] = None
     video_url: Optional[str] = None
-    target_audience: Optional[str] = "Women"
+    images: List[str] = []
     show_in_online_shop: Optional[bool] = False
     in_saloon: Optional[bool] = False
     is_retail: Optional[bool] = True
