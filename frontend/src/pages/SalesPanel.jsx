@@ -128,6 +128,7 @@ export default function SalesPanel() {
     grade: "", 
     nextDate: "", 
     nextTime: "", 
+    convertedDate: new Date().toISOString().split("T")[0],
     saleAmount: "",
     pendingAmount: "",
     paymentMode: "UPI",
@@ -294,7 +295,7 @@ export default function SalesPanel() {
 
       const isToken = callOutcome === "Token Received";
       const isConverted = callOutcome === "Converted";
-      const isDeadOutcome = ["Visit Scheduled Dead", "Said No"].includes(callOutcome);
+      const isNoFollowup = ["Visit Scheduled Dead", "Said No", "Converted"].includes(callOutcome);
 
       const payload = {
         duration: finalDuration,
@@ -302,8 +303,9 @@ export default function SalesPanel() {
         outcome: callOutcome,
         comment: callForm.comment,
         grade: callForm.grade || selectedLead.grade,
-        next_followup_date: isDeadOutcome ? null : (callForm.nextDate || null),
-        next_followup_time: isDeadOutcome ? null : (callForm.nextTime || null),
+        next_followup_date: isNoFollowup ? null : (callForm.nextDate || null),
+        next_followup_time: isNoFollowup ? null : (callForm.nextTime || null),
+        converted_date: isConverted ? (callForm.convertedDate || new Date().toISOString().split("T")[0]) : null,
         sale_amount: parseFloat(callForm.saleAmount) || null,
         pending_amount: isToken ? (parseFloat(callForm.pendingAmount) || 0) : null,
         payment_mode: (isToken || isConverted) ? callForm.paymentMode : null,
@@ -338,6 +340,7 @@ export default function SalesPanel() {
             "*Outcome / Status:* " + callOutcome + "\n" +
             (amtStr ? ("*Amount Received:* " + amtStr + "\n") : "") +
             (pendingStr ? ("*Pending Balance:* " + pendingStr + "\n") : "") +
+            (callOutcome === "Converted" && callForm.convertedDate ? ("*Converted Date:* " + callForm.convertedDate + "\n") : "") +
             (callOutcome !== "Converted" && callForm.nextDate ? ("*Next Appointment / Visit Date:* " + callForm.nextDate + (callForm.nextTime ? (" at " + callForm.nextTime) : "") + "\n") : "") +
             "*Payment Mode:* " + (callForm.paymentMode || "UPI") + "\n" +
             "*Date:* " + new Date().toLocaleDateString("en-IN") + "\n\n";
@@ -378,7 +381,7 @@ export default function SalesPanel() {
       setCallingMode(false);
       setCallActive(false);
       callDurationRef.current = 0;
-      setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", saleAmount: "", pendingAmount: "", paymentMode: "UPI", consultedBy: "" });
+      setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", convertedDate: new Date().toISOString().split("T")[0], saleAmount: "", pendingAmount: "", paymentMode: "UPI", consultedBy: "" });
       setSelectedLead(null);
       fetchLeads();
       fetchStats();
@@ -1294,7 +1297,7 @@ export default function SalesPanel() {
                     )}
                     <th className="px-6 py-4 tracking-widest font-bold">Client Information</th>
                     <th className="px-6 py-4 tracking-widest font-bold">Direct Contact</th>
-                    <th className="px-6 py-4 tracking-widest font-bold">Next Follow-up</th>
+                    <th className="px-6 py-4 tracking-widest font-bold">{activeTab === "Converted" ? "Converted Date" : "Next Follow-up"}</th>
                     <th className="px-6 py-4 tracking-widest font-bold">Pipeline Status</th>
                     <th className="px-6 py-4 tracking-widest font-bold text-center">Visiting Today?</th>
                     <th className="px-6 py-4 tracking-widest font-bold">Context</th>
@@ -1371,8 +1374,14 @@ export default function SalesPanel() {
                       </td>
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
-                          <span className="text-gray-900 font-bold">{lead.follow_up_date ? new Date(lead.follow_up_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "Not Scheduled"}</span>
-                          {lead.follow_up_time && (
+                          {lead.status === "converted" && (lead.converted_date || lead.converted_at) ? (
+                            <span className="text-emerald-700 font-bold">
+                              {lead.converted_date ? new Date(lead.converted_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date(lead.converted_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </span>
+                          ) : (
+                            <span className="text-gray-900 font-bold">{lead.follow_up_date ? new Date(lead.follow_up_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "Not Scheduled"}</span>
+                          )}
+                          {lead.follow_up_time && lead.status !== "converted" && (
                             <div className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">
                               <Clock size={10} /> {lead.follow_up_time} • {lead.follow_up_type || "Call"}
                             </div>
@@ -1666,18 +1675,32 @@ export default function SalesPanel() {
 
                         {callOutcome === "Converted" && (
                           <div className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100 mb-5 shadow-sm space-y-4">
-                            <div>
-                              <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
-                                Sale Amount (₹) *
-                              </label>
-                              <input
-                                type="number"
-                                required
-                                placeholder="Enter total amount"
-                                value={callForm.saleAmount}
-                                onChange={e => setCallForm({ ...callForm, saleAmount: e.target.value })}
-                                className="w-full border-emerald-200 rounded-xl p-3 text-xl font-black text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
-                              />
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
+                                  Sale Amount (₹) *
+                                </label>
+                                <input
+                                  type="number"
+                                  required
+                                  placeholder="Enter total amount"
+                                  value={callForm.saleAmount}
+                                  onChange={e => setCallForm({ ...callForm, saleAmount: e.target.value })}
+                                  className="w-full border-emerald-200 rounded-xl p-3 text-xl font-black text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-bold text-emerald-800 uppercase tracking-widest mb-2">
+                                  Converted Date *
+                                </label>
+                                <input
+                                  type="date"
+                                  required
+                                  value={callForm.convertedDate || new Date().toISOString().split("T")[0]}
+                                  onChange={e => setCallForm({ ...callForm, convertedDate: e.target.value })}
+                                  className="w-full border-emerald-200 rounded-xl p-3 text-sm font-bold text-emerald-900 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                                />
+                              </div>
                             </div>
                             
                             <div>
@@ -1747,7 +1770,7 @@ export default function SalesPanel() {
                         )}
 
                         {/* Next Follow-up / Appointment Schedule */}
-                        {callOutcome && !["Visit Scheduled Dead", "Said No"].includes(callOutcome) && (() => {
+                        {callOutcome && !["Visit Scheduled Dead", "Said No", "Converted"].includes(callOutcome) && (() => {
                           const TIME_SLOTS = [];
                           for (let h = 9; h <= 20; h++) {
                             for (let m of ["00", "30"]) {
@@ -1759,7 +1782,7 @@ export default function SalesPanel() {
                             }
                           }
                           const busySlots = getBusyTimeSlots(callForm.nextDate);
-                          const isAppointment = ["Token Received", "Converted", "Visit Scheduled"].includes(callOutcome);
+                          const isAppointment = ["Token Received", "Visit Scheduled"].includes(callOutcome);
                           const isReminder = callOutcome === "Not Picked Up";
                           const labelText = isAppointment ? "Next Appointment Date" : (isReminder ? "Reminder Date" : "Next Follow-up Date");
 

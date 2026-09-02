@@ -511,6 +511,7 @@ class CallLogIn(BaseModel):
     grade: Optional[str] = ""
     next_followup_date: Optional[str] = None
     next_followup_time: Optional[str] = None
+    converted_date: Optional[str] = None
     sale_amount: Optional[float] = None
     pending_amount: Optional[float] = None
     payment_mode: Optional[str] = None
@@ -533,6 +534,9 @@ class LeadUpdate(BaseModel):
     follow_up_type: Optional[str] = None # Call, Visit, WhatsApp
     assigned_to: Optional[str] = None
     grade: Optional[str] = None
+    hair_condition: Optional[str] = None
+    total_sale_amount: Optional[float] = None
+    converted_date: Optional[str] = None
     is_favorite: Optional[bool] = None
     hair_condition: Optional[str] = None
     packages: Optional[List[dict]] = None
@@ -3034,6 +3038,12 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         update_data["status"] = "token received"
     elif data.outcome == "Converted":
         update_data["status"] = "converted"
+        update_data["converted_date"] = data.converted_date or now_iso()[:10]
+        update_data["converted_at"] = (data.converted_date + "T12:00:00Z") if data.converted_date else now_iso()
+        update_data["follow_up_date"] = None
+        update_data["next_appointment_date"] = None
+        update_data["follow_up_time"] = None
+        update_data["next_appointment_time"] = None
     
     if lead_snap.exists:
         if update_data.get("status") == "dead" and lead_dict.get("status") != "dead":

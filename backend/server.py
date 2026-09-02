@@ -494,6 +494,7 @@ class CallLogIn(BaseModel):
     grade: Optional[str] = None # Hot, Warm, Cold
     next_followup_date: Optional[str] = None
     next_followup_time: Optional[str] = None
+    converted_date: Optional[str] = None
     sale_amount: Optional[float] = None
     payment_mode: Optional[str] = None
     consulted_by: Optional[str] = None
@@ -4571,6 +4572,12 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         update_data["status"] = "token received"
     elif data.outcome == "Converted":
         update_data["status"] = "converted"
+        update_data["converted_date"] = data.converted_date or now_iso()[:10]
+        update_data["converted_at"] = (data.converted_date + "T12:00:00Z") if data.converted_date else now_iso()
+        update_data["follow_up_date"] = None
+        update_data["next_appointment_date"] = None
+        update_data["follow_up_time"] = None
+        update_data["next_appointment_time"] = None
     
     if data.comment:
         notes_to_add.append({"text": f"Call Outcome: {data.outcome} - {data.comment}", "author": user["name"], "timestamp": now_iso()})
