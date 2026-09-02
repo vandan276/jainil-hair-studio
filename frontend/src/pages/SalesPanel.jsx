@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import {
   Phone, User, Calendar, MessageSquare, Plus, Search, Scissors,
   CheckCircle2, XCircle, ArrowRight, Clock, MapPin, Star, Bell, ArrowRightLeft, Trophy,
-  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Trash2
+  ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Trash2, Edit2
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import BillingPanel from "@/components/BillingPanel";
@@ -530,7 +530,13 @@ export default function SalesPanel() {
       hair_condition: lead.hair_condition || "",
       status: lead.status,
       grade: lead.grade,
-      total_sale_amount: lead.total_sale_amount || 0
+      follow_up_date: lead.follow_up_date || "",
+      follow_up_time: lead.follow_up_time || "",
+      follow_up_type: lead.follow_up_type || "Call",
+      total_sale_amount: lead.total_sale_amount || 0,
+      pending_payment: lead.pending_payment || 0,
+      token_received_date: lead.token_received_date || "",
+      converted_date: lead.converted_date || ""
     });
     setShowEditLeadModal(true);
   };
@@ -1364,6 +1370,13 @@ export default function SalesPanel() {
                               title="Call"
                             >
                               <Phone size={14} />
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); openEditModal(lead); }} 
+                              className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm"
+                              title="Edit Lead"
+                            >
+                              <Edit2 size={14} />
                             </button>
                             <button 
                               onClick={(e) => { e.stopPropagation(); handleDeleteLead(lead); }} 
@@ -2309,19 +2322,91 @@ export default function SalesPanel() {
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
                 </div>
-                {editLeadForm.status === "converted" && (
-                  <div className="col-span-2 animate-fade-in">
-                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Closure Amount (₹)</label>
-                    <input
-                      type="number"
-                      required
-                      value={editLeadForm.total_sale_amount || ""}
-                      onChange={e => setEditLeadForm({...editLeadForm, total_sale_amount: parseFloat(e.target.value) || 0})}
-                      placeholder="Enter closure amount"
-                      className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all font-serif"
-                    />
-                  </div>
+                {editLeadForm.status === "token received" && (
+                  <>
+                    <div className="animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Token Received (₹)</label>
+                      <input
+                        type="number"
+                        value={editLeadForm.total_sale_amount || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, total_sale_amount: parseFloat(e.target.value) || 0})}
+                        placeholder="Enter token amount"
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all font-serif"
+                      />
+                    </div>
+                    <div className="animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Pending Amount (₹)</label>
+                      <input
+                        type="number"
+                        value={editLeadForm.pending_payment || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, pending_payment: parseFloat(e.target.value) || 0})}
+                        placeholder="Remaining balance"
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all font-serif"
+                      />
+                    </div>
+                    <div className="col-span-2 animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Token Received Date</label>
+                      <input
+                        type="date"
+                        value={editLeadForm.token_received_date || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, token_received_date: e.target.value})}
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                      />
+                    </div>
+                  </>
                 )}
+
+                {editLeadForm.status === "converted" && (
+                  <>
+                    <div className="animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Closure Amount (₹)</label>
+                      <input
+                        type="number"
+                        required
+                        value={editLeadForm.total_sale_amount || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, total_sale_amount: parseFloat(e.target.value) || 0})}
+                        placeholder="Enter closure amount"
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all font-serif"
+                      />
+                    </div>
+                    <div className="animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Converted Date</label>
+                      <input
+                        type="date"
+                        value={editLeadForm.converted_date || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, converted_date: e.target.value})}
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                      />
+                    </div>
+                  </>
+                )}
+
+                {editLeadForm.status !== "converted" && editLeadForm.status !== "dead" && (
+                  <>
+                    <div className="animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">
+                        {editLeadForm.status === "token received" || editLeadForm.status === "visit" ? "Next Appointment Date" : "Next Follow-up Date"}
+                      </label>
+                      <input
+                        type="date"
+                        value={editLeadForm.follow_up_date || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, follow_up_date: e.target.value})}
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                      />
+                    </div>
+                    <div className="animate-fade-in">
+                      <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Time Slot</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 10:00 AM"
+                        value={editLeadForm.follow_up_time || ""}
+                        onChange={e => setEditLeadForm({...editLeadForm, follow_up_time: e.target.value})}
+                        className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
+                      />
+                    </div>
+                  </>
+                )}
+
                 <div className="col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hair Condition</label>
                   <input

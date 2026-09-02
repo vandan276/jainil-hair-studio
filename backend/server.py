@@ -467,6 +467,9 @@ class LeadUpdate(BaseModel):
     dob: Optional[str] = None
     anniversary: Optional[str] = None
     address: Optional[str] = None
+    pending_payment: Optional[float] = None
+    converted_date: Optional[str] = None
+    token_received_date: Optional[str] = None
 
 
 class LeadNoteIn(BaseModel):
@@ -4328,6 +4331,9 @@ def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employe
     if data.dob is not None: update_data["dob"] = data.dob
     if data.anniversary is not None: update_data["anniversary"] = data.anniversary
     if data.address is not None: update_data["address"] = data.address
+    if data.pending_payment is not None: update_data["pending_payment"] = data.pending_payment
+    if data.converted_date is not None: update_data["converted_date"] = data.converted_date
+    if data.token_received_date is not None: update_data["token_received_date"] = data.token_received_date
     
     doc_ref.update(update_data)
     return doc_ref.get().to_dict()
