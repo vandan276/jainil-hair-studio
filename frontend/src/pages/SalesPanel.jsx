@@ -1830,10 +1830,10 @@ export default function SalesPanel() {
                                   >
                                     <option value="">Select Time Slot</option>
                                     {TIME_SLOTS.map(slot => {
-                                      const isBooked = busySlots.includes(slot.value);
+                                      const bookedCount = busySlots.filter(s => s === slot.value).length;
                                       return (
-                                        <option key={slot.value} value={slot.value} disabled={isBooked}>
-                                          {slot.label} {isBooked ? "(Booked)" : ""}
+                                        <option key={slot.value} value={slot.value}>
+                                          {slot.label} {bookedCount > 0 ? `(${bookedCount} Booked)` : ""}
                                         </option>
                                       );
                                     })}
