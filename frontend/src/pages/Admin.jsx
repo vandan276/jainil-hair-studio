@@ -15950,6 +15950,19 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
     }
   };
 
+  const handleDeleteConsultation = async (consultation) => {
+    if (!window.confirm(`Are you sure you want to delete the consultation record for "${consultation.name}"?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/admin/consultations/${consultation.id}`);
+      toast.success("Consultation record deleted successfully!");
+      if (refresh) refresh();
+    } catch (err) {
+      toast.error("Failed to delete consultation: " + (err.response?.data?.detail || err.message));
+    }
+  };
+
   // Get unique salespersons
   const salesPersons = Array.from(
     new Set(
@@ -16151,6 +16164,15 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                 >
                   <Edit size={12} />
                   Edit
+                </button>
+
+                <button
+                  onClick={() => handleDeleteConsultation(c)}
+                  className="text-xs uppercase tracking-widest text-rose-600 hover:text-rose-700 transition-colors flex items-center gap-1 px-4 py-2 border border-rose-200 rounded-full hover:bg-rose-50"
+                  title="Delete Consultation"
+                >
+                  <Trash2 size={12} />
+                  Delete
                 </button>
 
                 {c.status === "Closed" && (() => {

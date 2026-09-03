@@ -1225,7 +1225,7 @@ export default function SalesPanel() {
         </div>
 
         {activeTab === "Consulting Form" ? (
-          <ConsultationsPanel consultations={consultations} />
+          <ConsultationsPanel consultations={consultations} refresh={fetchConsultations} />
         ) : (
           <>
             {/* Search Bar */}
@@ -2850,6 +2850,19 @@ function ConsultationsPanel({ consultations, refresh }) {
   const [search, setSearch] = useState("");
   const [editingConsultation, setEditingConsultation] = useState(null);
 
+  const handleDeleteConsultation = async (consultation) => {
+    if (!window.confirm(`Are you sure you want to delete the consultation record for "${consultation.name}"?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/consultations/${consultation.id}`);
+      toast.success("Consultation record deleted successfully!");
+      if (refresh) refresh();
+    } catch (err) {
+      toast.error("Failed to delete consultation: " + (err.response?.data?.detail || err.message));
+    }
+  };
+
   const filtered = consultations.filter(c => {
     const term = search.toLowerCase();
     return (
@@ -2930,6 +2943,14 @@ function ConsultationsPanel({ consultations, refresh }) {
                   className="text-xs uppercase tracking-widest text-gray-500 hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-gray-200 rounded-full hover:bg-gray-50"
                 >
                   Edit
+                </button>
+                <button 
+                  onClick={() => handleDeleteConsultation(c)}
+                  className="text-xs uppercase tracking-widest text-rose-600 hover:text-rose-700 transition-colors flex items-center gap-1 px-4 py-2 border border-rose-200 rounded-full hover:bg-rose-50"
+                  title="Delete Consultation"
+                >
+                  <Trash2 size={12} />
+                  Delete
                 </button>
                 <button 
                   onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}

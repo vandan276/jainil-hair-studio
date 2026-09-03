@@ -3900,6 +3900,24 @@ def admin_consultations(_: dict = Depends(require_admin)):
     return [d.to_dict() for d in docs]
 
 
+@api.delete("/admin/consultations/{cid}")
+def admin_delete_consultation(cid: str, user: dict = Depends(require_admin)):
+    doc_ref = db.collection("consultations").document(cid)
+    if not doc_ref.get().exists:
+        raise HTTPException(404, "Consultation record not found")
+    doc_ref.delete()
+    return {"status": "success", "message": "Consultation deleted successfully"}
+
+
+@api.delete("/consultations/{cid}")
+def delete_consultation(cid: str, user: dict = Depends(require_employee)):
+    doc_ref = db.collection("consultations").document(cid)
+    if not doc_ref.get().exists:
+        raise HTTPException(404, "Consultation record not found")
+    doc_ref.delete()
+    return {"status": "success", "message": "Consultation deleted successfully"}
+
+
 @api.patch("/admin/consultations/{cid}")
 def admin_update_consultation(cid: str, data: dict, user: dict = Depends(require_admin)):
     doc_ref = db.collection("consultations").document(cid)
