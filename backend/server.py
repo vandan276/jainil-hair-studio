@@ -3774,6 +3774,60 @@ def get_next_salesperson():
     transaction = db.transaction()
     return _get_next_salesperson_tx(transaction, routing_ref, available_sales)
 
+def find_existing_lead(phone: str):
+    if not phone:
+        return None
+    phone_str = str(phone).strip()
+    clean_digits = "".join(filter(str.isdigit, phone_str))
+    if not clean_digits or len(clean_digits) < 5:
+        return None
+        
+    variations = set([phone_str])
+    if len(clean_digits) >= 10:
+        last10 = clean_digits[-10:]
+        variations.update([
+            last10,
+            f"+91{last10}",
+            f"91{last10}",
+            f"+{last10}",
+            f"0{last10}",
+            f"+91 {last10}",
+            f"+91-{last10}",
+            f"{last10[:5]} {last10[5:]}",
+            f"+91 {last10[:5]} {last10[5:]}",
+        ])
+    else:
+        variations.update([clean_digits, f"+{clean_digits}"])
+        
+    var_list = list(variations)[:30]
+    
+    # 1. Try fast Firestore 'in' query
+    try:
+        docs = list(db.collection("leads").where("phone", "in", var_list).limit(1).stream())
+        if docs:
+            return docs[0]
+    except Exception as e:
+        print(f"find_existing_lead 'in' query failed: {e}")
+        
+    # 2. Try secondary_phone
+    try:
+        docs = list(db.collection("leads").where("secondary_phone", "in", var_list).limit(1).stream())
+        if docs:
+            return docs[0]
+    except Exception:
+        pass
+        
+    # 3. Fallback: single equality queries
+    for v in [phone_str, f"+{clean_digits}", clean_digits, f"+91{clean_digits[-10:]}" if len(clean_digits) >= 10 else clean_digits]:
+        try:
+            docs = list(db.collection("leads").where("phone", "==", v).limit(1).stream())
+            if docs:
+                return docs[0]
+        except Exception:
+            pass
+
+    return None
+
 @api.get("/admin/fb-config")
 def admin_get_fb_config(user: dict = Depends(require_admin)):
     doc = db.collection("settings").document("fb_config").get()
@@ -3824,12 +3878,12 @@ async def facebook_webhook(request: Request):
     cfg = get_fb_config()
     
     if "entry" in data:
-        for entry in data["entry"]:
+        for entry in data.get("entry", []):
             for change in entry.get("changes", []):
                 if change.get("field") == "leadgen":
-                    leadgen_id = change["value"].get("leadgen_id")
+                    leadgen_id = change.get("value", {}).get("leadgen_id")
                     if leadgen_id:
-                        token = cfg["page_access_token"]
+                        token = cfg.get("page_access_token")
                         if not token:
                             print(f"ERROR: FB_PAGE_ACCESS_TOKEN not set. Cannot fetch lead {leadgen_id}")
                             continue
@@ -3839,32 +3893,55 @@ async def facebook_webhook(request: Request):
                         name = field_data.get("full_name") or field_data.get("name") or "Meta Lead"
                         phone = str(field_data.get("phone_number") or field_data.get("phone") or "")
                         
-                        next_sales = get_next_salesperson()
-                        assigned_to = next_sales["id"] if next_sales else None
-                        assigned_to_name = next_sales["name"] if next_sales else None
-                        branch = (next_sales.get("branch") if next_sales else None) or "Baroda"
-                        section = (next_sales.get("section") if next_sales else None) or "Men"
-                        
-                        lid = new_id()
-                        doc = {
-                            "id": lid,
-                            "lead_number": f"LD-{int(time.time())}",
-                            "name": name,
-                            "phone": phone,
-                            "branch": branch,
-                            "section": section,
-                            "source": "Facebook Ads",
-                            "campaign": resp.get("campaign_name", "Meta Direct Ads"),
-                            "status": "new",
-                            "grade": "Warm",
-                            "assigned_to": assigned_to,
-                            "assigned_to_name": assigned_to_name,
-                            "notes": [{"text": f"Lead captured directly from Meta Ads. Form: {resp.get('form_id')}. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
-                            "created_by": "Meta",
-                            "created_at": now_iso(),
-                            "updated_at": now_iso()
-                        }
-                        db.collection("leads").document(lid).set(doc)
+                        if not phone:
+                            continue
+
+                        existing_doc = find_existing_lead(phone)
+                        if not existing_doc:
+                            next_sales = get_next_salesperson()
+                            assigned_to = next_sales["id"] if next_sales else None
+                            assigned_to_name = next_sales["name"] if next_sales else None
+                            branch = (next_sales.get("branch") if next_sales else None) or "Baroda"
+                            section = (next_sales.get("section") if next_sales else None) or "Men"
+                            
+                            lid = new_id()
+                            doc = {
+                                "id": lid,
+                                "lead_number": f"LD-{int(time.time())}",
+                                "name": name,
+                                "phone": phone,
+                                "branch": branch,
+                                "section": section,
+                                "source": "Facebook Ads",
+                                "campaign": resp.get("campaign_name", "Meta Direct Ads"),
+                                "status": "new",
+                                "grade": "Warm",
+                                "assigned_to": assigned_to,
+                                "assigned_to_name": assigned_to_name,
+                                "notes": [{"text": f"Lead captured directly from Meta Ads. Form: {resp.get('form_id')}. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
+                                "created_by": "Meta",
+                                "created_at": now_iso(),
+                                "updated_at": now_iso()
+                            }
+                            db.collection("leads").document(lid).set(doc)
+                        else:
+                            lead_id = existing_doc.id
+                            lead_data = existing_doc.to_dict()
+                            note = {
+                                "text": f"SYSTEM: Customer submitted another Meta Ad Form ({resp.get('campaign_name', 'Meta Ads')}).",
+                                "author": "System",
+                                "timestamp": now_iso()
+                            }
+                            update_payload = {
+                                "updated_at": now_iso(),
+                                "notes": firestore.ArrayUnion([note])
+                            }
+                            if not lead_data.get("assigned_to"):
+                                next_sales = get_next_salesperson()
+                                if next_sales:
+                                    update_payload["assigned_to"] = next_sales["id"]
+                                    update_payload["assigned_to_name"] = next_sales["name"]
+                            db.collection("leads").document(lead_id).update(update_payload)
         return {"status": "success"}
 
     auth_key = request.headers.get("X-Webhook-Key")
@@ -3872,37 +3949,60 @@ async def facebook_webhook(request: Request):
         name = data.get("full_name") or data.get("name")
         phone = str(data.get("phone_number") or data.get("phone") or "")
         if name and phone:
-            next_sales = get_next_salesperson()
-            assigned_to = next_sales["id"] if next_sales else None
-            assigned_to_name = next_sales["name"] if next_sales else None
-            branch = (next_sales.get("branch") if next_sales else None) or data.get("branch", "Baroda")
-            section = (next_sales.get("section") if next_sales else None) or data.get("section", "Men")
-            
-            lid = new_id()
-            doc = {
-                "id": lid,
-                "lead_number": f"LD-{int(time.time())}",
-                "name": name,
-                "phone": phone,
-                "branch": branch,
-                "section": section,
-                "source": "Facebook Ads",
-                "campaign": data.get("campaign", "Direct Ads"),
-                "status": "new",
-                "grade": "Warm",
-                "assigned_to": assigned_to,
-                "assigned_to_name": assigned_to_name,
-                "notes": [{"text": f"Lead captured via Webhook. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
-                "created_by": "Webhook",
-                "created_at": now_iso(),
-                "updated_at": now_iso()
-            }
-            db.collection("leads").document(lid).set(doc)
-            return {"status": "success", "lead_id": lid}
+            existing_doc = find_existing_lead(phone)
+            if not existing_doc:
+                next_sales = get_next_salesperson()
+                assigned_to = next_sales["id"] if next_sales else None
+                assigned_to_name = next_sales["name"] if next_sales else None
+                branch = (next_sales.get("branch") if next_sales else None) or data.get("branch", "Baroda")
+                section = (next_sales.get("section") if next_sales else None) or data.get("section", "Men")
+                
+                lid = new_id()
+                doc = {
+                    "id": lid,
+                    "lead_number": f"LD-{int(time.time())}",
+                    "name": name,
+                    "phone": phone,
+                    "branch": branch,
+                    "section": section,
+                    "source": "Facebook Ads",
+                    "campaign": data.get("campaign", "Direct Ads"),
+                    "status": "new",
+                    "grade": "Warm",
+                    "assigned_to": assigned_to,
+                    "assigned_to_name": assigned_to_name,
+                    "notes": [{"text": f"Lead captured via Webhook. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
+                    "created_by": "Webhook",
+                    "created_at": now_iso(),
+                    "updated_at": now_iso()
+                }
+                db.collection("leads").document(lid).set(doc)
+                return {"status": "success", "lead_id": lid}
+            else:
+                lead_id = existing_doc.id
+                lead_data = existing_doc.to_dict()
+                note = {
+                    "text": "SYSTEM: Customer re-engaged via Webhook.",
+                    "author": "System",
+                    "timestamp": now_iso()
+                }
+                update_payload = {
+                    "updated_at": now_iso(),
+                    "notes": firestore.ArrayUnion([note])
+                }
+                if not lead_data.get("assigned_to"):
+                    next_sales = get_next_salesperson()
+                    if next_sales:
+                        update_payload["assigned_to"] = next_sales["id"]
+                        update_payload["assigned_to_name"] = next_sales["name"]
+                db.collection("leads").document(lead_id).update(update_payload)
+                return {"status": "updated", "lead_id": lead_id}
     return {"status": "ignored"}
 
 
 @app.post("/webhooks/whatsapp")
+@api.post("/webhooks/whatsapp")
+@api.post("/webhook/whatsapp")
 async def whatsapp_webhook(request: Request):
     # Validate Verify Token if provided
     cfg = get_fb_config()
@@ -3931,30 +4031,36 @@ async def whatsapp_webhook(request: Request):
     except:
         return {"status": "error", "message": "Invalid JSON"}
         
-    # 1. Handle BotSe/BotSpace Workflow Format (Direct JSON)
-    if "phone" in data:
-        name = data.get("name") or data.get("full_name") or "WhatsApp Lead"
-        phone = str(data.get("phone"))
-        if not phone.startswith("+"): phone = "+" + phone
+    # 1. Handle Make.com / Bot / Direct JSON Format
+    if "phone" in data or "customer_phone" in data or "mobile" in data or "from" in data:
+        phone = str(data.get("phone") or data.get("customer_phone") or data.get("mobile") or data.get("from"))
+        name = data.get("name") or data.get("full_name") or data.get("customer_name") or "WhatsApp Lead"
+        message_text = data.get("message") or data.get("text") or data.get("body") or data.get("last_message") or ""
+        source = data.get("source") or "WhatsApp"
+        campaign = data.get("campaign") or "Make.com Flow"
+        branch_pref = data.get("branch")
+        section_pref = data.get("section")
         
-        # Check for existing
-        existing = db.collection("leads").where("phone", "==", phone).get()
-        if not existing:
+        # Check if lead already exists using normalized phone lookup
+        existing_doc = find_existing_lead(phone)
+        if not existing_doc:
             next_sales = get_next_salesperson()
             assigned_to = next_sales["id"] if next_sales else None
             assigned_to_name = next_sales["name"] if next_sales else None
-            branch = (next_sales.get("branch") if next_sales else None) or data.get("branch", "Baroda")
-            section = (next_sales.get("section") if next_sales else None) or data.get("section", "Men")
+            branch = branch_pref or (next_sales.get("branch") if next_sales else None) or "Baroda"
+            section = section_pref or (next_sales.get("section") if next_sales else None) or "Men"
             
-            source = data.get("source") or "WhatsApp"
-            campaign = data.get("campaign") or "Bot Workflow"
-            
+            init_note = f"SYSTEM: New lead captured via WhatsApp ({source}). Campaign: {campaign}."
+            if message_text:
+                init_note += f" Message: {message_text}"
+            init_note += f" Assigned to {assigned_to_name or 'Unassigned'}."
+
             lid = new_id()
             doc = {
                 "id": lid,
-                "lead_number": f"LD-BOT-{int(time.time())}",
+                "lead_number": f"LD-WA-{int(time.time())}",
                 "name": name,
-                "phone": phone,
+                "phone": phone if phone.startswith("+") else f"+{phone}",
                 "branch": branch,
                 "section": section,
                 "source": source,
@@ -3963,31 +4069,26 @@ async def whatsapp_webhook(request: Request):
                 "grade": "Hot",
                 "assigned_to": assigned_to,
                 "assigned_to_name": assigned_to_name,
-                "notes": [{"text": f"SYSTEM: Lead captured via Webhook ({source}). Campaign: {campaign}. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
-                "created_by": "Bot Workflow",
+                "notes": [{"text": init_note, "author": "System", "timestamp": now_iso()}],
+                "created_by": "WhatsApp",
                 "created_at": now_iso(),
                 "updated_at": now_iso()
             }
             db.collection("leads").document(lid).set(doc)
-            return {"status": "success", "lead_id": lid}
+            return {"status": "success", "action": "created", "lead_id": lid}
         else:
-            # Re-engage existing lead
-            lead_doc = existing[0]
-            lead_id = lead_doc.id
-            lead_data = lead_doc.to_dict()
+            # Lead already exists: DO NOT reset status to "new", DO NOT overwrite created_at
+            lead_id = existing_doc.id
+            lead_data = existing_doc.to_dict()
             
-            message_text = data.get("message") or data.get("text") or data.get("body") or "N/A"
-            note_text = f"SYSTEM: Customer sent a new WhatsApp message (Bot Workflow). Message: {message_text}"
-            
+            note_content = f"SYSTEM: Customer sent a WhatsApp message: {message_text}" if message_text else "SYSTEM: Customer messaged again on WhatsApp."
             note = {
-                "text": note_text,
-                "author": "System",
+                "text": note_content,
+                "author": "WhatsApp",
                 "timestamp": now_iso()
             }
             
             update_payload = {
-                "status": "new",
-                "created_at": now_iso(),  # bring it to the top of list
                 "updated_at": now_iso(),
                 "notes": firestore.ArrayUnion([note])
             }
@@ -3999,36 +4100,40 @@ async def whatsapp_webhook(request: Request):
                     update_payload["assigned_to_name"] = next_sales["name"]
             
             db.collection("leads").document(lead_id).update(update_payload)
-            return {"status": "updated", "lead_id": lead_id}
+            return {"status": "updated", "action": "message_appended", "lead_id": lead_id}
 
     # 2. Handle Standard Meta WhatsApp Webhook structure
     if "entry" in data:
-        for entry in data["entry"]:
+        for entry in data.get("entry", []):
             for change in entry.get("changes", []):
                 value = change.get("value", {})
                 if "messages" in value:
-                    for msg in value["messages"]:
-                        customer_phone = msg.get("from")
+                    for msg in value.get("messages", []):
+                        customer_phone = str(msg.get("from", ""))
+                        if not customer_phone:
+                            continue
                         contacts = value.get("contacts", [])
                         customer_name = "WhatsApp Lead"
                         if contacts:
                             customer_name = contacts[0].get("profile", {}).get("name", "WhatsApp Lead")
                         
-                        existing_phone = f"+{customer_phone}" if not customer_phone.startswith("+") else customer_phone
-                        existing = db.collection("leads").where("phone", "==", existing_phone).get()
-                        if not existing:
+                        message_body = msg.get("text", {}).get("body", "N/A")
+                        
+                        existing_doc = find_existing_lead(customer_phone)
+                        if not existing_doc:
                             next_sales = get_next_salesperson()
                             assigned_to = next_sales["id"] if next_sales else None
                             assigned_to_name = next_sales["name"] if next_sales else None
                             branch = (next_sales.get("branch") if next_sales else None) or "Baroda"
                             section = (next_sales.get("section") if next_sales else None) or "Men"
                             
+                            formatted_phone = f"+{customer_phone}" if not customer_phone.startswith("+") else customer_phone
                             lid = new_id()
                             doc = {
                                 "id": lid,
                                 "lead_number": f"LD-WA-{int(time.time())}",
                                 "name": customer_name,
-                                "phone": existing_phone,
+                                "phone": formatted_phone,
                                 "branch": branch,
                                 "section": section,
                                 "source": "WhatsApp Ads",
@@ -4037,30 +4142,24 @@ async def whatsapp_webhook(request: Request):
                                 "grade": "Hot",
                                 "assigned_to": assigned_to,
                                 "assigned_to_name": assigned_to_name,
-                                "notes": [{"text": f"SYSTEM: Lead captured via WhatsApp message. Initial message: {msg.get('text', {}).get('body', 'N/A')}. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
+                                "notes": [{"text": f"SYSTEM: Lead captured via WhatsApp message. Initial message: {message_body}. Assigned to {assigned_to_name or 'Unassigned'}.", "author": "System", "timestamp": now_iso()}],
                                 "created_by": "WhatsApp",
                                 "created_at": now_iso(),
                                 "updated_at": now_iso()
                             }
                             db.collection("leads").document(lid).set(doc)
                         else:
-                            # Re-engage existing lead
-                            lead_doc = existing[0]
-                            lead_id = lead_doc.id
-                            lead_data = lead_doc.to_dict()
-                            
-                            message_text = msg.get("text", {}).get("body", "N/A")
-                            note_text = f"SYSTEM: Customer sent a new WhatsApp message. Message: {message_text}"
+                            # Existing lead: Preserve current status & created_at
+                            lead_id = existing_doc.id
+                            lead_data = existing_doc.to_dict()
                             
                             note = {
-                                "text": note_text,
-                                "author": "System",
+                                "text": f"SYSTEM: Customer sent WhatsApp message: {message_body}",
+                                "author": "WhatsApp",
                                 "timestamp": now_iso()
                             }
                             
                             update_payload = {
-                                "status": "new",
-                                "created_at": now_iso(),  # bring it to the top of list
                                 "updated_at": now_iso(),
                                 "notes": firestore.ArrayUnion([note])
                             }
