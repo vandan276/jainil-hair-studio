@@ -1422,7 +1422,7 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="flex gap-1.5 flex-nowrap sm:flex-wrap overflow-x-auto pb-2 sm:pb-0 mb-8 bg-gray-100/80 p-1.5 rounded-2xl w-full border border-gray-200 shadow-inner relative z-30 items-center no-scrollbar">
+      <div className="flex gap-2 flex-wrap mb-8 bg-gray-100/80 p-2 rounded-2xl w-full border border-gray-200 shadow-inner relative z-30 items-center">
 
         {/* DASHBOARD SCHEDULER */}
         {canAccess("dashboard") && (
@@ -1431,7 +1431,7 @@ export default function Admin() {
               setTab("dashboard");
               closeAllDropdowns();
             }}
-            className={`pill-tab ${tab === "dashboard" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+            className={`pill-tab shrink-0 ${tab === "dashboard" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             Dashboard
           </button>
@@ -1443,7 +1443,7 @@ export default function Admin() {
             setTab("overview");
             closeAllDropdowns();
           }}
-          className={`pill-tab ${tab === "overview" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+          className={`pill-tab shrink-0 ${tab === "overview" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
         >
           {t("overview")}
         </button>
@@ -1455,7 +1455,7 @@ export default function Admin() {
               setTab("appointments");
               closeAllDropdowns();
             }}
-            className={`pill-tab ${tab === "appointments" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+            className={`pill-tab shrink-0 ${tab === "appointments" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             Appointments
           </button>
@@ -1466,7 +1466,7 @@ export default function Admin() {
           href="/consultancy"
           target="_blank"
           rel="noopener noreferrer"
-          className="pill-tab flex items-center gap-1.5 text-gray-700 hover:text-gray-900 hover:bg-white/50 transition-colors"
+          className="pill-tab shrink-0 flex items-center gap-1.5 text-gray-700 hover:text-gray-900 hover:bg-white/50 transition-colors"
         >
           Consulting Form
         </a>
@@ -1478,7 +1478,7 @@ export default function Admin() {
               setTab("add-kiosk");
               closeAllDropdowns();
             }}
-            className={`pill-tab flex items-center gap-1.5 ${tab === "add-kiosk" ? "bg-gray-950 text-white shadow-lg" : "text-gray-700 hover:text-gray-900 hover:bg-white/50"}`}
+            className={`pill-tab shrink-0 flex items-center gap-1.5 ${tab === "add-kiosk" ? "bg-gray-950 text-white shadow-lg" : "text-gray-700 hover:text-gray-900 hover:bg-white/50"}`}
           >
             <span>Attendance Kiosk</span>
           </button>
@@ -1491,7 +1491,7 @@ export default function Admin() {
               setTab("approve-leaves");
               closeAllDropdowns();
             }}
-            className={`pill-tab flex items-center gap-1.5 ${tab === "approve-leaves" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+            className={`pill-tab shrink-0 flex items-center gap-1.5 ${tab === "approve-leaves" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             <span>Approve Leaves</span>
             {(() => {
@@ -1506,11 +1506,14 @@ export default function Admin() {
         )}
 
         {/* PRODUCTS DROPDOWN */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => {
               setProductsDropdownOpen(!productsDropdownOpen);
               setReportsDropdownOpen(false);
+              setServicesDropdownOpen(false);
+              setHrDropdownOpen(false);
+              setOpsDropdownOpen(false);
             }}
             className={`pill-tab flex items-center gap-1 ${isProductsActive ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
@@ -1519,7 +1522,7 @@ export default function Admin() {
           {productsDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40 cursor-default" onClick={closeAllDropdowns} />
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1">
+              <div className="absolute top-full left-0 mt-2 w-56 max-w-[85vw] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[350px] overflow-y-auto">
                 {[
                   { k: "products-stock", label: "Current stock" },
                   { k: "products-list", label: "Product list" },
@@ -1552,11 +1555,14 @@ export default function Admin() {
           "reports-pending", "reports-history", "reports-balance", "reports-advance",
           "reports-attendance", "reports-sms"
         ].some(k => canAccess(k))) && (
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 onClick={() => {
                   setReportsDropdownOpen(!reportsDropdownOpen);
                   setProductsDropdownOpen(false);
+                  setServicesDropdownOpen(false);
+                  setHrDropdownOpen(false);
+                  setOpsDropdownOpen(false);
                 }}
                 className={`pill-tab flex items-center gap-1 ${isReportsActive ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
               >
@@ -1565,7 +1571,7 @@ export default function Admin() {
               {reportsDropdownOpen && (
                 <>
                   <div className="fixed inset-0 z-40 cursor-default" onClick={closeAllDropdowns} />
-                  <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[400px] overflow-y-auto">
+                  <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 max-w-[85vw] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[350px] overflow-y-auto">
                     {[
                       { k: "reports-finance", label: "Finance Page" },
                       { k: "analysis", label: "Business Analysis" },
@@ -1600,7 +1606,7 @@ export default function Admin() {
           )}
 
         {/* SERVICES & OFFERS DROPDOWN */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => {
               setServicesDropdownOpen(!servicesDropdownOpen);
@@ -1616,7 +1622,7 @@ export default function Admin() {
           {servicesDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40 cursor-default" onClick={closeAllDropdowns} />
-              <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[400px] overflow-y-auto">
+              <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 max-w-[85vw] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[350px] overflow-y-auto">
                 {[
                   { k: "add-services", label: "Services" },
                   { k: "add-packages", label: "Packages" },
@@ -1641,7 +1647,7 @@ export default function Admin() {
         </div>
 
         {/* HR & STAFF DROPDOWN */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => {
               setHrDropdownOpen(!hrDropdownOpen);
@@ -1657,7 +1663,7 @@ export default function Admin() {
           {hrDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40 cursor-default" onClick={closeAllDropdowns} />
-              <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[400px] overflow-y-auto">
+              <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 w-64 max-w-[85vw] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[350px] overflow-y-auto">
                 {[
                   { k: "add-staff", label: "Sales Staff" },
                   { k: "add-providers", label: "Service providers" },
@@ -1683,7 +1689,7 @@ export default function Admin() {
         </div>
 
         {/* OPERATIONS DROPDOWN */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => {
               setOpsDropdownOpen(!opsDropdownOpen);
@@ -1699,7 +1705,7 @@ export default function Admin() {
           {opsDropdownOpen && (
             <>
               <div className="fixed inset-0 z-40 cursor-default" onClick={closeAllDropdowns} />
-              <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[400px] overflow-y-auto">
+              <div className="absolute top-full right-0 mt-2 w-64 max-w-[85vw] bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden text-left py-1 text-sm font-normal text-gray-700 animate-in fade-in slide-in-from-top-1 max-h-[350px] overflow-y-auto">
                 {[
                   { k: "add-expenses", label: "Expenses" },
                   { k: "add-transfers", label: "Transfer options" },
@@ -1738,7 +1744,7 @@ export default function Admin() {
               setTab("users");
               closeAllDropdowns();
             }}
-            className={`pill-tab ${tab === "users" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+            className={`pill-tab shrink-0 ${tab === "users" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             {t("users")}
           </button>
@@ -1751,7 +1757,7 @@ export default function Admin() {
               setTab("consultations");
               closeAllDropdowns();
             }}
-            className={`pill-tab ${tab === "consultations" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
+            className={`pill-tab shrink-0 ${tab === "consultations" ? "bg-gray-950 text-white shadow-lg" : "text-gray-500 hover:text-gray-900 hover:bg-white/50"}`}
           >
             Consultancy Records
           </button>
