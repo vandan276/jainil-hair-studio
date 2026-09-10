@@ -509,12 +509,25 @@ export default function SalesPanel() {
       await api.post("/leads", newLeadForm);
       toast.success("Lead added successfully");
       setShowAddLeadModal(false);
+      
+      // If admin was filtering on another section, adjust to "All" or match lead's section
+      if (user?.role === "admin" && sectionFilter !== "All" && newLeadForm.section !== sectionFilter) {
+        setSectionFilter("All");
+      }
+      
+      // Ensure we switch to "New" tab and clear any search/date/stat filters that might hide the new lead
+      setActiveTab("New");
+      setActiveStatFilter(null);
+      setSearch("");
+      setLeadFilterStartDate("");
+      setLeadFilterEndDate("");
+
       setNewLeadForm({
         name: "",
         phone: "",
         secondary_phone: "",
-        branch: "Baroda",
-        section: "Men",
+        branch: user?.branch || "Baroda",
+        section: user?.section || "Men",
         source: "Manual",
         grade: "Cold",
         city: "",
@@ -633,10 +646,20 @@ export default function SalesPanel() {
       );
     }
     
+    const getLocalDateStr = (isoStr) => {
+      if (!isoStr) return "";
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return "";
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    };
+
     if (leadFilterStartDate) {
       filtered = filtered.filter(l => {
         if (!l.created_at) return false;
-        const leadDate = new Date(l.created_at).toISOString().split("T")[0];
+        const leadDate = getLocalDateStr(l.created_at);
         return leadDate >= leadFilterStartDate;
       });
     }
@@ -644,7 +667,7 @@ export default function SalesPanel() {
     if (leadFilterEndDate) {
       filtered = filtered.filter(l => {
         if (!l.created_at) return false;
-        const leadDate = new Date(l.created_at).toISOString().split("T")[0];
+        const leadDate = getLocalDateStr(l.created_at);
         return leadDate <= leadFilterEndDate;
       });
     }
