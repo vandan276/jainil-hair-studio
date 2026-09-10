@@ -3,7 +3,7 @@ import api from "@/lib/api";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 
-import { Search, Plus, Trash2, IndianRupee, FileText, Clock, User, Gift, CreditCard, X, Download, Printer, MessageSquare } from "lucide-react";
+import { Search, Plus, Trash2, IndianRupee, FileText, Clock, User, UserPlus, Check, Sparkles, Gift, CreditCard, X, Download, Printer, MessageSquare } from "lucide-react";
 import { downloadOrderInvoice, printOrderInvoice } from "@/lib/utils";
 
 const PAYMENT_METHODS = [
@@ -241,6 +241,63 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       await refreshLeads();
     } catch (err) {
       toast.error("Failed to assign package");
+    }
+  };
+
+  const [isSavingClient, setIsSavingClient] = useState(false);
+
+  const handleSaveNewClient = async () => {
+    const cleanPhone = (contactNumber || "").replace(/\D/g, "");
+    if (!cleanPhone || cleanPhone.length < 10) {
+      toast.error("Please enter a valid 10-digit contact number");
+      return;
+    }
+    if (!clientName || !clientName.trim()) {
+      toast.error("Please enter the client name");
+      return;
+    }
+
+    setIsSavingClient(true);
+    try {
+      const payload = {
+        name: clientName.trim(),
+        phone: cleanPhone,
+        branch: user?.branch || "Baroda",
+        section: serviceFor === "Men" ? "Men" : (serviceFor === "Women" ? "Female" : "Men & Women"),
+        source: "Billing",
+        grade: "Warm",
+        is_client: true,
+        status: "client",
+        assigned_to: selectedEmployee && selectedEmployee !== "walkin" ? selectedEmployee : undefined,
+        notes: `Client registered via Billing Desk on ${new Date().toLocaleDateString("en-IN")}`
+      };
+
+      const res = await api.post("/leads", payload);
+      const newLead = res.data;
+
+      // Update local client profile
+      setClientData({
+        name: newLead?.name || clientName.trim(),
+        phone: newLead?.phone || cleanPhone,
+        branch: newLead?.branch || user?.branch || "Baroda",
+        total_visits: newLead?.visit_count || 0,
+        total_spendings: newLead?.total_sale_amount || 0,
+        membership: "—",
+        reward_points: newLead?.points || 0,
+        gender: newLead?.gender || "—",
+        source: newLead?.source || "Billing",
+        city: newLead?.city || "—",
+        packages: newLead?.packages || [],
+        wallet: newLead?.wallet || 0
+      });
+
+      toast.success(`Client "${clientName.trim()}" saved successfully!`);
+      await refreshLeads();
+    } catch (err) {
+      console.error("Save client error:", err);
+      toast.error(err.response?.data?.detail || "Failed to save client details");
+    } finally {
+      setIsSavingClient(false);
     }
   };
 
@@ -814,6 +871,36 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
               </div>
             </div>
 
+            {/* Quick Client Status / Save as New Client bar */}
+            {contactNumber && contactNumber.length >= 10 && (
+              <div className="mb-4 p-2.5 bg-eminence-surface/60 border border-eminence-border rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+                {clientData ? (
+                  <div className="flex items-center gap-2 text-emerald-700 font-medium">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Existing Client: <strong>{clientData.name}</strong> ({clientData.phone})</span>
+                    <span className="text-[11px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">Registered</span>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 text-amber-700 font-medium">
+                      <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                      <span>New / Unregistered Client Number: <strong>{contactNumber}</strong></span>
+                      {clientName && <span className="text-eminence-text font-bold">({clientName})</span>}
+                    </div>
+                    <button
+                      type="button"
+                      disabled={isSavingClient || !clientName?.trim()}
+                      onClick={handleSaveNewClient}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-md shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <UserPlus size={13} />
+                      {isSavingClient ? "Saving Client..." : "+ Save as New Client"}
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <label className={labelCls}>Service For</label>
@@ -1342,7 +1429,33 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             </h3>
 
             {!clientData ? (
-              <p className="text-xs text-eminence-muted italic text-center py-10">Enter client contact to view details</p>
+              <div className="py-6 text-center space-y-3">
+                {contactNumber && contactNumber.length >= 10 ? (
+                  <div className="bg-amber-50/40 border border-amber-200/60 rounded-xl p-3.5 space-y-2.5 text-left">
+                    <div className="flex items-center gap-2 text-amber-800 font-bold text-xs">
+                      <UserPlus size={14} className="text-amber-600" />
+                      <span>New Customer</span>
+                    </div>
+                    <p className="text-[11px] text-gray-600 leading-relaxed">
+                      No existing profile found for <strong>{contactNumber}</strong>. Save details to register them as a new client!
+                    </p>
+                    <button
+                      type="button"
+                      disabled={isSavingClient || !clientName?.trim()}
+                      onClick={handleSaveNewClient}
+                      className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <UserPlus size={13} />
+                      {isSavingClient ? "Saving Client..." : "Save as New Client"}
+                    </button>
+                    {!clientName?.trim() && (
+                      <p className="text-[10px] text-red-500 italic text-center">* Enter client name above</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-eminence-muted italic py-6">Enter client contact to view details</p>
+                )}
+              </div>
             ) : (
               <div className="space-y-2.5 text-xs">
                 {[
