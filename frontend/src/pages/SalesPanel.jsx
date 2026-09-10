@@ -2314,7 +2314,14 @@ export default function SalesPanel() {
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Status</label>
                   <select
                     value={editLeadForm.status}
-                    onChange={e => setEditLeadForm({...editLeadForm, status: e.target.value})}
+                    onChange={e => {
+                      const nextStatus = e.target.value;
+                      setEditLeadForm(prev => ({
+                        ...prev,
+                        status: nextStatus,
+                        pending_payment: nextStatus === "converted" ? 0 : prev.pending_payment
+                      }));
+                    }}
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
                   >
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}

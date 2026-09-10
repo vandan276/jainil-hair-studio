@@ -4778,6 +4778,11 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             "timestamp": now_iso()
         })
 
+    if getattr(data, "pending_amount", None) is not None:
+        update_data["pending_payment"] = data.pending_amount
+    elif data.outcome == "Converted":
+        update_data["pending_payment"] = 0.0
+
     if notes_to_add:
         update_data["notes"] = firestore.firestore.ArrayUnion(notes_to_add)
 
