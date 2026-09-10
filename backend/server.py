@@ -3381,7 +3381,7 @@ def admin_reports(month: Optional[str] = Query(None), branch: Optional[str] = No
     leads_query = db.collection("leads")
     if branch:
         leads_query = leads_query.where("branch", "==", branch)
-    leads_docs = leads_query.select(["assigned_to", "payments", "status", "created_at", "updated_at", "branch", "section"]).stream()
+    leads_docs = leads_query.select(["id", "assigned_to", "source", "payments", "status", "created_at", "updated_at", "branch", "section", "is_repeated"]).stream()
     
     leads_by_emp = {}
     all_payments = []
@@ -3389,6 +3389,25 @@ def admin_reports(month: Optional[str] = Query(None), branch: Optional[str] = No
     for doc in leads_docs:
         d = doc.to_dict()
         emp_id = d.get("assigned_to")
+        lead_source = (d.get("source") or "").strip().lower()
+        lead_status = (d.get("status") or "").strip().lower()
+        is_repeated = bool(d.get("is_repeated")) or ("repeat" in lead_source) or ("repeated" in lead_source)
+        
+        # 1. Sales person must be specifically assigned to their own lead
+        if not emp_id or emp_id == "walkin":
+            continue
+
+        # 2. No sales commission for Walk-in or Billing clients
+        if lead_source in ["walk-in", "walkin", "direct", "walk in", "billing"]:
+            continue
+
+        # 3. No sales commission for Repeated customers
+        if is_repeated:
+            continue
+
+        # 4. Sales commission is only awarded when their own lead is officially converted
+        if lead_status not in ["converted", "closed"]:
+            continue
         
         # Group leads created in the current month
         created_at = d.get("created_at", "")
@@ -3398,18 +3417,10 @@ def admin_reports(month: Optional[str] = Query(None), branch: Optional[str] = No
         payments = d.get("payments", [])
         for p in payments:
             if isinstance(p, dict):
-                if p.get("type") == "token":
-                    if d.get("status") not in ["converted", "closed"]:
-                        continue
-                    ts = None
-                    for pay in payments:
-                        if pay.get("type") == "closure" and pay.get("timestamp"):
-                            ts = pay.get("timestamp")
-                            break
-                    if not ts:
-                        ts = d.get("updated_at") or p.get("timestamp") or ""
-                else:
-                    ts = p.get("timestamp") or ""
+                p_type = (p.get("type") or "").strip().lower()
+                if p_type == "token":
+                    continue
+                ts = p.get("timestamp") or d.get("updated_at") or ""
                 
                 p_copy = p.copy()
                 p_copy["timestamp"] = ts

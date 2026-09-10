@@ -4472,7 +4472,7 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
     leads_query = db.collection("leads")
     if branch:
         leads_query = leads_query.where("branch", "==", branch)
-    leads_docs = leads_query.select(["id", "name", "phone", "source", "assigned_to", "payments", "status", "updated_at"]).stream()
+    leads_docs = leads_query.select(["id", "name", "phone", "source", "assigned_to", "payments", "status", "updated_at", "is_repeated", "is_client"]).stream()
     all_payments = []
     for doc in leads_docs:
         d = doc.to_dict()
@@ -4481,12 +4481,21 @@ def admin_payroll(month: Optional[str] = None, branch: Optional[str] = None, use
         emp_id = d.get("assigned_to")
         lead_source = (d.get("source") or "").strip().lower()
         lead_status = (d.get("status") or "").strip().lower()
+        is_repeated = bool(d.get("is_repeated")) or ("repeat" in lead_source) or ("repeated" in lead_source)
 
-        # 1. No sales commission for Walk-in clients
-        if lead_source in ["walk-in", "walkin", "direct", "walk in"]:
+        # 1. Sales person must be specifically assigned to their own lead
+        if not emp_id or emp_id == "walkin":
             continue
 
-        # 2. Sales commission is only awarded when the client is officially converted
+        # 2. No sales commission for Walk-in or Billing clients
+        if lead_source in ["walk-in", "walkin", "direct", "walk in", "billing"]:
+            continue
+
+        # 3. No sales commission for Repeated customers
+        if is_repeated:
+            continue
+
+        # 4. Sales commission is only awarded when their own lead is officially converted
         if lead_status not in ["converted", "closed"]:
             continue
 
