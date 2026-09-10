@@ -1640,18 +1640,49 @@ def delete_order(oid: str, user: dict = Depends(require_admin)):
         raise HTTPException(404, "Order not found")
     
     order_data = doc_snap.to_dict()
-    # If order is linked to a lead, adjust total_sale_amount
+    order_total = float(order_data.get("total", 0.0) or 0.0)
+    order_paid = sum(float(p.get("amount", 0.0)) for p in order_data.get("split_payments", [])) if order_data.get("split_payments") else order_total
+
+    # If order is linked to a lead, adjust total_sale_amount and clean up payment list
     lead_id = order_data.get("lead_id")
     if lead_id:
         try:
             lead_ref = db.collection("leads").document(lead_id)
-            if lead_ref.get().exists:
-                lead_ref.update({
-                    "total_sale_amount": firestore.firestore.Increment(-float(order_data.get("total", 0.0)))
-                })
+            lead_snap = lead_ref.get()
+            if lead_snap.exists:
+                lead_data = lead_snap.to_dict()
+                lead_payments = lead_data.get("payments", [])
+                new_payments = [
+                    p for p in lead_payments 
+                    if not (isinstance(p, dict) and (p.get("order_id") == oid or (oid[:8].upper() in str(p.get("notes", "")))))
+                ]
+                # Recalculate total_sale_amount from remaining payments or decrement
+                if len(new_payments) < len(lead_payments):
+                    recalc_total = sum(float(p.get("amount", 0.0)) for p in new_payments if isinstance(p, dict))
+                    lead_ref.update({
+                        "payments": new_payments,
+                        "total_sale_amount": recalc_total,
+                        "updated_at": now_iso()
+                    })
+                else:
+                    lead_ref.update({
+                        "total_sale_amount": firestore.firestore.Increment(-order_paid),
+                        "updated_at": now_iso()
+                    })
         except Exception:
             pass
-            
+
+    # Decrement settings/revenue_cache if exists
+    try:
+        from google.cloud.firestore import Increment as FSIncrement
+        db.collection("settings").document("revenue_cache").set(
+            {"total": FSIncrement(-order_total), "updated_at": now_iso()},
+            merge=True
+        )
+    except Exception:
+        pass
+
+    cache_bust("admin_stats")
     doc_ref.delete()
     return {"ok": True, "message": "Order and commissions deleted successfully"}
 
@@ -4108,9 +4139,8 @@ def admin_update_order(oid: str, data: dict, _: dict = Depends(require_admin)):
     return {"ok": True}
 
 @api.delete("/admin/orders/{oid}")
-def admin_delete_order(oid: str, _: dict = Depends(require_admin)):
-    db.collection("orders").document(oid).delete()
-    return {"ok": True}
+def admin_delete_order(oid: str, user: dict = Depends(require_admin)):
+    return delete_order(oid, user)
 
 @api.get("/admin/users")
 def admin_users(limit: int = 200, _: dict = Depends(require_admin)):

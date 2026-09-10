@@ -1321,6 +1321,63 @@ def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
     return order
 
 
+@api.delete("/orders/{oid}")
+def delete_order(oid: str, user: dict = Depends(require_admin)):
+    doc_ref = db.collection("orders").document(oid)
+    doc_snap = doc_ref.get()
+    if not doc_snap.exists:
+        raise HTTPException(404, "Order not found")
+    
+    order_data = doc_snap.to_dict()
+    order_total = float(order_data.get("total", 0.0) or 0.0)
+    order_paid = sum(float(p.get("amount", 0.0)) for p in order_data.get("split_payments", [])) if order_data.get("split_payments") else order_total
+
+    lead_id = order_data.get("lead_id")
+    if lead_id:
+        try:
+            lead_ref = db.collection("leads").document(lead_id)
+            lead_snap = lead_ref.get()
+            if lead_snap.exists:
+                lead_data = lead_snap.to_dict()
+                lead_payments = lead_data.get("payments", [])
+                new_payments = [
+                    p for p in lead_payments 
+                    if not (isinstance(p, dict) and (p.get("order_id") == oid or (oid[:8].upper() in str(p.get("notes", "")))))
+                ]
+                if len(new_payments) < len(lead_payments):
+                    recalc_total = sum(float(p.get("amount", 0.0)) for p in new_payments if isinstance(p, dict))
+                    lead_ref.update({
+                        "payments": new_payments,
+                        "total_sale_amount": recalc_total,
+                        "updated_at": now_iso()
+                    })
+                else:
+                    lead_ref.update({
+                        "total_sale_amount": firestore.firestore.Increment(-order_paid),
+                        "updated_at": now_iso()
+                    })
+        except Exception:
+            pass
+
+    try:
+        from google.cloud.firestore import Increment as FSIncrement
+        db.collection("settings").document("revenue_cache").set(
+            {"total": FSIncrement(-order_total), "updated_at": now_iso()},
+            merge=True
+        )
+    except Exception:
+        pass
+
+    cache_bust("admin_stats")
+    doc_ref.delete()
+    return {"ok": True, "message": "Order and commissions deleted successfully"}
+
+
+@api.delete("/admin/orders/{oid}")
+def admin_delete_order(oid: str, user: dict = Depends(require_admin)):
+    return delete_order(oid, user)
+
+
 @api.get("/orders/me")
 def my_orders(user: dict = Depends(get_current_user)):
     docs = db.collection("orders").where("user_id", "==", user["id"]).order_by("created_at", direction="DESCENDING").stream()
