@@ -13330,34 +13330,39 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
 
       {subTab === "payroll" && (
         <div className="flex flex-col gap-4">
-          <div className="flex justify-end">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 className="font-serif text-xl font-bold text-gray-900">Staff Payroll & Salary Overview</h3>
+              <p className="text-xs text-gray-500">Monthly salary, sales commission, service payouts, and attendance calculations.</p>
+            </div>
             <input
               type="month"
               value={payrollFilterMonth}
               onChange={(e) => setPayrollFilterMonth(e.target.value)}
-              className="bg-white border border-eminence-border px-4 py-2 text-sm focus:outline-none focus:border-eminence-gold"
+              className="bg-white border border-eminence-border px-4 py-2 text-sm rounded-lg focus:outline-none focus:border-eminence-gold shadow-xs self-start sm:self-auto"
             />
           </div>
           <div className="eminence-card overflow-hidden">
             {loading ? (
               <div className="p-20 text-center animate-pulse text-eminence-muted uppercase tracking-[0.3em] text-xs">Loading Payroll...</div>
             ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-eminence-border bg-eminence-surface/50">
-                    <th className="text-left px-6 py-4 overline">Employee</th>
-                    <th className="text-left px-6 py-4 overline">Base Salary</th>
-                    <th className="text-left px-6 py-4 overline">Monthly Sales</th>
-                    <th className="text-left px-6 py-4 overline">Service Comm</th>
-                    <th className="text-left px-6 py-4 overline">Product Comm</th>
-                    <th className="text-left px-6 py-4 overline">Package Comm</th>
-                    <th className="text-left px-6 py-4 overline">Member Comm</th>
-                    <th className="text-left px-6 py-4 overline">Attendance & Leaves</th>
-                    <th className="text-left px-6 py-4 overline text-eminence-gold">Total Payout</th>
-                    <th className="text-left px-6 py-4 overline">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-eminence-border/50">
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-sm min-w-[950px]">
+                  <thead>
+                    <tr className="border-b border-eminence-border bg-eminence-surface/50">
+                      <th className="text-left px-6 py-4 overline">Employee</th>
+                      <th className="text-left px-6 py-4 overline">Base Salary</th>
+                      <th className="text-left px-6 py-4 overline">Monthly Sales</th>
+                      <th className="text-left px-6 py-4 overline">Service Comm</th>
+                      <th className="text-left px-6 py-4 overline">Product Comm</th>
+                      <th className="text-left px-6 py-4 overline">Package Comm</th>
+                      <th className="text-left px-6 py-4 overline">Member Comm</th>
+                      <th className="text-left px-6 py-4 overline">Attendance & Leaves</th>
+                      <th className="text-left px-6 py-4 overline text-eminence-gold">Total Payout</th>
+                      <th className="text-left px-6 py-4 overline">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-eminence-border/50">
                   {payrollData.map((emp) => {
                     const isService = emp.role === "service";
                     const isSales = emp.role === "sales";
@@ -13612,8 +13617,8 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                       : `No billable salon activities/sales logged for ${emp.name} in ${payrollFilterMonth}.`}
                                   </div>
                                 ) : (
-                                  <div className="overflow-x-auto max-h-[300px] overflow-y-auto rounded-xl border border-gray-200">
-                                    <table className="w-full text-xs">
+                                  <div className="overflow-x-auto max-h-[350px] overflow-y-auto rounded-xl border border-gray-200">
+                                    <table className="w-full text-xs min-w-[700px]">
                                       <thead className="bg-gray-100/90 text-gray-700 font-bold sticky top-0">
                                         <tr>
                                           <th className="text-left px-4 py-2.5 uppercase tracking-wider text-[10px]">Date</th>
@@ -13684,6 +13689,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                   })}
                 </tbody>
               </table>
+              </div>
             )}
             {!loading && payrollData.length === 0 && <p className="text-center py-20 text-eminence-muted italic text-sm">No payroll records found.</p>}
           </div>
