@@ -2267,15 +2267,26 @@ export default function SalesPanel() {
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Source</label>
                   <select
-                    value={newLeadForm.source}
-                    onChange={e => setNewLeadForm({...newLeadForm, source: e.target.value})}
+                    value={newLeadForm.is_repeated ? "Repeated Customer" : newLeadForm.source}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === "Repeated Customer" || val === "Repeated") {
+                        setNewLeadForm({ ...newLeadForm, source: val, is_repeated: true });
+                      } else {
+                        setNewLeadForm({ ...newLeadForm, source: val, is_repeated: false });
+                      }
+                    }}
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
                   >
                     <option value="Manual">Manual Entry</option>
+                    <option value="Repeated Customer">Repeated Customer (Repeat)</option>
                     <option value="Walk-in">Walk-in</option>
                     <option value="Instagram">Instagram</option>
                     <option value="Referral">Referral</option>
                     <option value="Facebook">Facebook Ads</option>
+                    <option value="WhatsApp">WhatsApp</option>
+                    <option value="Website">Website</option>
+                    <option value="Google Ads">Google Ads</option>
                   </select>
                 </div>
                 <div>
@@ -2288,7 +2299,7 @@ export default function SalesPanel() {
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
                 </div>
-                <div>
+                <div className="col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Consulted By</label>
                   <select
                     value={newLeadForm.consulted_by || ""}
@@ -2303,12 +2314,19 @@ export default function SalesPanel() {
                     ))}
                   </select>
                 </div>
-                <div className="flex items-center gap-3 pt-4">
+                <div className="col-span-2 flex items-center gap-3 pt-1">
                   <label className="relative flex items-center cursor-pointer">
                     <input
                       type="checkbox"
-                      checked={newLeadForm.is_repeated || false}
-                      onChange={e => setNewLeadForm({...newLeadForm, is_repeated: e.target.checked})}
+                      checked={newLeadForm.is_repeated || newLeadForm.source === "Repeated Customer" || newLeadForm.source === "Repeated"}
+                      onChange={e => {
+                        const checked = e.target.checked;
+                        setNewLeadForm({
+                          ...newLeadForm,
+                          is_repeated: checked,
+                          source: checked ? "Repeated Customer" : (newLeadForm.source === "Repeated Customer" ? "Manual" : newLeadForm.source)
+                        });
+                      }}
                       className="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer"
                     />
                     <span className="ml-3 text-xs font-bold text-gray-700 uppercase tracking-wider">Repeated Customer</span>
@@ -2446,11 +2464,19 @@ export default function SalesPanel() {
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Source</label>
                   <select
-                    value={editLeadForm.source || "Manual"}
-                    onChange={e => setEditLeadForm({...editLeadForm, source: e.target.value})}
+                    value={editLeadForm.is_repeated ? "Repeated Customer" : (editLeadForm.source || "Manual")}
+                    onChange={e => {
+                      const val = e.target.value;
+                      if (val === "Repeated Customer" || val === "Repeated") {
+                        setEditLeadForm({ ...editLeadForm, source: val, is_repeated: true });
+                      } else {
+                        setEditLeadForm({ ...editLeadForm, source: val, is_repeated: false });
+                      }
+                    }}
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
                   >
                     <option value="Manual">Manual Entry</option>
+                    <option value="Repeated Customer">Repeated Customer (Repeat)</option>
                     <option value="Walk-in">Walk-in</option>
                     <option value="Instagram">Instagram</option>
                     <option value="Referral">Referral</option>
