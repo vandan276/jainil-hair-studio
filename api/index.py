@@ -2101,20 +2101,13 @@ def get_order_invoice(oid: str):
         c.drawRightString(268, ry, val_str)
         ry -= 10.5
 
-    draw_summary_row("Total :", f"{subtotal_before_tax_and_disc:.2f}")
-    draw_summary_row("Coupon Dis :", "0")
-    draw_summary_row("Discount :", f"{point_discount:.2f}")
-    draw_summary_row("Tax Type :", "Inclusive" if tax_inclusive else "Exclusive")
-
-    cgst_label = f"CGST({tax_rate * 50:.1f}%) :" if tax_rate > 0 else "CGST(0%) :"
-    sgst_label = f"SGST({tax_rate * 50:.1f}%) :" if tax_rate > 0 else "SGST(0%) :"
-    draw_summary_row(sgst_label, f"{total_tax / 2:.2f}")
-    draw_summary_row(cgst_label, f"{total_tax / 2:.2f}")
-
+    draw_summary_row("Subtotal :", f"{subtotal_before_tax_and_disc:.2f}")
+    if point_discount > 0:
+        draw_summary_row("Discount :", f"{point_discount:.2f}")
     draw_summary_row("Total :", f"{grand_total:.2f}", bold=True)
-    draw_summary_row("Advance :", "0.00")
     draw_summary_row("Amount Paid :", f"{total_paid:.2f}")
-    draw_summary_row("Amount Due :", f"{amount_due:.2f}")
+    if amount_due > 0:
+        draw_summary_row("Amount Due :", f"{amount_due:.2f}", bold=True)
 
     # Dashed separator at bottom
     fy = min(ly, ry) - 6

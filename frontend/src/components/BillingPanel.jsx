@@ -498,22 +498,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
     return acc + lineTotal - disc;
   }, 0), [lineItems]);
 
-  const selectedTaxOpt = TAX_OPTIONS.find(t => t.key === selectedTax) || TAX_OPTIONS[0];
-  // taxAmount is always shown in the Taxes row for info
-  const taxAmount = useMemo(() => {
-    if (!selectedTaxOpt || !selectedTaxOpt.rate) return 0;
-    if (selectedTaxOpt.inclusive) {
-      // Tax already included in price — extract for display only
-      return subtotal - subtotal / (1 + selectedTaxOpt.rate / 100);
-    } else {
-      // Exclusive — added on top
-      return subtotal * selectedTaxOpt.rate / 100;
-    }
-  }, [subtotal, selectedTaxOpt]);
-
-  // Only exclusive tax gets added to the total; inclusive is already in the price
-  const taxAdded = selectedTaxOpt?.inclusive ? 0 : taxAmount;
-  const totalAmount = Math.max(0, subtotal - discountAmt + taxAdded);
+  const totalAmount = Math.max(0, subtotal - discountAmt);
 
   const totalAmountPaid = useMemo(() => {
     return splitPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
@@ -634,7 +619,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           address: "In-store",
           city: clientData?.city || "Vadodara",
           pincode: "000000",
-          notes: `COMBINED BILLING | Discount: ₹${totalDiscount} | Tax: ${selectedTaxOpt?.label || "None"} | Payments: ${paymentNotesStr}${referredByClient ? ` | Referred by: ${referredByClient.name} (${referredByClient.phone})` : ""} | ${notes}`,
+          notes: `COMBINED BILLING | Discount: ₹${totalDiscount} | Payments: ${paymentNotesStr}${referredByClient ? ` | Referred by: ${referredByClient.name} (${referredByClient.phone})` : ""} | ${notes}`,
           employee_id: selectedEmployee === "walkin" ? null : (selectedEmployee || undefined),
           employee_name: selectedEmployee === "walkin" ? "Walk-in Client" : (emp ? emp.name : undefined),
           branch: emp?.branch || clientData?.branch || user?.branch || "Baroda",
@@ -1176,42 +1161,6 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
               <div className="flex justify-between items-center">
                 <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Discount</span>
                 <input type="number" min={0} value={discountAmt} onChange={e => setDiscountAmt(Number(e.target.value))} className="w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Give Reward Points</span>
-                <input type="text" value={giveRewardPoints} onChange={e => setGiveRewardPoints(e.target.value)} className="w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" placeholder="XXXXXXX" />
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Taxes</span>
-                <select
-                  value={selectedTax}
-                  onChange={e => setSelectedTax(e.target.value)}
-                  className="w-48 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold"
-                >
-                  <option value="">Select Taxes</option>
-                  <optgroup label="── Inclusive Taxes">
-                    <option value="inc_prod_18">Gst on Products (18%)</option>
-                    <option value="inc_prod_5">Gst on Products (5%)</option>
-                    <option value="inc_svc_18">Gst on Service (18%)</option>
-                    <option value="inc_svc_5">Gst on Service (5%)</option>
-                  </optgroup>
-                  <optgroup label="── Exclusive Taxes">
-                    <option value="exc_prod_18">Gst on Products (18%)</option>
-                    <option value="exc_prod_5">Gst on Products (5%)</option>
-                    <option value="exc_svc_18">Gst on Service (18%)</option>
-                    <option value="exc_svc_5">Gst on Service (5%)</option>
-                  </optgroup>
-                </select>
-                {taxAmount > 0 && (
-                  <div className="flex justify-between items-center text-xs mt-1">
-                    <span className="text-eminence-muted">
-                      Tax amount{selectedTaxOpt?.inclusive ? " (incl. in price — not added)" : " (added to total)"}
-                    </span>
-                    <span className={selectedTaxOpt?.inclusive ? "text-eminence-muted line-through" : "text-eminence-text font-semibold"}>
-                      ₹{taxAmount.toFixed(2)}
-                    </span>
-                  </div>
-                )}
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Advance Received</span>
