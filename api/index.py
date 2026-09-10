@@ -2158,7 +2158,46 @@ def create_employee(data: RegisterIn, user: dict = Depends(require_admin)):
 
 # ----- Leads CRM -----
 @api.post("/leads")
+@app.post("/leads")
+@api.post("/lead")
+@app.post("/lead")
 def create_lead(data: LeadIn, user: dict = Depends(require_employee)):
+    is_billing = bool(data.source and data.source.lower() == "billing")
+    
+    # Check if lead or client with this phone number already exists
+    if not is_billing and data.phone:
+        existing_doc = find_existing_lead(data.phone)
+        if existing_doc:
+            lead_id = existing_doc.id
+            lead_data = existing_doc.to_dict()
+            
+            update_payload = {
+                "updated_at": now_iso()
+            }
+            # Only update contact info if provided
+            if data.name and data.name != "WhatsApp Lead" and data.name != "Meta Lead":
+                update_payload["name"] = data.name
+            if data.city:
+                update_payload["city"] = data.city
+            if data.hair_condition:
+                update_payload["hair_condition"] = data.hair_condition
+            if data.notes:
+                note = {"text": data.notes, "author": user.get("name", "System"), "timestamp": now_iso()}
+                update_payload["notes"] = firestore.ArrayUnion([note])
+                
+            if not lead_data.get("assigned_to"):
+                if user.get("role") == "sales":
+                    update_payload["assigned_to"] = user["id"]
+                    update_payload["assigned_to_name"] = user["name"]
+                else:
+                    next_sales = get_next_salesperson()
+                    if next_sales:
+                        update_payload["assigned_to"] = next_sales["id"]
+                        update_payload["assigned_to_name"] = next_sales["name"]
+                        
+            db.collection("leads").document(lead_id).update(update_payload)
+            return {**lead_data, **update_payload, "id": lead_id}
+
     lid = new_id()
     assigned_to = None
     assigned_to_name = None
@@ -2167,7 +2206,7 @@ def create_lead(data: LeadIn, user: dict = Depends(require_employee)):
         assigned_to_name = user["name"]
     status = data.status or "new"
     is_client = data.is_client or False
-    if data.source and data.source.lower() == "billing":
+    if is_billing:
         status = "client"
         is_client = True
 
