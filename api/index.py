@@ -3232,11 +3232,15 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
     # Handle Sale Amount & Pending Amount
     created_order_id = None
     if data.sale_amount:
+        eff_date = data.converted_date if data.outcome == "Converted" and data.converted_date else (data.token_received_date if data.outcome == "Token Received" and data.token_received_date else None)
+        payment_ts = f"{eff_date}T12:00:00Z" if eff_date else now_iso()
+        
         payment = {
             "amount": data.sale_amount,
             "type": "token" if data.outcome == "Token Received" else "closure",
             "mode": data.payment_mode or "Not Specified",
-            "timestamp": now_iso(),
+            "timestamp": payment_ts,
+            "date": eff_date or payment_ts[:10],
             "recorded_by": user["name"]
         }
         update_data["payments"] = firestore.firestore.ArrayUnion([payment])
@@ -3278,7 +3282,8 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             "notes": f"CRM {data.outcome} | Amount Paid: ₹{sale_paid:,.2f} | Pending Due: ₹{pending_due:,.2f}",
             "next_appointment_date": data.next_followup_date or "",
             "next_appointment_time": data.next_followup_time or "",
-            "created_at": now_iso()
+            "created_at": payment_ts,
+            "order_date": eff_date or payment_ts[:10]
         }
         db.collection("orders").document(created_order_id).set(order_doc)
 
@@ -3287,8 +3292,9 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
         pmode = data.payment_mode or "Not Specified"
         pending_str = f" | Pending Due: ₹{data.pending_amount:,.2f}" if (data.pending_amount is not None and data.pending_amount > 0) else ""
         appt_str = f" | Next Appt: {data.next_followup_date}" if data.next_followup_date else ""
+        date_str = f" | Date: {eff_date}" if eff_date else ""
         notes_to_add.append({
-            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str}{appt_str} (Invoice #{created_order_id[:8].upper()})", 
+            "text": f"SYSTEM: {user['name']} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{pending_str}{appt_str}{date_str} (Invoice #{created_order_id[:8].upper()})", 
             "author": "System", 
             "timestamp": now_iso()
         })
@@ -3382,34 +3388,51 @@ def get_sales_dashboard(
 
     def get_effective_ts(p, d):
         if p.get("type") == "token":
-            if d.get("status") not in ["converted", "closed"]:
-                return ""
-            for pay in d.get("payments", []):
-                if pay.get("type") == "closure" and pay.get("timestamp"):
-                    return pay.get("timestamp")
-            return d.get("updated_at") or p.get("timestamp") or ""
-        return p.get("timestamp") or ""
+            if d.get("token_received_date"):
+                return d.get("token_received_date")
+            if d.get("token_received_at"):
+                return d.get("token_received_at")
+            return p.get("date") or p.get("timestamp") or ""
+        elif p.get("type") == "closure":
+            if d.get("converted_date"):
+                return d.get("converted_date")
+            if d.get("converted_at"):
+                return d.get("converted_at")
+            return p.get("date") or p.get("timestamp") or ""
+        return p.get("date") or p.get("timestamp") or ""
 
     # Periodic Stats
     period_sales = 0.0
     for d in docs:
         for p in d.get("payments", []):
-            eff_ts = get_effective_ts(p, d)
-            if is_in(eff_ts, p_start, p_end):
-                period_sales += p.get("amount", 0.0)
+            if isinstance(p, dict):
+                eff_ts = get_effective_ts(p, d)
+                if is_in(eff_ts, p_start, p_end):
+                    period_sales += float(p.get("amount", 0.0))
 
     # Result Stats
     def check_result(d, status_list):
         if d.get("status") not in status_list: return False
-        return is_in(d.get("updated_at"), r_start, r_end)
+        if "converted" in status_list or "closed" in status_list:
+            dt_str = d.get("converted_date") or d.get("converted_at") or d.get("updated_at") or ""
+        elif "token received" in status_list:
+            dt_str = d.get("token_received_date") or d.get("token_received_at") or d.get("updated_at") or ""
+        elif "visited" in status_list:
+            dt_str = d.get("visited_date") or d.get("updated_at") or ""
+        elif "dead" in status_list:
+            dt_str = d.get("dead_at") or d.get("updated_at") or ""
+        else:
+            dt_str = d.get("updated_at") or ""
+        return is_in(dt_str, r_start, r_end)
 
     this_month = now_iso()[:7]
     monthly_sales = 0.0
     for d in docs:
         for p in d.get("payments", []):
-            eff_ts = get_effective_ts(p, d)
-            if eff_ts.startswith(this_month):
-                monthly_sales += p.get("amount", 0.0)
+            if isinstance(p, dict):
+                eff_ts = get_effective_ts(p, d)
+                if eff_ts and eff_ts[:7] == this_month:
+                    monthly_sales += float(p.get("amount", 0.0))
 
     inactive_statuses = ["converted", "closed", "dead", "visit scheduled dead", "recycled"]
     stats = {
@@ -3691,20 +3714,16 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
         for p in l.get("payments", []):
             if isinstance(p, dict):
                 if p.get("type") == "token":
-                    if l.get("status") not in ["converted", "closed"]:
+                    if l.get("status") not in ["converted", "closed", "token received"]:
                         continue
-                    ts = None
-                    for pay in l.get("payments", []):
-                        if pay.get("type") == "closure" and pay.get("timestamp"):
-                            ts = pay.get("timestamp")
-                            break
-                    if not ts:
-                        ts = l.get("updated_at") or p.get("timestamp") or ""
+                    ts = l.get("token_received_date") or p.get("date") or p.get("timestamp") or ""
+                elif p.get("type") == "closure":
+                    ts = l.get("converted_date") or p.get("date") or p.get("timestamp") or ""
                 else:
-                    ts = p.get("timestamp") or ""
+                    ts = p.get("date") or p.get("timestamp") or ""
 
                 if to_ist_date(ts) == today:
-                    amount = p.get("amount", 0.0)
+                    amount = float(p.get("amount", 0.0))
                     lead_todays_sales += amount
                     daily_sales_details.append({
                         "id": doc.id,
