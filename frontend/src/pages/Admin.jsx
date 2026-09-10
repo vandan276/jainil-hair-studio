@@ -15889,7 +15889,6 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
   const [videos, setVideos] = useState([]);
   const [saving, setSaving] = useState(false);
   const [isMediaManagerExpanded, setIsMediaManagerExpanded] = useState(false);
-  const [selectedSalesPerson, setSelectedSalesPerson] = useState("");
 
   // States for edit modal
   const [editingConsultation, setEditingConsultation] = useState(null);
@@ -15972,10 +15971,19 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
     )
   ).sort();
 
-  // Filter consultations based on selected salesperson
+  const [selectedSalesPerson, setSelectedSalesPerson] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Filter consultations based on selected salesperson and search query (name / phone)
   const filteredConsultations = consultations.filter(c => {
-    if (!selectedSalesPerson) return true;
-    return c.consulted_by === selectedSalesPerson;
+    if (selectedSalesPerson && c.consulted_by !== selectedSalesPerson) return false;
+    if (searchQuery && searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const nameMatch = (c.name || "").toLowerCase().includes(q);
+      const phoneMatch = (c.phone || "").includes(q);
+      if (!nameMatch && !phoneMatch) return false;
+    }
+    return true;
   });
 
   return (
@@ -16085,18 +16093,40 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
           <h3 className="font-serif text-lg text-gray-800">Consultation Records</h3>
           <p className="text-xs text-eminence-muted">List of styling and diagnostic consult forms filled by users.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 font-medium">Filter by Consulted By:</span>
-          <select
-            value={selectedSalesPerson}
-            onChange={e => setSelectedSalesPerson(e.target.value)}
-            className="bg-eminence-surface border border-eminence-border rounded px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-eminence-gold"
-          >
-            <option value="">All Salespersons</option>
-            {salesPersons.map(sp => (
-              <option key={sp} value={sp}>{sp}</option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search by client name or phone */}
+          <div className="relative min-w-[220px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search by client name or phone..."
+              className="w-full pl-9 pr-8 py-1.5 bg-eminence-surface border border-eminence-border rounded-lg text-xs text-gray-700 focus:outline-none focus:border-eminence-gold transition-colors"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={12} />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500 font-medium">Consulted By:</span>
+            <select
+              value={selectedSalesPerson}
+              onChange={e => setSelectedSalesPerson(e.target.value)}
+              className="bg-eminence-surface border border-eminence-border rounded-lg px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-eminence-gold"
+            >
+              <option value="">All Salespersons</option>
+              {salesPersons.map(sp => (
+                <option key={sp} value={sp}>{sp}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -16301,9 +16331,13 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
         ))}
       </div>
 
-      {consultations.length === 0 && (
-        <div className="py-20 text-center text-eminence-muted">
-          <p className="italic">{t("noRecords") || "No consultancy records found."}</p>
+      {filteredConsultations.length === 0 && (
+        <div className="py-20 text-center text-eminence-muted bg-white rounded-xl border border-dashed border-eminence-border/60">
+          <User className="mx-auto mb-2 text-gray-300" size={32} />
+          <p className="font-semibold text-gray-700">No consultation records match your filter.</p>
+          {searchQuery && (
+            <p className="text-xs text-eminence-muted mt-1">Try clearing your search: "{searchQuery}"</p>
+          )}
         </div>
       )}
 
