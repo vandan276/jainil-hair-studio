@@ -206,17 +206,17 @@ export default function ReceptionistPanel() {
   };
 
   return (
-    <div className="max-w-[1500px] mx-auto px-6 lg:px-12 py-12" data-testid="receptionist-panel">
-      <div className="mb-10 text-center md:text-left">
-        <p className="text-[10px] uppercase tracking-[0.3em] text-eminence-gold font-bold mb-2">Virtual Reception Desk</p>
-        <h1 className="font-serif text-4xl text-eminence-text">Appointment Booking Manager</h1>
-        <p className="text-eminence-muted text-sm mt-1">Book salon appointments and assign them to stylist employees.</p>
+    <div className="max-w-[1500px] mx-auto px-3 sm:px-6 lg:px-12 py-8 sm:py-12" data-testid="receptionist-panel">
+      <div className="mb-6 sm:mb-10 text-center md:text-left">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-eminence-gold font-bold mb-1 sm:mb-2">Virtual Reception Desk</p>
+        <h1 className="font-serif text-2xl sm:text-4xl text-eminence-text">Appointment Booking Manager</h1>
+        <p className="text-eminence-muted text-xs sm:text-sm mt-1">Book salon appointments and assign them to stylist employees.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
         {/* BOOKING FORM */}
-        <form onSubmit={handleBook} className="lg:col-span-1 eminence-card p-6 space-y-5 h-fit bg-white border border-eminence-border/60 shadow-sm rounded-2xl sticky top-24">
+        <form onSubmit={handleBook} className="lg:col-span-1 eminence-card p-4 sm:p-6 space-y-4 sm:space-y-5 h-fit bg-white border border-eminence-border/60 shadow-sm rounded-2xl static lg:sticky lg:top-24">
           <div className="border-b border-eminence-border/50 pb-3 flex items-center justify-between">
             <h3 className="font-serif text-xl text-eminence-text flex items-center gap-2">
               <Sparkles className="text-eminence-gold" size={18} /> Take Appointment

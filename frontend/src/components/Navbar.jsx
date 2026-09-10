@@ -45,7 +45,7 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-eminence-border shadow-sm">
-        <div className="max-w-[1500px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+        <div className="max-w-[1500px] mx-auto px-3 sm:px-6 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
           <nav className="hidden lg:flex items-center gap-10 flex-1">
             {links.map((l) => {
               const isStaffPath = l.to.startsWith("/billing") || l.to.startsWith("/consultancy") || l.to.startsWith("/admin") || l.to.endsWith("-panel");
@@ -77,11 +77,11 @@ export default function Navbar() {
             <img 
               src="/assets/Logo/Jainil Studio.svg" 
               alt="Jainil Hair Studio Logo" 
-              className="h-10 md:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              className="h-8 sm:h-10 md:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
             />
           </Link>
 
-          <div className="flex items-center gap-5 lg:flex-1 lg:justify-end">
+          <div className="flex items-center gap-3 sm:gap-5 lg:flex-1 lg:justify-end">
             {/* Language switcher */}
             <div className="relative">
               <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] font-medium ${txt} hover:opacity-70`} data-testid="nav-language">

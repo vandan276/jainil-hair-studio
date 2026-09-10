@@ -775,13 +775,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
         <div className="xl:col-span-3 space-y-5">
 
           {/* Header: Generate New Bill */}
-          <div className="eminence-card p-6">
+          <div className="eminence-card p-4 sm:p-6">
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-eminence-text mb-4 flex items-center gap-2">
               <FileText size={15} className="text-eminence-gold" />
               Generate New Bill
             </h3>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
               <div>
                 <label className={labelCls}>Date of Billing *</label>
                 <input type="date" value={billDate} onChange={e => setBillDate(e.target.value)} className={inputCls} />
@@ -886,7 +886,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
               </div>
             )}
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <label className={labelCls}>Service For</label>
                 <select value={serviceFor} onChange={e => setServiceFor(e.target.value)} className={inputCls}>
@@ -941,14 +941,14 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
           {/* Line Items Table */}
           <div className="eminence-card overflow-hidden">
-            <div className="px-6 py-4 border-b border-eminence-border/20 flex justify-between items-center">
+            <div className="px-4 sm:px-6 py-4 border-b border-eminence-border/20 flex justify-between items-center">
               <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-eminence-text">
                 Services & Products
               </h3>
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-sm min-w-[760px]">
                 <thead>
                   <tr className="text-[9px] text-eminence-muted uppercase tracking-wider bg-eminence-surface/30 border-b border-eminence-border/20">
                     <th className="px-3 py-3 text-left w-8">#</th>
@@ -1103,7 +1103,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           </div>
 
           {/* Financials Section */}
-          <div className="eminence-card p-6 space-y-4">
+          <div className="eminence-card p-4 sm:p-6 space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="flex justify-between items-center col-span-2 md:col-span-4 border-b border-eminence-border/20 pb-3">
                 <span className="text-xs text-eminence-muted uppercase font-bold tracking-widest">Subtotal</span>
@@ -1113,13 +1113,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
             {/* Coupon, Discount, Tax, Total */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Coupon</span>
-                <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" placeholder="Enter code" />
+                <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="w-36 sm:w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" placeholder="Enter code" />
               </div>
-              <div className="flex justify-between items-center relative">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Referred By (Client Phone)</span>
-                <div className="relative w-48">
+              <div className="flex justify-between items-center gap-2 relative">
+                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Referred By</span>
+                <div className="relative w-40 sm:w-48">
                   <input
                     type="text"
                     value={searchReferredBy}
@@ -1133,7 +1133,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     onFocus={() => setShowReferredDropdown(true)}
                     onBlur={() => setTimeout(() => setShowReferredDropdown(false), 200)}
                     className="w-full text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold"
-                    placeholder="Search phone or name..."
+                    placeholder="Search client..."
                   />
                   {showReferredDropdown && searchReferredBy && (
                     <div className="absolute right-0 z-30 w-56 mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-40 overflow-y-auto text-left">
@@ -1158,13 +1158,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   )}
                 </div>
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Discount</span>
-                <input type="number" min={0} value={discountAmt} onChange={e => setDiscountAmt(Number(e.target.value))} className="w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" />
+                <input type="number" min={0} value={discountAmt} onChange={e => setDiscountAmt(Number(e.target.value))} className="w-36 sm:w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" />
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center gap-2">
                 <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Advance Received</span>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <label className="flex items-center gap-1 text-xs cursor-pointer">
                     <input type="radio" name="advance" value="Yes" checked={advanceReceived === "Yes"} onChange={e => setAdvanceReceived(e.target.value)} className="accent-eminence-gold" /> Yes
                   </label>
@@ -1323,7 +1323,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
             {/* Invoice Action Options – shows after successful bill */}
             {lastOrderId && (
-              <div className="grid grid-cols-3 gap-2 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
                 <button
                   onClick={async () => {
                     try {

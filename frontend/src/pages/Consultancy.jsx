@@ -189,21 +189,21 @@ export default function Consultancy() {
   const inputCls = "w-full border-b border-eminence-border py-2 px-1 focus:outline-none focus:border-eminence-gold bg-transparent";
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-light uppercase tracking-[0.2em] text-eminence-text mb-2">Consultation Form</h1>
-        <p className="text-eminence-muted font-light tracking-widest text-sm">Help us understand your needs</p>
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 py-8 sm:py-12">
+      <div className="text-center mb-6 sm:mb-10">
+        <h1 className="text-2xl sm:text-3xl font-light uppercase tracking-[0.2em] text-eminence-text mb-2">Consultation Form</h1>
+        <p className="text-eminence-muted font-light tracking-widest text-xs sm:text-sm">Help us understand your needs</p>
       </div>
 
       {/* Step Indicator */}
-      <div className="flex items-center justify-center gap-3 mb-10">
-        <button onClick={() => setStep(1)} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 1 ? "bg-eminence-gold text-white shadow-lg shadow-eminence-gold/20" : "bg-eminence-surface text-eminence-muted border border-eminence-border hover:border-eminence-gold/50"}`}>
-          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 1 ? "bg-white/20" : "bg-eminence-border/50"}`}>1</span>
+      <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
+        <button onClick={() => setStep(1)} className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 1 ? "bg-eminence-gold text-white shadow-lg shadow-eminence-gold/20" : "bg-eminence-surface text-eminence-muted border border-eminence-border hover:border-eminence-gold/50"}`}>
+          <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 1 ? "bg-white/20" : "bg-eminence-border/50"}`}>1</span>
           Client & Questionnaire
         </button>
         <ChevronRight size={16} className="text-eminence-muted" />
-        <button onClick={() => { if (formData.name && formData.phone) setStep(2); }} className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 2 ? "bg-eminence-gold text-white shadow-lg shadow-eminence-gold/20" : "bg-eminence-surface text-eminence-muted border border-eminence-border hover:border-eminence-gold/50"}`}>
-          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 2 ? "bg-white/20" : "bg-eminence-border/50"}`}>2</span>
+        <button onClick={() => { if (formData.name && formData.phone) setStep(2); }} className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 2 ? "bg-eminence-gold text-white shadow-lg shadow-eminence-gold/20" : "bg-eminence-surface text-eminence-muted border border-eminence-border hover:border-eminence-gold/50"}`}>
+          <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 2 ? "bg-white/20" : "bg-eminence-border/50"}`}>2</span>
           Staff Only
         </button>
       </div>
@@ -211,7 +211,7 @@ export default function Consultancy() {
       <form onSubmit={handleSubmit}>
         {/* ===== STEP 1: Client Details + Questionnaire ===== */}
         {step === 1 && (
-          <div className="space-y-10 bg-white p-8 border border-eminence-border shadow-sm animate-fade-in">
+          <div className="space-y-8 sm:space-y-10 bg-white p-4 sm:p-8 border border-eminence-border shadow-sm animate-fade-in rounded-2xl">
             {/* SECTION 1: CUSTOMER DETAILS */}
             <div className="space-y-6">
               <h2 className="text-lg uppercase tracking-[0.15em] border-b border-eminence-border pb-2">1. Client Details</h2>

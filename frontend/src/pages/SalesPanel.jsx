@@ -791,11 +791,11 @@ export default function SalesPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 pt-20 pb-12 px-4 md:px-6">
+    <div className="min-h-screen bg-gray-100 pt-20 pb-12 px-2.5 sm:px-4 md:px-6">
       <div className="max-w-[1600px] mx-auto space-y-6">
 
         {/* Top Header */}
-        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm">
           <div>
             <h1 className="text-xl font-bold text-gray-800">Welcome, {user?.name || "Team Member"}</h1>
             <p className="text-sm text-gray-500">
@@ -803,24 +803,24 @@ export default function SalesPanel() {
             </p>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
             {user?.role === "admin" && (
-              <div className="flex bg-gray-100 p-1 rounded-lg">
+              <div className="flex bg-gray-100 p-1 rounded-lg w-full sm:w-auto overflow-x-auto">
                 <button
                   onClick={() => setSectionFilter("All")}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sectionFilter === "All" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${sectionFilter === "All" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
                 >
                   All Sections
                 </button>
                 <button
                   onClick={() => setSectionFilter("Men")}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sectionFilter === "Men" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${sectionFilter === "Men" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
                 >
                   Men Section
                 </button>
                 <button
                   onClick={() => setSectionFilter("Female")}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${sectionFilter === "Female" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
+                  className={`flex-1 sm:flex-none px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium rounded-md transition-colors ${sectionFilter === "Female" ? "bg-white shadow text-gray-900" : "text-gray-500 hover:text-gray-700"}`}
                 >
                   Female Section
                 </button>
@@ -1278,9 +1278,9 @@ export default function SalesPanel() {
         ) : (
           <>
             {/* Search Bar */}
-            <div className="p-4 bg-gray-50/50 border-b border-gray-200 flex flex-wrap justify-between items-center gap-4">
-              <div className="flex flex-wrap gap-4 items-center">
-                <div className="relative w-72">
+            <div className="p-4 bg-gray-50/50 border-b border-gray-200 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
+              <div className="flex flex-wrap gap-4 items-center w-full md:w-auto">
+                <div className="relative w-full sm:w-72">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
                   <input
                     type="text"
@@ -1292,20 +1292,20 @@ export default function SalesPanel() {
                 </div>
                 
                 {/* Date Filter */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                   <input 
                     type="date"
                     value={leadFilterStartDate}
                     onChange={(e) => setLeadFilterStartDate(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-600 focus:outline-none focus:border-eminence-gold"
+                    className="border border-gray-300 rounded px-2 py-1.5 text-xs sm:text-sm text-gray-600 focus:outline-none focus:border-eminence-gold"
                     title="Start Date (Created At)"
                   />
-                  <span className="text-gray-400 text-sm">to</span>
+                  <span className="text-gray-400 text-xs sm:text-sm">to</span>
                   <input 
                     type="date"
                     value={leadFilterEndDate}
                     onChange={(e) => setLeadFilterEndDate(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1.5 text-sm text-gray-600 focus:outline-none focus:border-eminence-gold"
+                    className="border border-gray-300 rounded px-2 py-1.5 text-xs sm:text-sm text-gray-600 focus:outline-none focus:border-eminence-gold"
                     title="End Date (Created At)"
                   />
                   {(leadFilterStartDate || leadFilterEndDate) && (
@@ -1544,73 +1544,73 @@ export default function SalesPanel() {
       </div>
 
 
-      {/* LEAD DETAIL & CALLING MODAL */}
+      {/* LEAD DETAILS / CALL LOG MODAL */}
       {selectedLead && (
-        <div className="fixed inset-0 z-[999] flex items-start justify-center p-4 pt-32 overflow-y-auto bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div className="absolute inset-0" onClick={() => !callingMode && setSelectedLead(null)} />
 
-          <div className="relative bg-gray-50 w-full max-w-5xl mb-8 rounded-xl shadow-2xl flex flex-col overflow-hidden">
+          <div className="relative bg-gray-50 w-full max-w-5xl my-auto rounded-xl shadow-2xl flex flex-col max-h-[92vh] overflow-hidden">
 
             {/* Modal Header */}
-            <div className="bg-white px-6 py-4 border-b flex justify-between items-center shrink-0">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-eminence-gold/10 text-eminence-gold rounded-full flex items-center justify-center font-bold text-xl">
+            <div className="bg-white px-4 sm:px-6 py-3 sm:py-4 border-b flex flex-wrap justify-between items-center gap-3 shrink-0">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-eminence-gold/10 text-eminence-gold rounded-full flex items-center justify-center font-bold text-lg sm:text-xl shrink-0">
                   {selectedLead.name.charAt(0)}
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-bold text-gray-900">{selectedLead.name}</h2>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className="text-base sm:text-xl font-bold text-gray-900">{selectedLead.name}</h2>
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${STATUS_COLORS[selectedLead.status]}`}>
                       {selectedLead.status}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">{selectedLead.lead_number || "LD-NEW"} • Created {new Date(selectedLead.created_at).toLocaleDateString()}</p>
+                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5">{selectedLead.lead_number || "LD-NEW"} • Created {new Date(selectedLead.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
 
               {!callingMode ? (
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                   <button
                     onClick={() => openEditModal(selectedLead)}
-                    className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded font-medium hover:bg-gray-200 transition-colors shadow-sm"
+                    className="flex items-center gap-1.5 bg-gray-100 text-gray-700 px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm font-medium hover:bg-gray-200 transition-colors shadow-sm"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDeleteLead(selectedLead)}
-                    className="flex items-center gap-1.5 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-600 hover:text-white px-3.5 py-2 rounded font-medium transition-all shadow-sm"
+                    className="flex items-center gap-1 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-600 hover:text-white px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded text-xs sm:text-sm font-medium transition-all shadow-sm"
                     title="Delete Lead"
                   >
-                    <Trash2 size={16} /> Delete
+                    <Trash2 size={14} /> <span className="hidden sm:inline">Delete</span>
                   </button>
                   <button
                     onClick={() => startCall()}
-                    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                    className="flex items-center gap-1.5 bg-blue-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded text-xs sm:text-sm font-medium hover:bg-blue-700 transition-colors shadow-sm"
                   >
-                    <Phone size={18} /> Initiate Call
+                    <Phone size={14} /> Initiate Call
                   </button>
-                  <button onClick={() => setSelectedLead(null)} className="text-gray-400 hover:text-gray-700">
-                    <XCircle size={24} />
+                  <button onClick={() => setSelectedLead(null)} className="text-gray-400 hover:text-gray-700 p-1">
+                    <XCircle size={20} />
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2 sm:gap-4">
                   {callActive ? (
                     <>
-                      <div className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded font-bold border border-red-200 shadow-inner uppercase text-sm">
+                      <div className="flex items-center gap-2 bg-red-50 text-red-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded font-bold border border-red-200 shadow-inner uppercase text-xs sm:text-sm">
                         <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
-                        On Active Call...
+                        Active Call...
                       </div>
                       <button 
                         onClick={endCall} 
-                        className="bg-red-600 text-white px-6 py-2 rounded font-bold hover:bg-red-700 shadow-md transition-all flex items-center gap-2"
+                        className="bg-red-600 text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded font-bold hover:bg-red-700 shadow-md transition-all flex items-center gap-1.5 text-xs sm:text-sm"
                       >
-                        <CheckCircle2 size={18} /> Call Done
+                        <CheckCircle2 size={16} /> Done
                       </button>
                     </>
                   ) : (
-                    <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-4 py-2 rounded font-bold border border-emerald-200 uppercase text-sm">
-                      <CheckCircle2 size={16} /> Call Completed
+                    <div className="flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded font-bold border border-emerald-200 uppercase text-xs sm:text-sm">
+                      <CheckCircle2 size={16} /> Completed
                     </div>
                   )}
                 </div>
@@ -1618,10 +1618,10 @@ export default function SalesPanel() {
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 flex overflow-hidden">
+            <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
 
               {/* Left Column - Main Details */}
-              <div className="flex-1 overflow-y-auto p-6 bg-white border-r">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-white border-b lg:border-b-0 lg:border-r">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b pb-2">Overview Information</h3>
 
                 <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-8">
@@ -1714,7 +1714,7 @@ export default function SalesPanel() {
               </div>
 
               {/* Right Column - Action / System */}
-              <div className="w-96 bg-gray-50 overflow-y-auto flex flex-col">
+              <div className="w-full lg:w-96 bg-gray-50 overflow-y-auto flex flex-col">
 
                 {callingMode ? (
                   <div className={`p-6 bg-white border-b-4 ${callActive ? 'border-gray-200 opacity-50' : 'border-blue-500'} h-full transition-opacity`}>
@@ -2194,20 +2194,20 @@ export default function SalesPanel() {
 
       {/* ADD LEAD MODAL */}
       {showAddLeadModal && (
-        <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-32 overflow-y-auto bg-black/60 backdrop-blur-md">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20">
-            <div className="bg-gray-900 px-8 py-6 flex justify-between items-center">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-black/60 backdrop-blur-md">
+          <div className="bg-white w-full max-w-2xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20 max-h-[90vh] flex flex-col">
+            <div className="bg-gray-900 px-6 sm:px-8 py-4 sm:py-6 flex justify-between items-center shrink-0">
               <div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Add New Lead</h3>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Manual Entry System</p>
+                <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">Add New Lead</h3>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Manual Entry System</p>
               </div>
-              <button onClick={() => setShowAddLeadModal(false)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all">
-                <XCircle size={20} />
+              <button onClick={() => setShowAddLeadModal(false)} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all">
+                <XCircle size={18} />
               </button>
             </div>
             
-            <form onSubmit={handleAddLead} className="p-8">
-              <div className="grid grid-cols-2 gap-6">
+            <form onSubmit={handleAddLead} className="p-4 sm:p-8 overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Full Name *</label>
                   <input
@@ -2289,7 +2289,7 @@ export default function SalesPanel() {
                     <option value="Google Ads">Google Ads</option>
                   </select>
                 </div>
-                <div>
+                <div className="col-span-1 sm:col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">City</label>
                   <input
                     type="text"
@@ -2299,7 +2299,7 @@ export default function SalesPanel() {
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-1 sm:col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Consulted By</label>
                   <select
                     value={newLeadForm.consulted_by || ""}
@@ -2314,7 +2314,7 @@ export default function SalesPanel() {
                     ))}
                   </select>
                 </div>
-                <div className="col-span-2 flex items-center gap-3 pt-1">
+                <div className="col-span-1 sm:col-span-2 flex items-center gap-3 pt-1">
                   <label className="relative flex items-center cursor-pointer">
                     <input
                       type="checkbox"
@@ -2332,7 +2332,7 @@ export default function SalesPanel() {
                     <span className="ml-3 text-xs font-bold text-gray-700 uppercase tracking-wider">Repeated Customer</span>
                   </label>
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-1 sm:col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hair Condition</label>
                   <input
                     type="text"
@@ -2342,7 +2342,7 @@ export default function SalesPanel() {
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
                 </div>
-                <div className="col-span-2">
+                <div className="col-span-1 sm:col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Notes</label>
                   <textarea
                     value={newLeadForm.notes}
@@ -2353,17 +2353,17 @@ export default function SalesPanel() {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-8">
+              <div className="flex gap-4 pt-6 sm:pt-8">
                 <button
                   type="button"
                   onClick={() => setShowAddLeadModal(false)}
-                  className="flex-1 px-6 py-4 text-xs font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all uppercase tracking-widest"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all uppercase tracking-widest"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-4 text-xs font-bold text-white bg-gray-900 rounded-xl hover:premium-gradient transition-all uppercase tracking-widest shadow-lg hover:shadow-xl"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-white bg-gray-900 rounded-xl hover:premium-gradient transition-all uppercase tracking-widest shadow-lg hover:shadow-xl"
                 >
                   Create Lead
                 </button>
@@ -2375,20 +2375,20 @@ export default function SalesPanel() {
 
       {/* EDIT LEAD MODAL */}
       {showEditLeadModal && editLeadForm && (
-        <div className="fixed inset-0 z-[1000] flex items-start justify-center p-4 pt-32 overflow-y-auto bg-black/60 backdrop-blur-md">
-          <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20">
-            <div className="bg-gray-900 px-8 py-6 flex justify-between items-center">
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-black/60 backdrop-blur-md">
+          <div className="bg-white w-full max-w-2xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20 max-h-[90vh] flex flex-col">
+            <div className="bg-gray-900 px-6 sm:px-8 py-4 sm:py-6 flex justify-between items-center shrink-0">
               <div>
-                <h3 className="text-xl font-bold text-white tracking-tight">Edit Lead</h3>
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Updating client records</p>
+                <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">Edit Lead</h3>
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">Updating client records</p>
               </div>
-              <button onClick={() => setShowEditLeadModal(false)} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all">
-                <XCircle size={20} />
+              <button onClick={() => setShowEditLeadModal(false)} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/20 transition-all">
+                <XCircle size={18} />
               </button>
             </div>
             
-            <form onSubmit={handleEditLead} className="p-8">
-              <div className="grid grid-cols-2 gap-6">
+            <form onSubmit={handleEditLead} className="p-4 sm:p-8 overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Full Name *</label>
                   <input
@@ -2618,7 +2618,7 @@ export default function SalesPanel() {
                   </>
                 )}
 
-                <div className="col-span-2">
+                <div className="col-span-1 sm:col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hair Condition</label>
                   <input
                     type="text"
@@ -2630,17 +2630,17 @@ export default function SalesPanel() {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-8">
+              <div className="flex gap-4 pt-6 sm:pt-8">
                 <button
                   type="button"
                   onClick={() => setShowEditLeadModal(false)}
-                  className="flex-1 px-6 py-4 text-xs font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all uppercase tracking-widest"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all uppercase tracking-widest"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-4 text-xs font-bold text-white bg-gray-900 rounded-xl hover:premium-gradient transition-all uppercase tracking-widest shadow-lg hover:shadow-xl"
+                  className="flex-1 px-4 sm:px-6 py-3 sm:py-4 text-xs font-bold text-white bg-gray-900 rounded-xl hover:premium-gradient transition-all uppercase tracking-widest shadow-lg hover:shadow-xl"
                 >
                   Save Changes
                 </button>

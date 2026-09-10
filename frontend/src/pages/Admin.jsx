@@ -1399,7 +1399,7 @@ export default function Admin() {
   };
 
   return (
-    <div className="max-w-[1500px] mx-auto px-6 lg:px-12 py-20" data-testid="admin-page">
+    <div className="max-w-[1500px] mx-auto px-3 sm:px-6 lg:px-12 py-12 sm:py-20" data-testid="admin-page">
       {/* Clean Premium Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 pb-6 border-b border-gray-200">
         <div>
@@ -1413,7 +1413,7 @@ export default function Admin() {
               </span>
             )}
           </div>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
             {isSuperAdmin ? "Super Admin Dashboard" : t("adminDashboard")}
           </h1>
           <p className="text-gray-500 text-sm mt-1">
@@ -1422,7 +1422,7 @@ export default function Admin() {
         </div>
       </div>
 
-      <div className="flex gap-1.5 flex-wrap mb-8 bg-gray-100/80 p-1.5 rounded-2xl w-full border border-gray-200 shadow-inner relative z-30 items-center">
+      <div className="flex gap-1.5 flex-nowrap sm:flex-wrap overflow-x-auto pb-2 sm:pb-0 mb-8 bg-gray-100/80 p-1.5 rounded-2xl w-full border border-gray-200 shadow-inner relative z-30 items-center no-scrollbar">
 
         {/* DASHBOARD SCHEDULER */}
         {canAccess("dashboard") && (
