@@ -180,7 +180,7 @@ def find_existing_lead(phone: str):
     if not clean_digits or len(clean_digits) < 5:
         return None
         
-    variations = set([phone_str])
+    variations = set([phone_str, clean_digits, f"+{clean_digits}"])
     if len(clean_digits) >= 10:
         last10 = clean_digits[-10:]
         variations.update([
@@ -193,30 +193,41 @@ def find_existing_lead(phone: str):
             f"+91-{last10}",
             f"{last10[:5]} {last10[5:]}",
             f"+91 {last10[:5]} {last10[5:]}",
+            f"91 {last10}",
+            f"0{last10[:5]} {last10[5:]}",
+            f"0{last10[:5]}-{last10[5:]}",
         ])
     else:
         variations.update([clean_digits, f"+{clean_digits}"])
         
-    var_list = list(variations)[:30]
+    var_list = list(variations)
     
-    # 1. Try fast Firestore 'in' query
-    try:
-        docs = list(db.collection("leads").where("phone", "in", var_list).limit(1).stream())
-        if docs:
-            return docs[0]
-    except Exception as e:
-        logger.warning(f"find_existing_lead 'in' query failed: {e}")
+    # 1. Try batch 'in' queries on phone (Firestore supports up to 30 items per 'in' query)
+    for i in range(0, len(var_list), 30):
+        chunk = var_list[i:i+30]
+        try:
+            docs = list(db.collection("leads").where("phone", "in", chunk).limit(1).stream())
+            if docs:
+                return docs[0]
+        except Exception as e:
+            logger.warning(f"find_existing_lead phone 'in' query failed: {e}")
         
-    # 2. Try secondary_phone
-    try:
-        docs = list(db.collection("leads").where("secondary_phone", "in", var_list).limit(1).stream())
-        if docs:
-            return docs[0]
-    except Exception:
-        pass
+    # 2. Try batch 'in' queries on secondary_phone
+    for i in range(0, len(var_list), 30):
+        chunk = var_list[i:i+30]
+        try:
+            docs = list(db.collection("leads").where("secondary_phone", "in", chunk).limit(1).stream())
+            if docs:
+                return docs[0]
+        except Exception:
+            pass
         
-    # 3. Fallback: single equality queries
-    for v in [phone_str, f"+{clean_digits}", clean_digits, f"+91{clean_digits[-10:]}" if len(clean_digits) >= 10 else clean_digits]:
+    # 3. Direct equality queries on prominent variations
+    core_checks = [phone_str, clean_digits, f"+{clean_digits}"]
+    if len(clean_digits) >= 10:
+        last10 = clean_digits[-10:]
+        core_checks.extend([last10, f"+91{last10}", f"91{last10}", f"0{last10}"])
+    for v in core_checks:
         try:
             docs = list(db.collection("leads").where("phone", "==", v).limit(1).stream())
             if docs:
@@ -2682,21 +2693,8 @@ def webhook_meta_sync(key: Optional[str] = None):
                     
                 phone_clean = "".join(filter(str.isdigit, phone))
                 
-                # Check for existing
-                existing = False
-                docs1 = db.collection("leads").where("phone", "==", phone).get()
-                if docs1:
-                    existing = True
-                else:
-                    docs2 = db.collection("leads").where("phone", "==", f"+{phone_clean}").get()
-                    if docs2:
-                        existing = True
-                    else:
-                        docs3 = db.collection("leads").where("phone", "==", phone_clean).get()
-                        if docs3:
-                            existing = True
-                            
-                if not existing:
+                existing_doc = find_existing_lead(phone)
+                if not existing_doc:
                     next_sales = get_next_salesperson()
                     assigned_to = next_sales["id"] if next_sales else None
                     assigned_to_name = next_sales["name"] if next_sales else None
