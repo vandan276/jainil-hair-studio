@@ -159,6 +159,7 @@ export default function SalesPanel() {
   const [employeesLoading, setEmployeesLoading] = useState(false);
   const [visitForm, setVisitForm] = useState({ liked: null, serviceDays: 10, note: "" });
 
+  const [salesEmployees, setSalesEmployees] = useState([]);
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [newLeadForm, setNewLeadForm] = useState({
     name: "",
@@ -170,7 +171,9 @@ export default function SalesPanel() {
     grade: "Cold",
     city: "",
     hair_condition: "",
-    notes: ""
+    notes: "",
+    is_repeated: false,
+    consulted_by: ""
   });
 
   // Retargeting States
@@ -206,6 +209,17 @@ export default function SalesPanel() {
     }
   }, [user, nav]);
 
+  const fetchSalesEmployees = useCallback(async () => {
+    try {
+      const res = await api.get("/admin/employees");
+      // Include all sales employees as well as admins if applicable
+      const sales = res.data.filter(e => e.role === "sales" || e.role === "employee" || e.role === "admin");
+      setSalesEmployees(sales);
+    } catch (err) {
+      console.error("Failed to load employees:", err);
+    }
+  }, []);
+
   const fetchLeads = useCallback(async () => {
     try {
       const res = await api.get("/leads");
@@ -232,6 +246,10 @@ export default function SalesPanel() {
       toast.error("Failed to load CRM stats");
     }
   }, [dashboardDate, dashboardPeriod, resultsDate, resultsPeriod, dashboardStartDate, dashboardEndDate, resultsStartDate, resultsEndDate]);
+
+  useEffect(() => {
+    fetchSalesEmployees();
+  }, [fetchSalesEmployees]);
 
   useEffect(() => {
     fetchLeads();
@@ -277,7 +295,11 @@ export default function SalesPanel() {
     if (leadToCall) setSelectedLead(leadToCall);
     setCallingMode(true);
     setCallActive(false);
-    setCallForm(prev => ({ ...prev, grade: (leadToCall || selectedLead)?.grade || "" }));
+    setCallForm(prev => ({
+      ...prev,
+      grade: target?.grade || "",
+      consultedBy: target?.consulted_by || target?.assigned_to_name || (user?.role === "sales" ? user?.name : "") || ""
+    }));
   };
 
   const triggerActualCall = () => {
@@ -532,7 +554,9 @@ export default function SalesPanel() {
         grade: "Cold",
         city: "",
         hair_condition: "",
-        notes: ""
+        notes: "",
+        is_repeated: false,
+        consulted_by: ""
       });
       fetchLeads();
       fetchStats();
@@ -569,6 +593,8 @@ export default function SalesPanel() {
       source: lead.source || "Manual",
       city: lead.city || "",
       hair_condition: lead.hair_condition || "",
+      is_repeated: lead.is_repeated || false,
+      consulted_by: lead.consulted_by || "",
       status: lead.status,
       grade: lead.grade,
       follow_up_date: lead.follow_up_date || "",
@@ -1392,6 +1418,11 @@ export default function SalesPanel() {
                           <div>
                             <div className="flex items-center gap-2">
                               <span className="font-bold text-gray-900 text-base group-hover:text-eminence-gold transition-colors">{lead.name}</span>
+                              {lead.is_repeated && (
+                                <span className="bg-purple-100 text-purple-700 text-[9px] font-bold px-1.5 py-0.5 rounded border border-purple-200 uppercase tracking-wider" title="Repeated Customer">
+                                  Repeated
+                                </span>
+                              )}
                               {lead.is_transferred && (
                                 <div className="bg-purple-50 text-purple-600 p-1 rounded-full border border-purple-100" title={`Transferred from ${lead.transferred_from_name}`}>
                                   <ArrowRightLeft size={10} />
@@ -1483,6 +1514,11 @@ export default function SalesPanel() {
                           <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
                             {lead.branch} • {lead.section}
                           </div>
+                          {(lead.consulted_by || lead.assigned_to_name) && (
+                            <div className="text-[10px] text-eminence-gold font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1">
+                              <span>By:</span> {lead.consulted_by || lead.assigned_to_name}
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -1623,6 +1659,29 @@ export default function SalesPanel() {
                   </div>
 
                   <div>
+                    <label className="text-xs text-gray-400 uppercase tracking-wide">Consulted By</label>
+                    <p className="font-semibold text-gray-800 mt-1 flex items-center gap-1.5">
+                      <User size={14} className="text-eminence-gold" />
+                      {selectedLead.consulted_by || selectedLead.assigned_to_name || "Not Assigned"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-400 uppercase tracking-wide">Customer Type</label>
+                    <p className="mt-1">
+                      {selectedLead.is_repeated ? (
+                        <span className="bg-purple-100 text-purple-800 border border-purple-200 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1">
+                          ★ Repeated Customer
+                        </span>
+                      ) : (
+                        <span className="bg-gray-100 text-gray-600 border border-gray-200 text-xs font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-flex items-center gap-1">
+                          New Client
+                        </span>
+                      )}
+                    </p>
+                  </div>
+
+                  <div>
                     <label className="text-xs text-gray-400 uppercase tracking-wide">Total Paid / Pending</label>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-emerald-700 font-bold text-sm bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
@@ -1729,14 +1788,22 @@ export default function SalesPanel() {
                         {callOutcome === "Visited" && (
                           <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-5 shadow-sm">
                             <label className="block text-sm font-bold text-blue-800 mb-2">Consulted By *</label>
-                            <input
-                              type="text"
+                            <select
                               required
-                              placeholder="Enter employee name"
-                              value={callForm.consultedBy}
+                              value={callForm.consultedBy || ""}
                               onChange={e => setCallForm({ ...callForm, consultedBy: e.target.value })}
-                              className="w-full border-blue-200 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500"
-                            />
+                              className="w-full border-blue-200 rounded-lg p-2.5 bg-white text-sm focus:ring-blue-500 focus:border-blue-500 font-medium"
+                            >
+                              <option value="">Select Sales Employee</option>
+                              {salesEmployees.map(emp => (
+                                <option key={emp.id} value={emp.name || emp.full_name}>
+                                  {emp.name || emp.full_name} ({emp.branch || 'Branch'} - {emp.section || 'All'})
+                                </option>
+                              ))}
+                              {callForm.consultedBy && !salesEmployees.some(emp => (emp.name || emp.full_name) === callForm.consultedBy) && (
+                                <option value={callForm.consultedBy}>{callForm.consultedBy}</option>
+                              )}
+                            </select>
                           </div>
                         )}
 
@@ -2221,6 +2288,32 @@ export default function SalesPanel() {
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
                 </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Consulted By</label>
+                  <select
+                    value={newLeadForm.consulted_by || ""}
+                    onChange={e => setNewLeadForm({...newLeadForm, consulted_by: e.target.value})}
+                    className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
+                  >
+                    <option value="">Select Sales Employee (Optional)</option>
+                    {salesEmployees.map(emp => (
+                      <option key={emp.id} value={emp.name || emp.full_name}>
+                        {emp.name || emp.full_name} ({emp.branch || 'Branch'} - {emp.section || 'All'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-3 pt-4">
+                  <label className="relative flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={newLeadForm.is_repeated || false}
+                      onChange={e => setNewLeadForm({...newLeadForm, is_repeated: e.target.checked})}
+                      className="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer"
+                    />
+                    <span className="ml-3 text-xs font-bold text-gray-700 uppercase tracking-wider">Repeated Customer</span>
+                  </label>
+                </div>
                 <div className="col-span-2">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hair Condition</label>
                   <input
@@ -2379,6 +2472,32 @@ export default function SalesPanel() {
                     placeholder="e.g. Vadodara"
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Consulted By</label>
+                  <select
+                    value={editLeadForm.consulted_by || ""}
+                    onChange={e => setEditLeadForm({...editLeadForm, consulted_by: e.target.value})}
+                    className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none appearance-none transition-all"
+                  >
+                    <option value="">Select Sales Employee (Optional)</option>
+                    {salesEmployees.map(emp => (
+                      <option key={emp.id} value={emp.name || emp.full_name}>
+                        {emp.name || emp.full_name} ({emp.branch || 'Branch'} - {emp.section || 'All'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex items-center gap-3 pt-4">
+                  <label className="relative flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={editLeadForm.is_repeated || false}
+                      onChange={e => setEditLeadForm({...editLeadForm, is_repeated: e.target.checked})}
+                      className="w-5 h-5 rounded border-gray-300 text-gray-900 focus:ring-gray-900 cursor-pointer"
+                    />
+                    <span className="ml-3 text-xs font-bold text-gray-700 uppercase tracking-wider">Repeated Customer</span>
+                  </label>
                 </div>
                 {editLeadForm.status === "token received" && (
                   <>

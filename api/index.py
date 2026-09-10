@@ -594,9 +594,9 @@ class LeadUpdate(BaseModel):
     converted_date: Optional[str] = None
     token_received_date: Optional[str] = None
     is_favorite: Optional[bool] = None
-    hair_condition: Optional[str] = None
+    is_repeated: Optional[bool] = None
+    consulted_by: Optional[str] = None
     packages: Optional[List[dict]] = None
-    total_sale_amount: Optional[float] = None
     gender: Optional[str] = None
     dob: Optional[str] = None
     anniversary: Optional[str] = None
@@ -632,6 +632,8 @@ class LeadIn(BaseModel):
     city: Optional[str] = None
     hair_condition: Optional[str] = None
     is_client: Optional[bool] = False
+    is_repeated: Optional[bool] = False
+    consulted_by: Optional[str] = None
     status: Optional[str] = "new"
     gender: Optional[str] = "—"
     email: Optional[str] = "—"
@@ -2212,6 +2214,10 @@ def create_lead(data: LeadIn, user: dict = Depends(require_employee)):
                 update_payload["city"] = data.city
             if data.hair_condition:
                 update_payload["hair_condition"] = data.hair_condition
+            if data.is_repeated is not None:
+                update_payload["is_repeated"] = data.is_repeated
+            if data.consulted_by:
+                update_payload["consulted_by"] = data.consulted_by
             if data.notes:
                 note = {"text": data.notes, "author": user.get("name", "System"), "timestamp": now_iso()}
                 update_payload["notes"] = firestore.ArrayUnion([note])
@@ -2253,6 +2259,8 @@ def create_lead(data: LeadIn, user: dict = Depends(require_employee)):
         "campaign": data.campaign or "",
         "status": status,
         "is_client": is_client,
+        "is_repeated": bool(data.is_repeated),
+        "consulted_by": data.consulted_by or "",
         "grade": data.grade or "Cold",
         "city": data.city or "",
         "hair_condition": data.hair_condition or "",
@@ -2903,6 +2911,8 @@ def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employe
     if data.pending_payment is not None: update_data["pending_payment"] = data.pending_payment
     if data.converted_date is not None: update_data["converted_date"] = data.converted_date
     if data.token_received_date is not None: update_data["token_received_date"] = data.token_received_date
+    if data.is_repeated is not None: update_data["is_repeated"] = data.is_repeated
+    if data.consulted_by is not None: update_data["consulted_by"] = data.consulted_by
     
     doc_ref.update(update_data)
     return doc_ref.get().to_dict()
