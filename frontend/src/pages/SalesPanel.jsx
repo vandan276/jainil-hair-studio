@@ -1747,7 +1747,7 @@ export default function SalesPanel() {
               </div>
 
               {/* Right Column - Action / System (Always visible on desktop, toggleable on mobile if in callingMode) */}
-              <div className={`w-full md:max-w-md shrink-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200 ${
+              <div className={`w-full md:w-2/5 shrink-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200 ${
                 callingMode && leadModalTab === "info" ? "hidden md:flex" : "flex"
               }`}>
 
