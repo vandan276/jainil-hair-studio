@@ -133,6 +133,7 @@ export default function SalesPanel() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [callingMode, setCallingMode] = useState(false);
   const [callActive, setCallActive] = useState(false); // is the call actually running?
+  const [leadModalTab, setLeadModalTab] = useState("info"); // 'info' | 'call' for mobile view
   const [callOutcome, setCallOutcome] = useState("Interested (Follow-up)");
   const [callForm, setCallForm] = useState({ 
     comment: "", 
@@ -295,6 +296,7 @@ export default function SalesPanel() {
     if (leadToCall) setSelectedLead(leadToCall);
     setCallingMode(true);
     setCallActive(false);
+    setLeadModalTab("call"); // On mobile: auto-switch to call tab
     setCallForm(prev => ({
       ...prev,
       grade: target?.grade || "",
@@ -433,6 +435,7 @@ export default function SalesPanel() {
 
       setCallingMode(false);
       setCallActive(false);
+      setLeadModalTab("info"); // Reset tab for next open
       callDurationRef.current = 0;
       setCallForm({ comment: "", grade: "", nextDate: "", nextTime: "", convertedDate: new Date().toISOString().split("T")[0], tokenReceivedDate: new Date().toISOString().split("T")[0], saleAmount: "", pendingAmount: "", paymentMode: "UPI", consultedBy: "" });
       setSelectedLead(null);
@@ -1617,11 +1620,41 @@ export default function SalesPanel() {
               )}
             </div>
 
-            {/* Modal Body */}
+            {/* Mobile Tab Switcher (Visible only on small mobile screens when callingMode is active) */}
+            {callingMode && (
+              <div className="flex md:hidden bg-gray-100 p-1 border-b border-gray-200 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setLeadModalTab("info")}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    leadModalTab === "info"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  <User size={14} /> Lead Overview & History
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLeadModalTab("call")}
+                  className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+                    leadModalTab === "call"
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  <Phone size={14} /> Call Outcome
+                </button>
+              </div>
+            )}
+
+            {/* Modal Body - Always Side by Side on Tablet & Desktop (md:flex-row) */}
             <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden bg-white">
 
-              {/* Left Column - Main Details */}
-              <div className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 bg-white border-b md:border-b-0 md:border-r border-gray-200 ${callingMode ? 'hidden md:block' : 'block'}`}>
+              {/* Left Column - Main Details (Always visible on desktop, toggleable on mobile if in callingMode) */}
+              <div className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 bg-white border-b md:border-b-0 md:border-r border-gray-200 ${
+                callingMode && leadModalTab === "call" ? "hidden md:block" : "block"
+              }`}>
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b pb-2">Overview Information</h3>
 
                 <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-8">
@@ -1713,8 +1746,10 @@ export default function SalesPanel() {
                 </div>
               </div>
 
-              {/* Right Column - Action / System */}
-              <div className="w-full md:w-[400px] lg:w-[430px] shrink-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200">
+              {/* Right Column - Action / System (Always visible on desktop, toggleable on mobile if in callingMode) */}
+              <div className={`w-full md:w-[420px] lg:w-[460px] shrink-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200 ${
+                callingMode && leadModalTab === "info" ? "hidden md:flex" : "flex"
+              }`}>
 
                 {callingMode ? (
                   <div className={`p-5 sm:p-6 bg-white border-b-4 ${callActive ? 'border-gray-200 opacity-50' : 'border-blue-500'} min-h-full transition-opacity flex flex-col`}>
@@ -1732,7 +1767,7 @@ export default function SalesPanel() {
                           </button>
                         )}
                         <button 
-                          onClick={() => { setCallingMode(false); setCallActive(false); }}
+                          onClick={() => { setCallingMode(false); setCallActive(false); setLeadModalTab("info"); }}
                           className="bg-gray-100 text-gray-400 p-2 rounded-lg hover:bg-gray-200 hover:text-gray-600 transition-all"
                         >
                           <XCircle size={14} />
