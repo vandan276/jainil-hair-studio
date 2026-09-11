@@ -1552,7 +1552,7 @@ export default function SalesPanel() {
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
           <div className="absolute inset-0" onClick={() => !callingMode && setSelectedLead(null)} />
 
-          <div className="relative bg-white w-[96vw] max-w-6xl my-auto rounded-2xl shadow-2xl flex flex-col h-[90vh] max-h-[90vh] overflow-hidden border border-gray-200">
+          <div className="relative bg-white w-full max-w-6xl mx-auto my-auto rounded-2xl shadow-2xl flex flex-col h-[90vh] max-h-[90vh] overflow-hidden border border-gray-200">
 
             {/* Modal Header */}
             <div className="bg-white px-4 sm:px-6 py-3.5 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3 shrink-0">
