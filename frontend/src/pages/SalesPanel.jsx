@@ -1657,7 +1657,7 @@ export default function SalesPanel() {
                 style={{
                   flex: 1,
                   minWidth: 0,
-                  display: callingMode && leadModalTab === 'call' ? 'none' : 'flex',
+                  display: (window.innerWidth >= 768 || !(callingMode && leadModalTab === 'call')) ? 'flex' : 'none',
                   flexDirection: 'column',
                   borderRight: '1px solid #e5e7eb',
                 }}
@@ -1761,7 +1761,7 @@ export default function SalesPanel() {
                   minWidth: '320px',
                   maxWidth: '45%',
                   flexShrink: 0,
-                  display: callingMode && leadModalTab === 'info' ? 'none' : 'flex',
+                  display: (window.innerWidth >= 768 || !(callingMode && leadModalTab === 'info')) ? 'flex' : 'none',
                   flexDirection: 'column',
                   borderLeft: '1px solid #e5e7eb',
                 }}
