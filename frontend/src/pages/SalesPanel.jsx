@@ -1747,7 +1747,7 @@ export default function SalesPanel() {
               </div>
 
               {/* Right Column - Action / System (Always visible on desktop, toggleable on mobile if in callingMode) */}
-              <div className={`w-full md:w-2/5 shrink-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200 ${
+              <div className={`w-full md:w-2/5 shrink-0 min-w-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200 ${
                 callingMode && leadModalTab === "info" ? "hidden md:flex" : "flex"
               }`}>
 
@@ -1979,8 +1979,8 @@ export default function SalesPanel() {
                                   </span>
                                 )}
                               </div>
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
+                              <div className="flex flex-wrap gap-3">
+                                <div className="flex-1 min-w-[140px]">
                                   <input
                                     type="date"
                                     value={callForm.nextDate}
@@ -1988,7 +1988,7 @@ export default function SalesPanel() {
                                     className="w-full border border-emerald-200 rounded-lg p-2.5 text-xs bg-white focus:ring-2 focus:ring-emerald-500 focus:outline-none"
                                   />
                                 </div>
-                                <div>
+                                <div className="flex-1 min-w-[140px]">
                                   <select
                                     value={callForm.nextTime}
                                     onChange={e => setCallForm({ ...callForm, nextTime: e.target.value })}
@@ -2023,11 +2023,11 @@ export default function SalesPanel() {
                         ></textarea>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto pt-5 pb-1 sticky -bottom-5 sm:-bottom-6 bg-white z-10 border-t border-gray-100">
+                      <div className="flex flex-wrap gap-3 mt-auto pt-5 pb-1 sticky -bottom-5 sm:-bottom-6 bg-white z-10 border-t border-gray-100">
                         <button 
                           type="submit" 
                           disabled={callActive}
-                          className="w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none"
+                          className="flex-1 min-w-[200px] w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none"
                         >
                           Save Log & Update
                         </button>
@@ -2035,9 +2035,9 @@ export default function SalesPanel() {
                           type="button" 
                           disabled={callActive}
                           onClick={(e) => saveCallLog(e, true)}
-                          className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none flex items-center justify-center gap-1.5"
+                          className="flex-1 min-w-[220px] w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none flex items-center justify-center gap-1.5 whitespace-normal"
                         >
-                          <MessageSquare size={15} /> {["Token Received", "Converted"].includes(callOutcome) ? "Save & Share Invoice" : "Save & Share on WhatsApp"}
+                          <MessageSquare size={15} className="shrink-0" /> <span>{["Token Received", "Converted"].includes(callOutcome) ? "Save & Share Invoice" : "Save & Share on WhatsApp"}</span>
                         </button>
                       </div>
                     </form>
