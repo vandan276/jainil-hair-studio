@@ -1648,13 +1648,20 @@ export default function SalesPanel() {
               </div>
             )}
 
-            {/* Modal Body - Always Side by Side on Tablet & Desktop (md:flex-row) */}
-            <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden bg-white">
+            {/* Modal Body - Always Side by Side on Tablet & Desktop */}
+            <div className="flex-1 min-h-0 overflow-hidden bg-white" style={{display: 'flex', flexDirection: 'row'}}>
 
-              {/* Left Column - Main Details (Always visible on desktop, toggleable on mobile if in callingMode) */}
-              <div className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex-col ${
-                callingMode && leadModalTab === "call" ? "hidden md:flex" : "flex"
-              }`}>
+              {/* Left Column - Main Details */}
+              <div
+                className="overflow-y-auto p-4 bg-white border-gray-200"
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  display: callingMode && leadModalTab === 'call' ? 'none' : 'flex',
+                  flexDirection: 'column',
+                  borderRight: '1px solid #e5e7eb',
+                }}
+              >
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b pb-2">Overview Information</h3>
 
                 <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-8">
@@ -1746,10 +1753,19 @@ export default function SalesPanel() {
                 </div>
               </div>
 
-              {/* Right Column - Action / System (Always visible on desktop, toggleable on mobile if in callingMode) */}
-              <div className={`w-full md:w-2/5 shrink-0 min-w-0 bg-gray-50 overflow-y-auto flex flex-col border-t md:border-t-0 border-gray-200 ${
-                callingMode && leadModalTab === "info" ? "hidden md:flex" : "flex"
-              }`}>
+              {/* Right Column - Action / System */}
+              <div
+                className="overflow-y-auto bg-gray-50"
+                style={{
+                  width: '420px',
+                  minWidth: '320px',
+                  maxWidth: '45%',
+                  flexShrink: 0,
+                  display: callingMode && leadModalTab === 'info' ? 'none' : 'flex',
+                  flexDirection: 'column',
+                  borderLeft: '1px solid #e5e7eb',
+                }}
+              >
 
                 {callingMode ? (
                   <div className={`p-5 sm:p-6 bg-white flex-1 transition-opacity flex flex-col ${callActive ? 'opacity-50' : ''}`}>
