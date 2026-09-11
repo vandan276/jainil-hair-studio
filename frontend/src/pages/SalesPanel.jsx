@@ -1652,8 +1652,8 @@ export default function SalesPanel() {
             <div className="flex-1 flex flex-col md:flex-row min-h-0 overflow-hidden bg-white">
 
               {/* Left Column - Main Details (Always visible on desktop, toggleable on mobile if in callingMode) */}
-              <div className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 bg-white border-b md:border-b-0 md:border-r border-gray-200 ${
-                callingMode && leadModalTab === "call" ? "hidden md:block" : "block"
+              <div className={`flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 bg-white border-b md:border-b-0 md:border-r border-gray-200 flex-col ${
+                callingMode && leadModalTab === "call" ? "hidden md:flex" : "flex"
               }`}>
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b pb-2">Overview Information</h3>
 
@@ -1752,7 +1752,7 @@ export default function SalesPanel() {
               }`}>
 
                 {callingMode ? (
-                  <div className={`p-5 sm:p-6 bg-white border-b-4 ${callActive ? 'border-gray-200 opacity-50' : 'border-blue-500'} min-h-full transition-opacity flex flex-col`}>
+                  <div className={`p-5 sm:p-6 bg-white flex-1 transition-opacity flex flex-col ${callActive ? 'opacity-50' : ''}`}>
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="font-bold text-gray-900 flex items-center gap-2">
                         <Phone className={callActive ? "text-gray-400" : "text-blue-500"} /> Log Call Outcome
@@ -2023,7 +2023,7 @@ export default function SalesPanel() {
                         ></textarea>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-auto pt-5 pb-1 sticky -bottom-5 sm:-bottom-6 bg-white z-10 border-t border-gray-100">
                         <button 
                           type="submit" 
                           disabled={callActive}
