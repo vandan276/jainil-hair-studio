@@ -1618,10 +1618,10 @@ export default function SalesPanel() {
             </div>
 
             {/* Modal Body */}
-            <div className="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden">
+            <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-y-auto lg:overflow-hidden bg-white">
 
               {/* Left Column - Main Details */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-white border-b lg:border-b-0 lg:border-r">
+              <div className="flex-1 min-w-0 overflow-y-auto p-4 sm:p-6 bg-white border-b lg:border-b-0 lg:border-r border-gray-200">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-500 mb-4 border-b pb-2">Overview Information</h3>
 
                 <div className="grid grid-cols-2 gap-y-6 gap-x-8 mb-8">
@@ -1714,10 +1714,10 @@ export default function SalesPanel() {
               </div>
 
               {/* Right Column - Action / System */}
-              <div className="w-full lg:w-96 bg-gray-50 overflow-y-auto flex flex-col">
+              <div className="w-full lg:w-[420px] shrink-0 bg-gray-50 overflow-y-auto flex flex-col border-t lg:border-t-0 border-gray-200">
 
                 {callingMode ? (
-                  <div className={`p-6 bg-white border-b-4 ${callActive ? 'border-gray-200 opacity-50' : 'border-blue-500'} h-full transition-opacity`}>
+                  <div className={`p-6 bg-white border-b-4 ${callActive ? 'border-gray-200 opacity-50' : 'border-blue-500'} min-h-full transition-opacity flex flex-col`}>
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="font-bold text-gray-900 flex items-center gap-2">
                         <Phone className={callActive ? "text-gray-400" : "text-blue-500"} /> Log Call Outcome
