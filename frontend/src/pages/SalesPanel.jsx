@@ -1549,10 +1549,10 @@ export default function SalesPanel() {
 
       {/* LEAD DETAILS / CALL LOG MODAL */}
       {selectedLead && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center bg-black/60 backdrop-blur-sm overflow-y-auto" style={{paddingTop: '70px', paddingBottom: '16px', paddingLeft: '8px', paddingRight: '8px'}}>
           <div className="absolute inset-0" onClick={() => !callingMode && setSelectedLead(null)} />
 
-          <div className="relative bg-white w-full max-w-6xl mx-auto my-auto rounded-2xl shadow-2xl flex flex-col" style={{height: '90vh', maxHeight: '90vh', overflow: 'hidden', border: '1px solid #e5e7eb'}}>
+          <div className="relative bg-white w-full max-w-6xl mx-auto rounded-2xl shadow-2xl flex flex-col" style={{height: '85vh', maxHeight: '85vh', overflow: 'hidden', border: '1px solid #e5e7eb'}}>
 
             {/* Modal Header */}
             <div className="bg-white px-4 sm:px-6 py-3.5 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3 shrink-0">
