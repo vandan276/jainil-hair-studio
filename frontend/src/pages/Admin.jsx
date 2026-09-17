@@ -4681,7 +4681,7 @@ function PendingPaymentsPanel({ orders, refresh }) {
                 <td className="px-6 py-4 font-mono text-xs">#{o.id.slice(0, 8)}</td>
                 <td className="font-bold">{o.full_name || o.user_name}</td>
                 <td>{o.phone || "—"}</td>
-                <td className="font-semibold text-rose-600">₹{o.total.toLocaleString("en-IN")}</td>
+                <td className="font-semibold text-rose-600">₹{(o.total || o.total_amount || 0).toLocaleString("en-IN")}</td>
                 <td>{o.created_at?.split("T")[0]}</td>
                 <td className="text-right px-6">
                   <button onClick={() => markPaid(o.id)} className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors">
@@ -9808,7 +9808,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
               {stats.recent_orders.map((o) => (
                 <div key={o.id} className="flex justify-between text-sm border-b border-eminence-border py-2">
                   <span>{o.full_name || o.user_name} · <span className="text-eminence-muted">#{o.id.slice(0, 8)}</span></span>
-                  <span className="text-eminence-gold">₹{o.total.toLocaleString("en-IN")}</span>
+                  <span className="text-eminence-gold">₹{(o.total || o.total_amount || 0).toLocaleString("en-IN")}</span>
                 </div>
               ))}
               {stats.recent_orders.length === 0 && <p className="text-eminence-muted text-sm">{t("noOrders")}</p>}
