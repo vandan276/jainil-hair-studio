@@ -1,0 +1,141 @@
+from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
+from typing import Optional, List
+
+from ..db import supabase
+from ..utils import new_id, now_iso, get_current_user, require_employee, require_admin
+
+router = APIRouter(tags=["orders_bookings"])
+
+class BookingIn(BaseModel):
+    service_id: str
+    stylist_id: Optional[str] = None
+    date: str
+    time: str
+    notes: Optional[str] = ""
+
+class CartItem(BaseModel):
+    product_id: str
+    quantity: int
+    package_id: Optional[str] = None
+    service_provider: Optional[str] = None
+    discount: Optional[float] = 0.0
+
+class OrderIn(BaseModel):
+    items: List[CartItem]
+    full_name: str
+    phone: str
+    address: str
+    city: str = "Vadodara"
+    pincode: str
+    notes: Optional[str] = ""
+    payment_method: Optional[str] = None
+    discount: Optional[float] = 0.0
+    branch: Optional[str] = None
+
+class StatusUpdate(BaseModel):
+    status: str
+
+# ----- BOOKINGS -----
+
+@router.get("/bookings")
+def get_bookings(user: dict = Depends(get_current_user)):
+    if user.get("role") in ["admin", "receptionist"]:
+        res = supabase.table("bookings").select("*").execute()
+    else:
+        res = supabase.table("bookings").select("*").eq("user_id", user["id"]).order("created_at", desc=True).execute()
+    return res.data
+
+@router.post("/bookings")
+def create_booking(data: BookingIn, user: dict = Depends(get_current_user)):
+    bid = new_id()
+    doc = {
+        "id": bid,
+        "user_id": user["id"],
+        "user_name": user.get("name"),
+        "service_id": data.service_id,
+        "stylist_id": data.stylist_id,
+        "date": data.date,
+        "time": data.time,
+        "notes": data.notes,
+        "status": "pending",
+        "created_at": now_iso()
+    }
+    
+    # Conflict check
+    if data.stylist_id:
+        conflict = supabase.table("bookings").select("id") \
+            .eq("stylist_id", data.stylist_id) \
+            .eq("date", data.date) \
+            .eq("time", data.time) \
+            .execute()
+        if conflict.data:
+            raise HTTPException(400, "Stylist is already booked at this time")
+            
+    supabase.table("bookings").insert(doc).execute()
+    return doc
+
+@router.patch("/bookings/{bid}/status")
+def update_booking_status(bid: str, data: StatusUpdate, user: dict = Depends(require_employee)):
+    res = supabase.table("bookings").select("id").eq("id", bid).execute()
+    if not res.data:
+        raise HTTPException(404, "Booking not found")
+        
+    supabase.table("bookings").update({"status": data.status, "updated_at": now_iso()}).eq("id", bid).execute()
+    return {"ok": True, "status": data.status}
+
+# ----- ORDERS -----
+
+@router.post("/orders")
+def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
+    oid = new_id()
+    
+    # In a full app, you'd calculate total_amount based on actual product prices to prevent client-side tampering.
+    # For now, we store the items directly.
+    doc = {
+        "id": oid,
+        "user_id": user["id"],
+        "user_name": user.get("name"),
+        "items": [item.model_dump() for item in data.items], # JSONB
+        "full_name": data.full_name,
+        "phone": data.phone,
+        "address": data.address,
+        "city": data.city,
+        "pincode": data.pincode,
+        "notes": data.notes,
+        "payment_method": data.payment_method,
+        "discount": data.discount,
+        "branch": data.branch,
+        "status": "pending",
+        "created_at": now_iso()
+    }
+    supabase.table("orders").insert(doc).execute()
+    
+    # Decrement stock for products (if they are retail products)
+    for item in data.items:
+        if not item.package_id:
+            # It's a product
+            prod_res = supabase.table("products").select("stock").eq("id", item.product_id).execute()
+            if prod_res.data:
+                current_stock = prod_res.data[0].get("stock", 0)
+                new_stock = max(0, current_stock - item.quantity)
+                supabase.table("products").update({"stock": new_stock}).eq("id", item.product_id).execute()
+                
+    return doc
+
+@router.get("/orders")
+def get_orders(user: dict = Depends(get_current_user)):
+    if user.get("role") in ["admin", "receptionist", "sales"]:
+        res = supabase.table("orders").select("*").order("created_at", desc=True).limit(500).execute()
+    else:
+        res = supabase.table("orders").select("*").eq("user_id", user["id"]).order("created_at", desc=True).limit(100).execute()
+    return res.data
+
+@router.patch("/orders/{oid}/status")
+def update_order_status(oid: str, data: StatusUpdate, user: dict = Depends(require_employee)):
+    res = supabase.table("orders").select("id").eq("id", oid).execute()
+    if not res.data:
+        raise HTTPException(404, "Order not found")
+        
+    supabase.table("orders").update({"status": data.status, "updated_at": now_iso()}).eq("id", oid).execute()
+    return {"ok": True, "status": data.status}

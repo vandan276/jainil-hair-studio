@@ -1247,15 +1247,15 @@ export default function Admin() {
           const key = keys[idx];
           const val = res.value.data;
           if (key === "stats") setStats(val);
-          else if (key === "products") setProducts(val);
-          else if (key === "productCategories") setProductCategories(val);
+          else if (key === "products") setProducts(val || []);
+          else if (key === "productCategories") setProductCategories(val || []);
           else if (key === "maintenance") setMaintenanceEnabled(!!val?.enabled);
           else if (key === "adminPermissions") {
             const perms = val?.allowed_tabs;
             setAdminPermissions(perms || "__ALL__");
           }
           else if (key === "orders") {
-            const mappedOrders = val.map(o => ({
+            const mappedOrders = (val || []).map(o => ({
               ...o,
               items: o.items?.map(it => ({
                 ...it,
@@ -1264,23 +1264,23 @@ export default function Admin() {
             }));
             setOrders(mappedOrders);
           }
-          else if (key === "consultations") setConsultations(val);
-          else if (key === "users") setUsers(val);
-          else if (key === "employees") setEmployees(val);
-          else if (key === "services") setServices(val);
-          else if (key === "memberships") setMemberships(val);
-          else if (key === "packages") setPackages(val);
-          else if (key === "vendors") setVendors(val);
-          else if (key === "transfers") setTransfers(val);
-          else if (key === "stockLogs") setStockLogs(val);
-          else if (key === "usages") setUsages(val);
-          else if (key === "expenses") setExpenses(val);
-          else if (key === "coupons") setCoupons(val);
-          else if (key === "reportsData") setReportsData(val);
-          else if (key === "attendanceLogs") setAttendanceLogs(val);
-          else if (key === "appointments") setAppointments(val);
-          else if (key === "leads") setLeads(val);
-          else if (key === "leaveRequests") setLeaveRequests(val);
+          else if (key === "consultations") setConsultations(val || []);
+          else if (key === "users") setUsers(val || []);
+          else if (key === "employees") setEmployees(val || []);
+          else if (key === "services") setServices(val || []);
+          else if (key === "memberships") setMemberships(val || []);
+          else if (key === "packages") setPackages(val || []);
+          else if (key === "vendors") setVendors(val || []);
+          else if (key === "transfers") setTransfers(val || []);
+          else if (key === "stockLogs") setStockLogs(val || []);
+          else if (key === "usages") setUsages(val || []);
+          else if (key === "expenses") setExpenses(val || []);
+          else if (key === "coupons") setCoupons(val || []);
+          else if (key === "reportsData") setReportsData(val || []);
+          else if (key === "attendanceLogs") setAttendanceLogs(val || []);
+          else if (key === "appointments") setAppointments(val || []);
+          else if (key === "leads") setLeads(val || []);
+          else if (key === "leaveRequests") setLeaveRequests(val || []);
         } else {
           console.error(`Failed to refresh ${keys[idx]}:`, res.reason);
         }
@@ -9593,7 +9593,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                           <td className="px-4 py-3 text-right font-serif font-bold text-emerald-700">+₹{item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
                         </tr>
                       ))}
-                      {(!stats?.daily_sales_details || stats.daily_sales_details.length === 0) && (
+                      {(!stats?.daily_sales_details || stats?.daily_sales_details?.length === 0) && (
                         <tr>
                           <td colSpan="5" className="text-center py-8 text-eminence-muted italic">No sales transactions logged today.</td>
                         </tr>
@@ -9658,7 +9658,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                           </tr>
                         );
                       })}
-                      {(!stats?.daily_services_details || stats.daily_services_details.length === 0) && (
+                      {(!stats?.daily_services_details || stats?.daily_services_details?.length === 0) && (
                         <tr>
                           <td colSpan="7" className="text-center py-8 text-eminence-muted italic">No service bills generated today.</td>
                         </tr>

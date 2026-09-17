@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && [401, 403].includes(error.response.status)) {
+    if (error.response && error.response.status === 401) {
       const isLoginUrl = error.config.url?.endsWith("/auth/login");
       if (!isLoginUrl) {
         localStorage.removeItem("eminence_token");

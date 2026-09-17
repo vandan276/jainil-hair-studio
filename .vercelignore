@@ -1,8 +1,6 @@
 # Ignore local testing and build artifacts
 node_modules
 frontend/node_modules
-backend
-backend/**
 backend/uploads
 api/uploads
 frontend/build
