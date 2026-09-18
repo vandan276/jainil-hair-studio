@@ -135,9 +135,13 @@ async def update_lead(lid: str, request: Request, user: dict = Depends(require_e
     
     update_data = {"updated_at": now_iso()}
     valid_cols = ['lead_number', 'name', 'phone', 'branch', 'section', 'source', 'campaign', 'status', 'grade', 'city', 'hair_condition', 'assigned_to', 'assigned_to_name', 'follow_up_date', 'follow_up_time', 'follow_up_type', 'is_favorite']
+    date_cols = {'follow_up_date', 'follow_up_time', 'follow_up_type'}
     
     for field, value in data.items():
         if field in valid_cols:
+            # Convert empty strings to None for date/time columns to avoid DB type errors
+            if field in date_cols and value == "":
+                value = None
             update_data[field] = value
         elif field not in ["id", "created_at", "updated_at", "created_by", "notes", "data"]:
             existing_data[field] = value
