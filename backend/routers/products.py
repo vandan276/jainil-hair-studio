@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from ..db import supabase
-from ..utils import new_id, now_iso, get_current_user, require_admin, require_employee
+from ..utils import unpack_data, new_id, now_iso, get_current_user, require_admin, require_employee
 
 router = APIRouter(tags=["products_services"])
 
@@ -82,7 +82,7 @@ def update_product(pid: str, data: dict, user: dict = Depends(require_admin)):
 @router.get("/services")
 def list_services():
     res = supabase.table("services").select("*").execute()
-    return res.data
+    return unpack_data(res.data)
 
 @router.post("/services")
 def create_service(data: ServiceIn, user: dict = Depends(require_admin)):
@@ -119,7 +119,7 @@ def update_service(sid: str, data: dict, user: dict = Depends(require_admin)):
 @router.get("/packages")
 def list_packages():
     res = supabase.table("packages").select("*").execute()
-    return res.data
+    return unpack_data(res.data)
 
 @router.post("/packages")
 def create_package(data: PackageIn, user: dict = Depends(require_admin)):

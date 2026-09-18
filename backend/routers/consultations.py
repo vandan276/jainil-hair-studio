@@ -2,18 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import Optional
 from pydantic import BaseModel
 from ..db import supabase
-from ..utils import require_admin, require_employee, new_id, now_iso
+from ..utils import require_admin, require_employee, new_id, now_iso, unpack_data
 
 router = APIRouter(tags=["consultations"])
 
 @router.post("/consultations")
 def create_consultation(data: dict, user: dict = Depends(require_employee)):
     cid = new_id()
+    data["created_by"] = user.get("name")
+    data["created_by_id"] = user.get("id")
+    
     doc = {
         "id": cid,
-        **data,
-        "created_by": user.get("name"),
-        "created_by_id": user.get("id"),
+        "data": data,
         "created_at": now_iso()
     }
     supabase.table("consultations").insert(doc).execute()
@@ -62,7 +63,7 @@ def create_consultation(data: dict, user: dict = Depends(require_employee)):
 def admin_list_consultations(_: dict = Depends(require_admin)):
     try:
         res = supabase.table("consultations").select("*").order("created_at", desc=True).execute()
-        return res.data
+        return unpack_data(res.data)
     except Exception:
         return []
 
@@ -70,27 +71,28 @@ def admin_list_consultations(_: dict = Depends(require_admin)):
 def list_consultations(_: dict = Depends(require_employee)):
     try:
         res = supabase.table("consultations").select("*").order("created_at", desc=True).execute()
-        return res.data
+        return unpack_data(res.data)
     except Exception:
         return []
 
 @router.patch("/admin/consultations/{cid}")
 def admin_patch_consultation(cid: str, data: dict, user: dict = Depends(require_admin)):
-    update_data = {
-        **data,
-        "updated_at": now_iso()
-    }
-    supabase.table("consultations").update(update_data).eq("id", cid).execute()
+    # First get existing
+    res = supabase.table("consultations").select("*").eq("id", cid).execute()
+    if res.data:
+        existing = res.data[0].get("data") or {}
+        existing.update(data)
+        supabase.table("consultations").update({"data": existing}).eq("id", cid).execute()
     return {"status": "success"}
 
 @router.put("/consultations/{cid}")
 def update_consultation(cid: str, data: dict, user: dict = Depends(require_employee)):
-    update_data = {
-        **data,
-        "updated_by": user.get("name"),
-        "updated_at": now_iso()
-    }
-    supabase.table("consultations").update(update_data).eq("id", cid).execute()
+    res = supabase.table("consultations").select("*").eq("id", cid).execute()
+    if res.data:
+        existing = res.data[0].get("data") or {}
+        data["updated_by"] = user.get("name")
+        existing.update(data)
+        supabase.table("consultations").update({"data": existing}).eq("id", cid).execute()
     return {"status": "success"}
 
 @router.delete("/admin/consultations/{cid}")

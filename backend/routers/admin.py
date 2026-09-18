@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 
 from ..db import supabase
-from ..utils import new_id, now_iso, get_current_user, require_admin, require_employee, hash_password
+from ..utils import unpack_data, new_id, now_iso, get_current_user, require_admin, require_employee, hash_password
 
 router = APIRouter(tags=["admin"])
 
@@ -94,7 +94,7 @@ def admin_appointments(_: dict = Depends(require_admin)):
 @router.get("/admin/product-categories")
 def admin_product_categories(_: dict = Depends(require_admin)):
     try:
-        return supabase.table("product_categories").select("*").execute().data
+        return unpack_data(supabase.table("product_categories").select("*").execute().data)
     except:
         return []
 
@@ -115,7 +115,7 @@ def admin_coupons(_: dict = Depends(require_admin)):
 @router.get("/admin/attendance")
 def admin_attendance(_: dict = Depends(require_admin)):
     try:
-        return supabase.table("attendance").select("*").execute().data
+        return unpack_data(supabase.table("attendance").select("*").execute().data)
     except:
         return []
 
@@ -239,7 +239,7 @@ def get_clients_segmentation(user: dict = Depends(require_employee)):
 def admin_branches(_: dict = Depends(require_admin)):
     try:
         res = supabase.table("branches").select("*").execute()
-        return res.data
+        return unpack_data(res.data)
     except Exception as e:
         print("Error fetching branches:", e)
         return []

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional
 from pydantic import BaseModel
 from ..db import supabase
-from ..utils import require_admin, new_id, now_iso
+from ..utils import unpack_data, require_admin, new_id, now_iso
 
 router = APIRouter(tags=["admin_dashboard"])
 
@@ -50,7 +50,7 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
         products_count = 0
     
     try:
-        services_count = len(supabase.table("services").select("id").execute().data)
+        services_count = len(unpack_data(supabase.table("services").select("id").execute().data))
     except:
         services_count = 0
     
@@ -114,7 +114,7 @@ def admin_list_expenses(branch: Optional[str] = None, user: dict = Depends(requi
     if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
-    docs = supabase.table("expenses").select("*").execute().data
+    docs = unpack_data(supabase.table("expenses").select("*").execute().data)
     if branch and branch != "All Branches":
         docs = [e for e in docs if not e.get("branch") or e.get("branch") == branch]
     
@@ -168,7 +168,7 @@ def admin_stock_logs(branch: Optional[str] = None, user: dict = Depends(require_
 @router.get("/admin/vendors")
 def admin_vendors(user: dict = Depends(require_admin)):
     try:
-        return supabase.table("vendors").select("*").execute().data
+        return unpack_data(supabase.table("vendors").select("*").execute().data)
     except:
         return []
 

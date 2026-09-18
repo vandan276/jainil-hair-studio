@@ -117,3 +117,18 @@ async def require_employee(user: dict = Depends(get_current_user)) -> dict:
     if user.get("role") not in ["admin", "super_admin", "employee", "sales", "service", "receptionist"]:
         raise HTTPException(403, "Staff or Admin access required")
     return user
+
+def unpack_data(rows: list) -> list:
+    """Unpacks a JSONB 'data' column into top-level dict keys for frontend compatibility."""
+    result = []
+    for r in rows:
+        base = r.get("data", {})
+        if not isinstance(base, dict):
+            base = {}
+        # Ensure id, name, created_at, updated_at from the root table are kept
+        for k in ["id", "name", "created_at", "updated_at"]:
+            if k in r and r[k] is not None:
+                base[k] = r[k]
+        result.append(base)
+    return result
+
