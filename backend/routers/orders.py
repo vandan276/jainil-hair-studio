@@ -149,6 +149,12 @@ def update_order_status(oid: str, data: StatusUpdate, user: dict = Depends(requi
 
 @router.get("/orders/{oid}/invoice")
 def download_invoice(oid: str, user: dict = Depends(get_current_user)):
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import mm
+    from io import BytesIO
+    from datetime import datetime, timezone, timedelta
+    from fastapi.responses import StreamingResponse
+
     res = supabase.table("orders").select("*").eq("id", oid).execute()
     if not res.data:
         raise HTTPException(404, "Order not found")
@@ -156,156 +162,306 @@ def download_invoice(oid: str, user: dict = Depends(get_current_user)):
     row = res.data[0]
     od = row.get("order_data") or {}
 
-    full_name = od.get("full_name") or od.get("user_name") or "Client"
-    phone = od.get("phone") or row.get("phone") or "—"
-    branch = od.get("branch") or "Jainil Hair Studio"
-    payment_method = od.get("payment_method") or "Cash"
-    discount = float(od.get("discount") or 0)
-    total = float(od.get("total") or row.get("total_amount") or 0)
-    notes = od.get("notes") or ""
-    items = od.get("items") or []
-    split_payments = od.get("split_payments") or []
-    created_at = row.get("created_at") or ""
-    bill_date = created_at[:10] if created_at else "—"
-    employee_name = od.get("employee_name") or "—"
+    # Fetch all employees/stylists to map IDs to names
+    employees_map = {}
+    try:
+        emp_res = supabase.table("users").select("id, name, branch").in_("role", ["sales", "service", "employee", "admin", "receptionist", "provider"]).execute()
+        for d in emp_res.data:
+            employees_map[d["id"]] = d.get("name", "")
+    except Exception as e:
+        print("Error fetching employees map:", e)
 
-    # ---- Build PDF with reportlab ----
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.lib.units import mm
-    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, HRFlowable
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+    # Resolve customer wallet balance by looking up lead
+    phone = od.get("phone", row.get("phone", ""))
+    lead_wallet = 0.0
+    if phone:
+        clean_phone = phone
+        if not clean_phone.startswith("+"):
+            clean_phone = "+" + clean_phone
+        leads_res = supabase.table("leads").select("wallet, data").eq("phone", clean_phone).limit(1).execute()
+        if not leads_res.data:
+            leads_res = supabase.table("leads").select("wallet, data").eq("phone", phone).limit(1).execute()
+        if leads_res.data:
+            lead_data = leads_res.data[0].get("data") or {}
+            lead_wallet = float(leads_res.data[0].get("wallet") or lead_data.get("wallet", 0.0))
 
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=A4,
-                            leftMargin=15*mm, rightMargin=15*mm,
-                            topMargin=15*mm, bottomMargin=15*mm)
+    phone_number = phone
+    if phone_number.startswith("+91"):
+        phone_number = phone_number[3:]
 
-    styles = getSampleStyleSheet()
-    gold = colors.HexColor("#7B5B38")
-    dark = colors.HexColor("#1A1A1A")
-    light_gray = colors.HexColor("#F5F5F5")
-    mid_gray = colors.HexColor("#888888")
+    # Resolve branch name
+    branch_name = od.get("branch", "Subhanpura")
+    branch_contact = "7405088809"
+    if branch_name.lower() == "surat":
+        branch_contact = "8799288809"
 
-    h1 = ParagraphStyle("h1", fontSize=22, textColor=gold, alignment=TA_CENTER, fontName="Helvetica-Bold", spaceAfter=2)
-    h2 = ParagraphStyle("h2", fontSize=9, textColor=mid_gray, alignment=TA_CENTER, fontName="Helvetica", spaceAfter=6)
-    label_s = ParagraphStyle("label", fontSize=8, textColor=mid_gray, fontName="Helvetica")
-    val_s = ParagraphStyle("val", fontSize=10, textColor=dark, fontName="Helvetica-Bold")
-    small_s = ParagraphStyle("small", fontSize=8, textColor=mid_gray, fontName="Helvetica")
+    # Invoice sequence number formatting (E.g. 0948/B2C/26-27)
+    try:
+        hex_val = int(oid.replace("-", "")[:8], 16)
+        serial = str(hex_val % 10000).zfill(4)
+    except:
+        serial = "0001"
 
-    elems = []
+    created_str = row.get("created_at", "")
+    dt = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)
+    if created_str:
+        try:
+            dt = datetime.fromisoformat(created_str.replace("Z", "+00:00"))
+            ist = timezone(timedelta(hours=5, minutes=30))
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            dt = dt.astimezone(ist)
+        except:
+            pass
 
-    # Header
-    elems.append(Paragraph("JAINIL HAIR STUDIO", h1))
-    elems.append(Paragraph(f"{branch}  |  jainilhairstudio.com", h2))
-    elems.append(HRFlowable(width="100%", thickness=1, color=gold, spaceAfter=8))
+    year = dt.year
+    if dt.month >= 4:
+        fy_start = str(year)[2:]
+        fy_end = str(year + 1)[2:]
+    else:
+        fy_start = str(year - 1)[2:]
+        fy_end = str(year)[2:]
+    fy_str = f"{fy_start}-{fy_end}"
+    invoice_no = f"{serial}/B2C/{fy_str}"
+    invoice_date = dt.strftime("%d-%m-%Y %I:%M %p")
 
-    # Invoice meta + client info side by side
-    inv_id = oid[:8].upper()
-    meta = [
-        ["INVOICE", f"#{inv_id}"],
-        ["DATE", bill_date],
-        ["CLIENT", full_name],
-        ["CONTACT", phone],
-        ["SERVICED BY", employee_name],
-    ]
-    meta_table = Table(meta, colWidths=[35*mm, 80*mm])
-    meta_table.setStyle(TableStyle([
-        ("FONT", (0, 0), (0, -1), "Helvetica-Bold", 8),
-        ("FONT", (1, 0), (1, -1), "Helvetica", 9),
-        ("TEXTCOLOR", (0, 0), (0, -1), mid_gray),
-        ("TEXTCOLOR", (1, 0), (1, -1), dark),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-    ]))
-    elems.append(meta_table)
-    elems.append(Spacer(1, 6*mm))
+    # Math calculations
+    items = od.get("items", [])
+    subtotal_before_tax_and_disc = 0
+    for it in items:
+        p = float(it.get("price", 0))
+        q = float(it.get("quantity", it.get("qty", 1)))
+        subtotal_before_tax_and_disc += (p * q)
+        
+    point_discount = float(od.get("discount", 0.0))
+    grand_total = float(od.get("total", row.get("total_amount", 0.0)))
 
-    # Items table
-    header_row = ["#", "Item / Service", "Qty", "Price", "Disc", "Total"]
-    rows = [header_row]
-    subtotal = 0
-    for i, item in enumerate(items, 1):
-        name = item.get("name") or item.get("item_name") or "—"
-        qty = item.get("quantity") or item.get("qty") or 1
-        price = float(item.get("price") or 0)
-        disc_raw = float(item.get("discount") or 0)
-        disc_type = item.get("discount_type") or "INR"
-        line_total = price * qty
-        disc_amt = (line_total * disc_raw / 100) if disc_type == "%" else disc_raw
-        net = max(0, line_total - disc_amt)
-        subtotal += net
-        rows.append([
-            str(i),
-            name,
-            str(qty),
-            f"₹{price:.0f}",
-            f"₹{disc_amt:.0f}" if disc_amt else "—",
-            f"₹{net:.0f}",
-        ])
-
-    col_w = [10*mm, 80*mm, 15*mm, 25*mm, 20*mm, 25*mm]
-    t = Table(rows, colWidths=col_w, repeatRows=1)
-    t.setStyle(TableStyle([
-        ("BACKGROUND", (0, 0), (-1, 0), gold),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, 0), 8),
-        ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
-        ("FONTSIZE", (0, 1), (-1, -1), 9),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, light_gray]),
-        ("GRID", (0, 0), (-1, -1), 0.25, colors.HexColor("#DDDDDD")),
-        ("ALIGN", (2, 0), (-1, -1), "RIGHT"),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
-        ("TOPPADDING", (0, 0), (-1, -1), 4),
-    ]))
-    elems.append(t)
-    elems.append(Spacer(1, 4*mm))
-
-    # Totals block
-    paid_total = sum(float(p.get("amount") or 0) for p in split_payments) if split_payments else total
-    pending = max(0, total - paid_total)
-
-    totals_data = [
-        ["SUBTOTAL", f"₹{subtotal:.2f}"],
-        ["DISCOUNT", f"- ₹{discount:.2f}"],
-        ["TOTAL", f"₹{total:.2f}"],
-        ["PAID", f"₹{paid_total:.2f}"],
-        ["PENDING", f"₹{pending:.2f}"],
-    ]
-    totals_table = Table(totals_data, colWidths=[130*mm, 35*mm])
-    totals_table.setStyle(TableStyle([
-        ("FONT", (0, 0), (0, -1), "Helvetica", 9),
-        ("FONT", (1, 0), (1, -1), "Helvetica", 9),
-        ("FONT", (0, 2), (1, 2), "Helvetica-Bold", 11),
-        ("TEXTCOLOR", (0, 2), (1, 2), gold),
-        ("ALIGN", (1, 0), (1, -1), "RIGHT"),
-        ("LINEABOVE", (0, 2), (-1, 2), 1, gold),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
-        ("TOPPADDING", (0, 0), (-1, -1), 3),
-    ]))
-    elems.append(totals_table)
-
-    # Payment breakdown
+    # Amount Paid and Due
+    total_paid = 0.0
+    split_payments = od.get("split_payments", [])
     if split_payments:
-        elems.append(Spacer(1, 3*mm))
-        elems.append(Paragraph("PAYMENT BREAKDOWN", ParagraphStyle("ph", fontSize=8, textColor=mid_gray, fontName="Helvetica-Bold")))
-        for p in split_payments:
-            elems.append(Paragraph(
-                f"  {p.get('method','—')} — ₹{float(p.get('amount',0)):.2f}" + (f"  (TXN: {p['txn_id']})" if p.get('txn_id') else ""),
-                small_s))
+        total_paid = sum(float(p.get("amount", 0.0)) for p in split_payments)
+    else:
+        total_paid = grand_total
+    amount_due = max(0.0, grand_total - total_paid)
 
-    elems.append(Spacer(1, 8*mm))
-    elems.append(HRFlowable(width="100%", thickness=0.5, color=colors.HexColor("#DDDDDD")))
-    elems.append(Spacer(1, 2*mm))
-    elems.append(Paragraph("Thank you for visiting Jainil Hair Studio! We look forward to seeing you again.", 
-                            ParagraphStyle("footer", fontSize=8, textColor=mid_gray, alignment=TA_CENTER, fontName="Helvetica")))
+    # Dynamic page height calculation based on item name and provider text lengths
+    def wrap_text(text, max_chars):
+        if not text:
+            return [""]
+        words = text.split()
+        lines = []
+        curr_line = ""
+        for w in words:
+            if len(curr_line) + len(w) + 1 <= max_chars:
+                curr_line = curr_line + (" " if curr_line else "") + w
+            else:
+                lines.append(curr_line)
+                curr_line = w
+        if curr_line:
+            lines.append(curr_line)
+        return lines
 
-    doc.build(elems)
-    buf.seek(0)
+    # Calculate height contribution of rows
+    row_heights_sum = 0
+    for it in items:
+        name_lines = len(wrap_text(it.get("name", ""), 18))
+        providers = []
+        p1 = it.get("service_provider")
+        p2 = it.get("service_provider_2")
+        if p1: providers.append(employees_map.get(p1, p1))
+        if p2: providers.append(employees_map.get(p2, p2))
+        for extra_id in it.get("extra_providers", []):
+            if extra_id: providers.append(employees_map.get(extra_id, extra_id))
+        provider_name = ", ".join(providers) if providers else "—"
+        provider_lines = len(wrap_text(provider_name, 14))
+        num_lines = max(name_lines, provider_lines)
+        row_heights_sum += num_lines * 9 + 4
+
+    page_width = 280
+    page_height = 360 + row_heights_sum
+
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=(page_width, page_height))
+
+    # Helper function for drawing dashed separators
+    def draw_dashed_line(y_pos):
+        c.setLineWidth(0.5)
+        c.setStrokeColorRGB(0.5, 0.5, 0.5)
+        c.setDash(2, 2)
+        c.line(12, y_pos, page_width - 12, y_pos)
+        c.setDash()
+
+    # ── HEADER (Centered) ──────────────────────────────────────────────────
+    c.setFont("Helvetica", 7.5)
+    c.setFillColorRGB(0.1, 0.1, 0.1)
+    header_lines = [
+        "GF-7 SHRINATH COMPLEX, NR RELIANCE",
+        "PETROL PUMP, HIGH TENSION ROAD,",
+        "SUBHANPURA VADODARA",
+        f"Contact : {branch_contact}",
+        "Email : info@jainilhairstudio.com",
+        "Website : jainil-hair-studio.vercel.app",
+        "GST No : 24AGAPV1520E1ZX"
+    ]
+    hy = page_height - 15
+    for line in header_lines:
+        c.drawCentredString(page_width / 2, hy, line)
+        hy -= 10
+
+    hy -= 4
+    c.setFont("Helvetica-Bold", 10.5)
+    c.drawCentredString(page_width / 2, hy, "SALES INVOICE")
+    hy -= 11
+    c.setFont("Helvetica", 8)
+    c.drawCentredString(page_width / 2, hy, f"(Branch : {branch_name})")
+
+    # ── CUSTOMER DETAILS ───────────────────────────────────────────────────
+    y = page_height - 120
+    c.setFont("Helvetica", 8)
+
+    c.drawString(12, y, "Customer Name")
+    c.drawString(90, y, ": " + str(od.get("full_name", row.get("user_name", "—"))))
+    y -= 11
+
+    c.drawString(12, y, "Mobile No")
+    c.drawString(90, y, ": " + str(phone_number))
+    y -= 11
+
+    c.drawString(12, y, "Wallet Balance")
+    c.drawString(90, y, f": INR {lead_wallet:.2f} /-")
+    y -= 11
+
+    c.drawString(12, y, "Invoice No")
+    c.drawString(90, y, ": " + invoice_no)
+    y -= 11
+
+    c.drawString(12, y, "Invoice Date")
+    c.drawString(90, y, ": " + invoice_date)
+    y -= 10
+
+    # Separator
+    draw_dashed_line(y)
+
+    # ── TABLE HEADERS ──────────────────────────────────────────────────────
+    y -= 10
+    c.setFont("Helvetica-Bold", 8)
+    c.drawString(12, y, "Service &")
+    c.drawString(100, y, "Provider")
+    c.drawRightString(200, y, "Rate")
+    c.drawRightString(224, y, "Dis")
+    c.drawRightString(242, y, "Qty")
+    c.drawRightString(268, y, "Total")
+
+    y -= 9
+    c.drawString(12, y, "Product")
+    y -= 4
+
+    draw_dashed_line(y)
+
+    # ── TABLE ROWS ─────────────────────────────────────────────────────────
+    y -= 2
+    c.setFont("Helvetica", 7.5)
+    for it in items:
+        name_lines = wrap_text(it.get("name", ""), 18)
+        providers = []
+        p1 = it.get("service_provider")
+        p2 = it.get("service_provider_2")
+        if p1: providers.append(employees_map.get(p1, p1))
+        if p2: providers.append(employees_map.get(p2, p2))
+        for extra_id in it.get("extra_providers", []):
+            if extra_id: providers.append(employees_map.get(extra_id, extra_id))
+        provider_name = ", ".join(providers) if providers else "—"
+        provider_lines = wrap_text(provider_name, 14)
+
+        num_lines = max(len(name_lines), len(provider_lines))
+        row_h = num_lines * 9 + 4
+
+        # Draw names
+        ny = y - 8
+        for line in name_lines:
+            c.drawString(12, ny, line)
+            ny -= 9
+        # Draw providers
+        py = y - 8
+        for line in provider_lines:
+            c.drawString(100, py, line)
+            py -= 9
+
+        # Draw values
+        price = float(it.get("price", 0))
+        disc_raw = float(it.get("discount", 0))
+        qty = float(it.get("quantity", it.get("qty", 1)))
+        disc_type = it.get("discount_type", "INR")
+        
+        line_total_base = price * qty
+        disc = (line_total_base * disc_raw / 100) if disc_type == "%" else disc_raw
+        total_val = max(0, line_total_base - disc)
+
+        c.drawRightString(200, y - 8, f"{price:.2f}")
+        c.drawRightString(224, y - 8, f"{disc:.0f}" if disc == int(disc) else f"{disc:.2f}")
+        c.drawRightString(242, y - 8, f"{qty:.0f}" if qty == int(qty) else f"{qty:.2f}")
+        c.drawRightString(268, y - 8, f"{total_val:.2f}")
+
+        y -= row_h
+
+    # Separator
+    draw_dashed_line(y)
+
+    # ── TOTALS & SUMMARY BLOCK ─────────────────────────────────────────────
+    # Left Details
+    ly = y - 10
+    c.setFont("Helvetica", 7.5)
+    total_qty = sum(float(it.get("quantity", it.get("qty", 1))) for it in items)
+    c.drawString(12, ly, f"Total Qty      : {total_qty:.0f}" if total_qty == int(total_qty) else f"Total Qty      : {total_qty:.2f}")
+    ly -= 11
+    c.drawString(12, ly, "Payment Mode :")
+    ly -= 10
+
+    pay_method = od.get("payment_method", "Cash")
+    if split_payments:
+        pay_method = ", ".join([p.get("method", "Cash") for p in split_payments])
+
+    pay_lines = wrap_text(pay_method, 16)
+    for line in pay_lines:
+        c.drawString(12, ly, line)
+        ly -= 9
+
+    # Right Details
+    ry = y - 10
+    def draw_summary_row(label, val_str, bold=False):
+        nonlocal ry
+        if bold:
+            c.setFont("Helvetica-Bold", 7.5)
+        else:
+            c.setFont("Helvetica", 7.5)
+        c.drawRightString(215, ry, label)
+        c.drawRightString(268, ry, val_str)
+        ry -= 10.5
+
+    draw_summary_row("Subtotal :", f"{subtotal_before_tax_and_disc:.2f}")
+    if point_discount > 0:
+        draw_summary_row("Discount :", f"{point_discount:.2f}")
+    draw_summary_row("Total :", f"{grand_total:.2f}", bold=True)
+    draw_summary_row("Amount Paid :", f"{total_paid:.2f}")
+    if amount_due > 0:
+        draw_summary_row("Amount Due :", f"{amount_due:.2f}", bold=True)
+
+    # Dashed separator at bottom
+    fy = min(ly, ry) - 6
+    draw_dashed_line(fy)
+
+    # Footer Centered Note
+    fy -= 12
+    c.setFont("Helvetica-Bold", 8)
+    c.drawCentredString(page_width / 2, fy, "****THANK YOU. PLEASE VISIT AGAIN****")
+
+    c.save()
+    buffer.seek(0)
+    
+    inv_id_hex = oid.replace("-", "")[:8].upper()
     return StreamingResponse(
-        buf,
+        buffer,
         media_type="application/pdf",
-        headers={"Content-Disposition": f'attachment; filename="Jainil_Invoice_{inv_id}.pdf"'}
+        headers={"Content-Disposition": f'attachment; filename="Jainil_Invoice_{inv_id_hex}.pdf"'}
     )
