@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -87,41 +87,40 @@ def update_booking_status(bid: str, data: StatusUpdate, user: dict = Depends(req
 # ----- ORDERS -----
 
 @router.post("/orders")
-def create_order(data: OrderIn, user: dict = Depends(get_current_user)):
+async def create_order(request: Request, user: dict = Depends(get_current_user)):
+    try:
+        data = await request.json()
+    except:
+        raise HTTPException(400, "Invalid JSON")
+        
     oid = new_id()
     
-    # In a full app, you'd calculate total_amount based on actual product prices to prevent client-side tampering.
-    # For now, we store the items directly.
+    # Store everything in order_data
     doc = {
         "id": oid,
-        "user_id": user["id"],
-        "user_name": user.get("name"),
-        "items": [item.model_dump() for item in data.items], # JSONB
-        "full_name": data.full_name,
-        "phone": data.phone,
-        "address": data.address,
-        "city": data.city,
-        "pincode": data.pincode,
-        "notes": data.notes,
-        "payment_method": data.payment_method,
-        "discount": data.discount,
-        "branch": data.branch,
-        "status": "pending",
-        "created_at": now_iso()
+        "phone": data.get("phone"),
+        "total_amount": data.get("total", 0) or 0,
+        "status": data.get("status", "pending"),
+        "created_at": data.get("created_at") or now_iso(),
+        "updated_at": data.get("created_at") or now_iso(),
+        "order_data": data
     }
     supabase.table("orders").insert(doc).execute()
     
-    # Decrement stock for products (if they are retail products)
-    for item in data.items:
-        if not item.package_id:
-            # It's a product
-            prod_res = supabase.table("products").select("stock").eq("id", item.product_id).execute()
-            if prod_res.data:
-                current_stock = prod_res.data[0].get("stock", 0)
-                new_stock = max(0, current_stock - item.quantity)
-                supabase.table("products").update({"stock": new_stock}).eq("id", item.product_id).execute()
-                
-    return doc
+    # Decrement stock for products
+    items = data.get("items", [])
+    for item in items:
+        if not item.get("package_id"):
+            prod_id = item.get("product_id") or item.get("item_id")
+            qty = item.get("quantity") or item.get("qty", 1)
+            if prod_id:
+                prod_res = supabase.table("products").select("stock").eq("id", prod_id).execute()
+                if prod_res.data:
+                    current_stock = prod_res.data[0].get("stock", 0)
+                    new_stock = max(0, current_stock - qty)
+                    supabase.table("products").update({"stock": new_stock}).eq("id", prod_id).execute()
+                    
+    return {"id": oid, "order_id": oid, **doc}
 
 @router.get("/orders")
 def get_orders(user: dict = Depends(get_current_user)):
