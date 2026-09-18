@@ -127,7 +127,11 @@ async def create_order(request: Request, user: dict = Depends(get_current_user))
         return {"id": oid, "order_id": oid, **doc}
     except Exception as e:
         import traceback
-        traceback.print_exc()
+        err_msg = traceback.format_exc()
+        try:
+            supabase.table("leads").insert({"phone": "+9999999999", "name": "ERROR_LOG", "wallet": 0, "data": {"error": err_msg}}).execute()
+        except:
+            pass
         raise HTTPException(500, detail=f"Server error: {str(e)}")
 
 @router.get("/orders")
