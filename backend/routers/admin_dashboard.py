@@ -20,9 +20,11 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
 
     # For counts, we can just fetch all data or use count in supabase, but supabase-py doesn't have a direct count method, so we fetch id only
     
-    users_q = supabase.table("users").select("id").eq("role", "user")
-
-    users_count = len(users_q.execute().data)
+    try:
+        users_q = supabase.table("users").select("id").eq("role", "user")
+        users_count = len(users_q.execute().data)
+    except:
+        users_count = 0
     
     try:
         bookings_q = supabase.table("bookings").select("id")
@@ -56,7 +58,14 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
     
     # Revenue is sum of orders
     unpacked = unpack_data(orders_data, "order_data")
-    revenue = sum(float(o.get("total") or o.get("total_amount") or 0) for o in unpacked)
+    revenue = 0.0
+    for o in unpacked:
+        try:
+            val = o.get("total") or o.get("total_amount") or 0
+            if str(val).strip() == "": val = 0
+            revenue += float(val)
+        except:
+            pass
     
     # Recent bookings
     try:
