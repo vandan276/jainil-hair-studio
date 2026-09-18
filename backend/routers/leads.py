@@ -1,5 +1,5 @@
 import time
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -118,8 +118,6 @@ def get_lead(lid: str, user: dict = Depends(require_employee)):
         raise HTTPException(403, "Not assigned to this lead")
     return data
 
-
-from fastapi import Request
 
 @router.patch("/leads/{lid}")
 async def update_lead(lid: str, request: Request, user: dict = Depends(require_employee)):
