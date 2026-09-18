@@ -197,7 +197,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             source: found.source || "—",
             city: found.city || "—",
             packages: found.packages || [],
-            wallet: found.wallet || 0
+            wallet: found.wallet || 0, total_pending: found.total_pending_amount || found.total_pending || 0
           });
         }
       }
@@ -317,7 +317,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           source: found.source || "—",
           city: found.city || "—",
           packages: found.packages || [],
-          wallet: found.wallet || 0
+          wallet: found.wallet || 0, total_pending: found.total_pending_amount || found.total_pending || 0
         });
         if (found.assigned_to) setSelectedEmployee(found.assigned_to);
       } else {
@@ -1411,7 +1411,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   { label: "Branch", value: clientData.branch },
                   { label: "Last Visit On", value: "—" },
                   { label: "Total Visits", value: clientData.total_visits },
-                  { label: "Total Spendings", value: `₹${Number(clientData.total_spendings || 0).toLocaleString("en-IN")}` },
+                  { label: "Total Spendings", value: `₹${Number(clientData.total_spendings || 0).toLocaleString("en-IN")}` }, { label: "Total Pending", value: `₹${Number(clientData.total_pending || 0).toLocaleString("en-IN")}` },
                   { label: "Membership", value: clientData.membership },
                   {
                     label: "Active Packages",
