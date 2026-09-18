@@ -80,7 +80,7 @@ def update_employee(uid: str, data: EmployeeUpdate, user: dict = Depends(require
 def admin_list_leaves(_: dict = Depends(require_admin)):
     try:
         res = supabase.table("leave_requests").select("*").order("created_at", desc=True).execute()
-        return res.data
+        return unpack_data(res.data)
     except:
         return []
 
