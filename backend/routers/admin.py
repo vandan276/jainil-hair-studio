@@ -234,3 +234,51 @@ def get_clients_segmentation(user: dict = Depends(require_employee)):
                     pass
 
     return segments
+
+@router.get("/admin/branches")
+def admin_branches(_: dict = Depends(require_admin)):
+    try:
+        res = supabase.table("branches").select("*").execute()
+        return res.data
+    except Exception as e:
+        print("Error fetching branches:", e)
+        return []
+
+@router.post("/admin/branches")
+def create_branch(data: dict, user: dict = Depends(require_admin)):
+    name = data.get("name")
+    if not name:
+        raise HTTPException(400, "Branch name is required")
+    doc = {
+        "id": new_id(),
+        "name": name,
+        "data": data,
+        "created_at": now_iso()
+    }
+    supabase.table("branches").insert(doc).execute()
+    return doc
+
+@router.get("/admin/permissions")
+def admin_permissions(_: dict = Depends(require_admin)):
+    try:
+        res = supabase.table("settings").select("data").eq("id", "admin_permissions").execute()
+        if res.data:
+            return res.data[0].get("data")
+        return {"allowed_tabs": "__ALL__"}
+    except Exception as e:
+        print("Error fetching permissions:", e)
+        return {"allowed_tabs": "__ALL__"}
+
+@router.post("/admin/permissions")
+def set_admin_permissions(data: dict, user: dict = Depends(require_admin)):
+    try:
+        # Check if row exists
+        res = supabase.table("settings").select("id").eq("id", "admin_permissions").execute()
+        if res.data:
+            supabase.table("settings").update({"data": data}).eq("id", "admin_permissions").execute()
+        else:
+            supabase.table("settings").insert({"id": "admin_permissions", "data": data}).execute()
+        return {"ok": True}
+    except Exception as e:
+        print("Error setting permissions:", e)
+        raise HTTPException(500, "Internal Server Error")
