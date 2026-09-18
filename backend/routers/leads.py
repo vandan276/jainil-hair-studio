@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from ..db import supabase
-from ..utils import new_id, now_iso, get_current_user, require_employee, require_admin
+from ..utils import new_id, now_iso, get_current_user, require_employee, require_admin, unpack_data
 
 router = APIRouter(tags=["leads"])
 
@@ -87,7 +87,7 @@ def list_leads(user: dict = Depends(require_employee)):
         role = user.get("role", "")
         if role == "sales":
             res = supabase.table("leads").select("*").eq("assigned_to", user.get("id")).order("created_at", desc=True).limit(1000).execute()
-            return res.data
+            return unpack_data(res.data, "data")
         elif role in ["employee", "service", "receptionist"]:
             user_id = user.get("id")
             user_branch = user.get("branch") or ""
@@ -99,10 +99,10 @@ def list_leads(user: dict = Depends(require_employee)):
             res4 = supabase.table("leads").select("*").is_("assigned_to", "null").eq("branch", "Not Decided").limit(500).execute()
             
             merged = {l["id"]: l for l in (res1.data + res2.data + res3.data + res4.data)}
-            return sorted(merged.values(), key=lambda x: x.get("created_at", ""), reverse=True)
+            return unpack_data(sorted(merged.values(), key=lambda x: x.get("created_at", ""), reverse=True), "data")
         else:
             res = supabase.table("leads").select("*").order("created_at", desc=True).limit(1000).execute()
-            return res.data
+            return unpack_data(res.data, "data")
     except Exception as e:
         print(f"Error in list_leads: {e}")
         return []
@@ -130,7 +130,7 @@ def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employe
         update_data[field] = value
         
     res = supabase.table("leads").update(update_data).eq("id", lid).execute()
-    return res.data[0] if res.data else {}
+    return unpack_data(res.data, "data")[0] if res.data else {}
 
 
 @router.post("/leads/{lid}/notes")
@@ -166,7 +166,7 @@ def assign_lead(lid: str, data: dict, user: dict = Depends(require_admin)):
         "updated_at": now_iso()
     }).eq("id", lid).execute()
     
-    return res.data[0] if res.data else {}
+    return unpack_data(res.data, "data")[0] if res.data else {}
 
 
 @router.post("/leads/{lid}/calls")
