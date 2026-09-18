@@ -91,7 +91,7 @@ def admin_orders(limit: int = 200, branch: Optional[str] = None, user: dict = De
 
     q = supabase.table("orders").select("*").order("created_at", desc=True).limit(limit)
 
-    return q.execute().data
+    return unpack_data(q.execute().data, "order_data")
 
 @router.patch("/admin/orders/{oid}")
 def admin_update_order(oid: str, data: dict, _: dict = Depends(require_admin)):
