@@ -119,16 +119,33 @@ def get_lead(lid: str, user: dict = Depends(require_employee)):
     return data
 
 
+from fastapi import Request
+
 @router.patch("/leads/{lid}")
-def update_lead(lid: str, data: LeadUpdate, user: dict = Depends(require_employee)):
-    res = supabase.table("leads").select("id").eq("id", lid).execute()
+async def update_lead(lid: str, request: Request, user: dict = Depends(require_employee)):
+    try:
+        data = await request.json()
+    except:
+        raise HTTPException(400, "Invalid JSON")
+        
+    res = supabase.table("leads").select("*").eq("id", lid).execute()
     if not res.data:
         raise HTTPException(404, "Lead not found")
+        
+    existing_lead = res.data[0]
+    existing_data = existing_lead.get("data") or {}
     
     update_data = {"updated_at": now_iso()}
-    for field, value in data.model_dump(exclude_unset=True).items():
-        update_data[field] = value
-        
+    valid_cols = ['lead_number', 'name', 'phone', 'branch', 'section', 'source', 'campaign', 'status', 'grade', 'city', 'hair_condition', 'assigned_to', 'assigned_to_name', 'follow_up_date', 'follow_up_time', 'follow_up_type', 'is_favorite']
+    
+    for field, value in data.items():
+        if field in valid_cols:
+            update_data[field] = value
+        elif field not in ["id", "created_at", "updated_at", "created_by", "notes", "data"]:
+            existing_data[field] = value
+            
+    update_data["data"] = existing_data
+    
     res = supabase.table("leads").update(update_data).eq("id", lid).execute()
     return unpack_data(res.data, "data")[0] if res.data else {}
 
