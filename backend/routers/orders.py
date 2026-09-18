@@ -95,34 +95,40 @@ async def create_order(request: Request, user: dict = Depends(get_current_user))
     except:
         raise HTTPException(400, "Invalid JSON")
         
-    oid = new_id()
-    
-    # Store everything in order_data
-    doc = {
-        "id": oid,
-        "phone": data.get("phone"),
-        "total_amount": data.get("total", 0) or 0,
-        "status": data.get("status", "pending"),
-        "created_at": data.get("created_at") or now_iso(),
-        "updated_at": data.get("created_at") or now_iso(),
-        "order_data": data
-    }
-    supabase.table("orders").insert(doc).execute()
-    
-    # Decrement stock for products
-    items = data.get("items", [])
-    for item in items:
-        if not item.get("package_id"):
-            prod_id = item.get("product_id") or item.get("item_id")
-            qty = item.get("quantity") or item.get("qty", 1)
-            if prod_id:
-                prod_res = supabase.table("products").select("stock").eq("id", prod_id).execute()
-                if prod_res.data:
-                    current_stock = prod_res.data[0].get("stock", 0)
-                    new_stock = max(0, current_stock - qty)
-                    supabase.table("products").update({"stock": new_stock}).eq("id", prod_id).execute()
-                    
-    return {"id": oid, "order_id": oid, **doc}
+    try:
+        oid = new_id()
+        
+        # Store everything in order_data
+        doc = {
+            "id": oid,
+            "phone": data.get("phone"),
+            "total_amount": float(data.get("total", 0) or 0),
+            "status": data.get("status", "pending"),
+            "created_at": data.get("created_at") or now_iso(),
+            "updated_at": data.get("created_at") or now_iso(),
+            "order_data": data
+        }
+        supabase.table("orders").insert(doc).execute()
+        
+        # Decrement stock for products
+        items = data.get("items", [])
+        for item in items:
+            if not item.get("package_id"):
+                prod_id = item.get("product_id") or item.get("item_id")
+                qty = int(item.get("quantity") or item.get("qty") or 1)
+                if prod_id:
+                    prod_res = supabase.table("products").select("stock").eq("id", prod_id).execute()
+                    if prod_res.data:
+                        current_stock = prod_res.data[0].get("stock")
+                        if current_stock is not None:
+                            new_stock = max(0, int(current_stock) - qty)
+                            supabase.table("products").update({"stock": new_stock}).eq("id", prod_id).execute()
+                        
+        return {"id": oid, "order_id": oid, **doc}
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, detail=f"Server error: {str(e)}")
 
 @router.get("/orders")
 def get_orders(user: dict = Depends(get_current_user)):
@@ -141,7 +147,7 @@ def update_order_status(oid: str, data: StatusUpdate, user: dict = Depends(requi
     supabase.table("orders").update({"status": data.status, "updated_at": now_iso()}).eq("id", oid).execute()
     return {"ok": True, "status": data.status}
 
-@router.get("/{oid}/invoice")
+@router.get("/orders/{oid}/invoice")
 def download_invoice(oid: str, user: dict = Depends(get_current_user)):
     res = supabase.table("orders").select("*").eq("id", oid).execute()
     if not res.data:
