@@ -115,7 +115,10 @@ def admin_list_expenses(branch: Optional[str] = None, user: dict = Depends(requi
     if user.get("email", "").lower() != "superadmin@jainil.com":
         branch = user.get("branch")
 
-    docs = unpack_data(supabase.table("expenses").select("*").execute().data)
+    try:
+        docs = unpack_data(supabase.table("expenses").select("*").execute().data)
+    except:
+        docs = []
     if branch and branch != "All Branches":
         docs = [e for e in docs if not e.get("branch") or e.get("branch") == branch]
     
