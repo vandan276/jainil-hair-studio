@@ -34,7 +34,7 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
 
     
     try:
-        orders_q = supabase.table("orders").select("total_amount")
+        orders_q = supabase.table("orders").select("total_amount,order_data")
         orders_data = orders_q.execute().data
         orders_count = len(orders_data)
     except:
@@ -55,7 +55,8 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
         services_count = 0
     
     # Revenue is sum of orders
-    revenue = sum(float(o.get("total_amount") or 0) for o in orders_data)
+    unpacked = unpack_data(orders_data, "order_data")
+    revenue = sum(float(o.get("total") or o.get("total_amount") or 0) for o in unpacked)
     
     # Recent bookings
     try:
@@ -70,7 +71,7 @@ def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin
     # Recent orders
     try:
         ro_q = supabase.table("orders").select("*").order("created_at", desc=True).limit(5)
-        recent_orders = ro_q.execute().data
+        recent_orders = unpack_data(ro_q.execute().data, "order_data")
     except:
         recent_orders = []
     

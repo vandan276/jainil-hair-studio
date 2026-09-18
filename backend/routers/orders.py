@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from typing import Optional, List
 
 from ..db import supabase
-from ..utils import new_id, now_iso, get_current_user, require_employee, require_admin
+from ..utils import new_id, now_iso, get_current_user, require_employee, require_admin, unpack_data
 
 router = APIRouter(tags=["orders_bookings"])
 
@@ -129,7 +129,7 @@ def get_orders(user: dict = Depends(get_current_user)):
         res = supabase.table("orders").select("*").order("created_at", desc=True).limit(500).execute()
     else:
         res = supabase.table("orders").select("*").eq("user_id", user["id"]).order("created_at", desc=True).limit(100).execute()
-    return res.data
+    return unpack_data(res.data, "order_data")
 
 @router.patch("/orders/{oid}/status")
 def update_order_status(oid: str, data: StatusUpdate, user: dict = Depends(require_employee)):
