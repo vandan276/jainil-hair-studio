@@ -36,8 +36,10 @@ class PackageIn(BaseModel):
 
 @router.get("/products")
 def list_products():
+    # Return list of products with JSONB data unpacked for frontend compatibility
     res = supabase.table("products").select("*").execute()
-    return res.data
+    # Some products may store fields inside a JSONB column named "data"; unpack them
+    return unpack_data(res.data)
 
 @router.post("/products")
 def create_product(data: ProductIn, user: dict = Depends(require_admin)):
@@ -59,10 +61,14 @@ def create_product(data: ProductIn, user: dict = Depends(require_admin)):
 
 @router.get("/products/{pid}")
 def get_product(pid: str):
+    # Fetch product and unpack any JSONB data for consistency
     res = supabase.table("products").select("*").eq("id", pid).execute()
     if not res.data:
         raise HTTPException(404, "Product not found")
-    return res.data[0]
+    # Unpack and return the first (and only) record
+    unpacked = unpack_data(res.data)
+    return unpacked[0] if unpacked else {}
+
 
 @router.patch("/products/{pid}")
 def update_product(pid: str, data: dict, user: dict = Depends(require_admin)):
