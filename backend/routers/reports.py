@@ -15,8 +15,11 @@ def get_payroll(month: Optional[str] = Query(None), user: dict = Depends(require
     
     # We will compute daily commissions for each employee
     # 1. Manual sales (service commission)
-    ms_res = supabase.table("manual_sales").select("*").ilike("date", f"{filter_val}%").execute()
-    manual_sales = ms_res.data
+    try:
+        ms_res = supabase.table("manual_sales").select("*").ilike("date", f"{filter_val}%").execute()
+        manual_sales = ms_res.data
+    except:
+        manual_sales = []
     
     # 2. Leads payments (sales commission)
     leads_res = supabase.table("leads").select("id,name,payments,assigned_to,status").execute()
@@ -102,10 +105,13 @@ def get_reports(month: Optional[str] = Query(None), branch: Optional[str] = None
     employees = emp_query.execute().data
     
     # 1. Fetch manual sales
-    ms_query = supabase.table("manual_sales").select("*").ilike("date", f"{filter_val}%")
-    if branch and branch != "All Branches":
-        ms_query = ms_query.eq("branch", branch)
-    manual_sales = ms_query.execute().data
+    try:
+        ms_query = supabase.table("manual_sales").select("*").ilike("date", f"{filter_val}%")
+        if branch and branch != "All Branches":
+            ms_query = ms_query.eq("branch", branch)
+        manual_sales = ms_query.execute().data
+    except:
+        manual_sales = []
     
     # 2. Fetch leads
     leads_query = supabase.table("leads").select("id,assigned_to,source,payments,status,created_at,updated_at,branch,section,is_repeated")

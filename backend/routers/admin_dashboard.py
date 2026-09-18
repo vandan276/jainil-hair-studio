@@ -15,95 +15,74 @@ class ExpenseIn(BaseModel):
 
 @router.get("/admin/stats")
 def admin_stats(branch: Optional[str] = None, user: dict = Depends(require_admin)):
-    if user.get("email", "").lower() != "superadmin@jainil.com":
-        branch = user.get("branch")
-
-    # For counts, we can just fetch all data or use count in supabase, but supabase-py doesn't have a direct count method, so we fetch id only
-    
+    import traceback
     try:
+        if user.get("email", "").lower() != "superadmin@jainil.com":
+            branch = user.get("branch")
+
         users_q = supabase.table("users").select("id").eq("role", "user")
         users_count = len(users_q.execute().data)
-    except:
-        users_count = 0
-    
-    try:
-        bookings_q = supabase.table("bookings").select("id")
-        if branch:
-            bookings_q = bookings_q.eq("branch", branch)
-        bookings_count = len(bookings_q.execute().data)
-    except:
-        bookings_count = 0
-
-    
-    try:
-        orders_q = supabase.table("orders").select("total_amount,order_data")
-        orders_data = orders_q.execute().data
-        orders_count = len(orders_data)
-    except:
-        orders_data = []
-        orders_count = 0
-    
-    try:
-        products_q = supabase.table("products").select("id")
-        if branch:
-            products_q = products_q.eq("branch", branch)
-        products_count = len(products_q.execute().data)
-    except:
-        products_count = 0
-    
-    try:
-        services_count = len(unpack_data(supabase.table("services").select("id").execute().data))
-    except:
-        services_count = 0
-    
-    # Revenue is sum of orders
-    unpacked = unpack_data(orders_data, "order_data")
-    revenue = 0.0
-    for o in unpacked:
+        
         try:
-            val = o.get("total") or o.get("total_amount") or 0
-            if str(val).strip() == "": val = 0
-            revenue += float(val)
-        except:
-            pass
-    
-    # Recent bookings
-    try:
-        rb_q = supabase.table("bookings").select("*").order("created_at", desc=True).limit(5)
-        if branch:
-            rb_q = rb_q.eq("branch", branch)
-        recent_bookings = rb_q.execute().data
-    except:
-        recent_bookings = []
+            bookings_q = supabase.table("bookings").select("id")
+            if branch: bookings_q = bookings_q.eq("branch", branch)
+            bookings_count = len(bookings_q.execute().data)
+        except: bookings_count = 0
 
-    
-    # Recent orders
-    try:
-        ro_q = supabase.table("orders").select("*").order("created_at", desc=True).limit(5)
-        recent_orders = unpack_data(ro_q.execute().data, "order_data")
-    except:
-        recent_orders = []
-    
-    return {
-        "users": users_count,
-        "bookings": bookings_count,
-        "orders": orders_count,
-        "products": products_count,
-        "services": services_count,
-        "revenue": revenue,
-        "recent_bookings": recent_bookings,
-        "recent_orders": recent_orders,
-        "today_revenue": 0,
-        "today_manual_revenue": 0,
-        "daily_sales": 0,
-        "daily_services": 0,
-        "daily_website_products": 0,
-        "daily_salon_products": 0,
-        "daily_sales_details": [],
-        "daily_services_details": [],
-        "daily_website_products_details": [],
-        "daily_salon_products_details": []
-    }
+        try:
+            orders_q = supabase.table("orders").select("total_amount,order_data")
+            orders_data = orders_q.execute().data
+            orders_count = len(orders_data)
+        except:
+            orders_data = []
+            orders_count = 0
+            
+        try:
+            products_q = supabase.table("products").select("id")
+            if branch: products_q = products_q.eq("branch", branch)
+            products_count = len(products_q.execute().data)
+        except: products_count = 0
+            
+        try:
+            services_count = len(unpack_data(supabase.table("services").select("id").execute().data))
+        except: services_count = 0
+            
+        unpacked = unpack_data(orders_data, "order_data")
+        revenue = 0.0
+        for o in unpacked:
+            try:
+                val = o.get("total") or o.get("total_amount") or 0
+                if str(val).strip() == "": val = 0
+                revenue += float(val)
+            except: pass
+            
+        try:
+            rb_q = supabase.table("bookings").select("*").order("created_at", desc=True).limit(5)
+            if branch: rb_q = rb_q.eq("branch", branch)
+            recent_bookings = rb_q.execute().data
+        except: recent_bookings = []
+        
+        try:
+            ro_q = supabase.table("orders").select("*").order("created_at", desc=True).limit(5)
+            recent_orders = unpack_data(ro_q.execute().data, "order_data")
+        except: recent_orders = []
+        
+        return {
+            "users": users_count,
+            "bookings": bookings_count,
+            "orders": orders_count,
+            "products": products_count,
+            "services": services_count,
+            "revenue": revenue,
+            "recent_bookings": recent_bookings,
+            "recent_orders": recent_orders,
+            "today_revenue": 0, "today_manual_revenue": 0, "daily_sales": 0,
+            "daily_services": 0, "daily_website_products": 0, "daily_salon_products": 0,
+            "daily_sales_details": [], "daily_services_details": [],
+            "daily_website_products_details": [], "daily_salon_products_details": []
+        }
+    except Exception as e:
+        return {"error": str(e), "traceback": traceback.format_exc()}
 
 @router.get("/admin/orders")
 def admin_orders(limit: int = 200, branch: Optional[str] = None, user: dict = Depends(require_admin)):
