@@ -80,14 +80,31 @@ def get_payroll(month: Optional[str] = Query(None), user: dict = Depends(require
                 "payment_id": p.get("id")
             })
             
-        # Sort daily comms by date desc
-        daily_comms.sort(key=lambda x: x["date"], reverse=True)
+        # Group daily comms by date for frontend rendering
+        grouped_by_date = {}
+        for c in daily_comms:
+            d = c["date"]
+            if d not in grouped_by_date:
+                grouped_by_date[d] = {
+                    "date": d,
+                    "items": [],
+                    "services_count": 0,
+                    "total_sales": 0,
+                    "total_commission": 0
+                }
+            grouped_by_date[d]["items"].append(c)
+            grouped_by_date[d]["services_count"] += 1
+            grouped_by_date[d]["total_sales"] += c["price"]
+            grouped_by_date[d]["total_commission"] += c["commission"]
+            
+        grouped_list = list(grouped_by_date.values())
+        grouped_list.sort(key=lambda x: x["date"], reverse=True)
         
         total_comm = sum(c["commission"] for c in daily_comms)
         
         emp_data = dict(emp)
         emp_data.pop("password_hash", None)
-        emp_data["daily_commissions"] = daily_comms
+        emp_data["daily_commissions"] = grouped_list
         emp_data["total_daily_commission"] = total_comm
         
         payroll_data.append(emp_data)

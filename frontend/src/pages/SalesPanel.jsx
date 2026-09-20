@@ -133,6 +133,7 @@ export default function SalesPanel() {
   const [selectedLead, setSelectedLead] = useState(null);
   const [callingMode, setCallingMode] = useState(false);
   const [callActive, setCallActive] = useState(false); // is the call actually running?
+  const [isSavingLog, setIsSavingLog] = useState(false); // prevent double-submit
   const [leadModalTab, setLeadModalTab] = useState("info"); // 'info' | 'call' for mobile view
   const [callOutcome, setCallOutcome] = useState("Interested (Follow-up)");
   const [callForm, setCallForm] = useState({ 
@@ -323,6 +324,8 @@ export default function SalesPanel() {
 
   const saveCallLog = async (e, shareInvoice = false) => {
     if (e && e.preventDefault) e.preventDefault();
+    if (isSavingLog) return; // prevent double-submit
+    setIsSavingLog(true);
     try {
       let finalDuration = callDurationRef.current;
       if (callActive && callStartTimeRef.current) {
@@ -443,6 +446,8 @@ export default function SalesPanel() {
       fetchStats();
     } catch (err) {
       toast.error("Failed to log call");
+    } finally {
+      setIsSavingLog(false);
     }
   };
 
@@ -687,17 +692,28 @@ export default function SalesPanel() {
 
     if (leadFilterStartDate) {
       filtered = filtered.filter(l => {
-        if (!l.created_at) return false;
-        const leadDate = getLocalDateStr(l.created_at);
+        const dateToUse = ["Visit Scheduled", "Visited"].includes(activeTab) ? l.follow_up_date : l.created_at;
+        if (!dateToUse) return false;
+        const leadDate = getLocalDateStr(dateToUse);
         return leadDate >= leadFilterStartDate;
       });
     }
     
     if (leadFilterEndDate) {
       filtered = filtered.filter(l => {
-        if (!l.created_at) return false;
-        const leadDate = getLocalDateStr(l.created_at);
+        const dateToUse = ["Visit Scheduled", "Visited"].includes(activeTab) ? l.follow_up_date : l.created_at;
+        if (!dateToUse) return false;
+        const leadDate = getLocalDateStr(dateToUse);
         return leadDate <= leadFilterEndDate;
+      });
+    }
+
+    // Sort by follow_up_date ascending for Visit Scheduled
+    if (activeTab === "Visit Scheduled") {
+      filtered = filtered.sort((a, b) => {
+        if (!a.follow_up_date) return 1;
+        if (!b.follow_up_date) return -1;
+        return new Date(a.follow_up_date) - new Date(b.follow_up_date);
       });
     }
 
@@ -1388,7 +1404,20 @@ export default function SalesPanel() {
                     <th className="px-6 py-4 tracking-widest font-bold">Direct Contact</th>
                     <th className="px-6 py-4 tracking-widest font-bold">{activeTab === "Converted" ? "Converted Date" : "Next Follow-up"}</th>
                     <th className="px-6 py-4 tracking-widest font-bold">Pipeline Status</th>
-                    <th className="px-6 py-4 tracking-widest font-bold text-center">Visiting Today?</th>
+                    {activeTab === "Token Received" ? (
+                      <>
+                        <th className="px-6 py-4 tracking-widest font-bold text-right">Token Amount</th>
+                        <th className="px-6 py-4 tracking-widest font-bold text-right">Pending Due</th>
+                        <th className="px-6 py-4 tracking-widest font-bold text-right">Payment Mode</th>
+                      </>
+                    ) : activeTab === "Converted" ? (
+                      <>
+                        <th className="px-6 py-4 tracking-widest font-bold text-right">Total Amount</th>
+                        <th className="px-6 py-4 tracking-widest font-bold text-right">Payment Mode</th>
+                      </>
+                    ) : (
+                      <th className="px-6 py-4 tracking-widest font-bold text-center">Visiting Today?</th>
+                    )}
                     <th className="px-6 py-4 tracking-widest font-bold">Context</th>
                   </tr>
                 </thead>
@@ -1477,10 +1506,10 @@ export default function SalesPanel() {
                         <div className="flex flex-col">
                           {lead.status === "converted" && (lead.converted_date || lead.converted_at) ? (
                             <span className="text-emerald-700 font-bold">
-                              {lead.converted_date ? new Date(lead.converted_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : new Date(lead.converted_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              {lead.converted_date ? new Date(lead.converted_date).toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' }) : new Date(lead.converted_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                             </span>
                           ) : (
-                            <span className="text-gray-900 font-bold">{lead.follow_up_date ? new Date(lead.follow_up_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "Not Scheduled"}</span>
+                            <span className="text-gray-900 font-bold">{lead.follow_up_date ? new Date(lead.follow_up_date).toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' }) : "Not Scheduled"}</span>
                           )}
                           {lead.follow_up_time && lead.status !== "converted" && (
                             <div className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">
@@ -1500,16 +1529,39 @@ export default function SalesPanel() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-center">
-                        {lead.status === "visit" && lead.follow_up_date === new Date().toISOString().split("T")[0] ? (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            Yes ({lead.follow_up_time || "—"})
-                          </span>
-                        ) : (
-                          <span className="text-gray-400 text-xs">—</span>
-                        )}
-                      </td>
+                      {activeTab === "Token Received" ? (
+                        <>
+                          <td className="px-6 py-5 text-right">
+                            <span className="font-bold text-emerald-700">₹{(lead.total_sale_amount || 0).toLocaleString("en-IN")}</span>
+                          </td>
+                          <td className="px-6 py-5 text-right">
+                            <span className="font-bold text-amber-700">₹{(lead.pending_payment || 0).toLocaleString("en-IN")}</span>
+                          </td>
+                          <td className="px-6 py-5 text-right">
+                            <span className="font-bold text-gray-700">{lead.payment_mode || "—"}</span>
+                          </td>
+                        </>
+                      ) : activeTab === "Converted" ? (
+                        <>
+                          <td className="px-6 py-5 text-right">
+                            <span className="font-bold text-emerald-700">₹{(lead.total_sale_amount || 0).toLocaleString("en-IN")}</span>
+                          </td>
+                          <td className="px-6 py-5 text-right">
+                            <span className="font-bold text-gray-700">{lead.payment_mode || "—"}</span>
+                          </td>
+                        </>
+                      ) : (
+                        <td className="px-6 py-5 text-center">
+                          {lead.status === "visit" && lead.follow_up_date === new Date().toISOString().split("T")[0] ? (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              Yes ({lead.follow_up_time || "—"})
+                            </span>
+                          ) : (
+                            <span className="text-gray-400 text-xs">—</span>
+                          )}
+                        </td>
+                      )}
 
                       <td className="px-6 py-5">
                         <div className="flex flex-col">
@@ -1528,7 +1580,7 @@ export default function SalesPanel() {
                   ))}
                   {getFilteredLeads().length === 0 && (
                     <tr>
-                      <td colSpan={activeTab === "Retargeting" ? 7 : 6} className="px-6 py-20 text-center">
+                      <td colSpan={["Retargeting", "Token Received", "Converted"].includes(activeTab) ? 8 : 6} className="px-6 py-20 text-center">
                         <div className="flex flex-col items-center">
                           <div className="p-4 bg-gray-50 rounded-full mb-4">
                             <Search size={32} className="text-gray-300" />
@@ -2042,18 +2094,18 @@ export default function SalesPanel() {
                       <div className="flex flex-wrap gap-3 mt-auto pt-5 pb-1 sticky -bottom-5 sm:-bottom-6 bg-white z-10 border-t border-gray-100">
                         <button 
                           type="submit" 
-                          disabled={callActive}
-                          className="flex-1 min-w-[200px] w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none"
+                          disabled={callActive || isSavingLog}
+                          className="flex-1 min-w-[200px] w-full bg-blue-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed"
                         >
-                          Save Log & Update
+                          {isSavingLog ? "Saving..." : "Save Log & Update"}
                         </button>
                         <button 
                           type="button" 
-                          disabled={callActive}
+                          disabled={callActive || isSavingLog}
                           onClick={(e) => saveCallLog(e, true)}
-                          className="flex-1 min-w-[220px] w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none flex items-center justify-center gap-1.5 whitespace-normal"
+                          className="flex-1 min-w-[220px] w-full bg-emerald-600 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-emerald-700 transition-colors shadow-md disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed flex items-center justify-center gap-1.5 whitespace-normal"
                         >
-                          <MessageSquare size={15} className="shrink-0" /> <span>{["Token Received", "Converted"].includes(callOutcome) ? "Save & Share Invoice" : "Save & Share on WhatsApp"}</span>
+                          <MessageSquare size={15} className="shrink-0" /> <span>{isSavingLog ? "Saving..." : (["Token Received", "Converted"].includes(callOutcome) ? "Save & Share Invoice" : "Save & Share on WhatsApp")}</span>
                         </button>
                       </div>
                     </form>
