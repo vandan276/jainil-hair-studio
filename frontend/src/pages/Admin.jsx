@@ -4702,11 +4702,11 @@ function PendingPaymentsPanel({ orders, refresh }) {
   );
 }
 
-function HistoryReportsPanel({ orders, expenses }) {
+function HistoryReportsPanel({ orders = [], expenses = [] }) {
   const combined = [
-    ...orders.map(o => ({ id: o.id, type: "Bill", title: `Bill created for ${o.full_name}`, amount: o.total, date: o.created_at?.split("T")[0] || "" })),
-    ...expenses.map(e => ({ id: e.id, type: "Expense", title: `Expense recorded: ${e.description}`, amount: -e.amount, date: e.date }))
-  ].sort((a, b) => b.date.localeCompare(a.date));
+    ...orders.map(o => ({ id: o.id, type: "Bill", title: `Bill created for ${o.full_name || o.customer_name || o.user_name || "Client"}`, amount: o.total || o.total_amount || 0, date: o.created_at?.split("T")[0] || "" })),
+    ...expenses.map(e => ({ id: e.id, type: "Expense", title: `Expense recorded: ${e.description || "N/A"}`, amount: -(e.amount || 0), date: e.date || "" }))
+  ].sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -9523,6 +9523,27 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
             </div>
           </div>
 
+          {/* Daily CRM Invoices Card */}
+          <div
+            onClick={() => setSelectedDailyDetail(selectedDailyDetail === "CRM_INVOICES" ? null : "CRM_INVOICES")}
+            className={`glass-card p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col justify-between hover:translate-y-[-2px] ${selectedDailyDetail === "CRM_INVOICES"
+              ? "border-purple-600 bg-purple-50/20 shadow-[0_4px_20px_rgba(147,51,234,0.15)] scale-102"
+              : "border-gray-100 bg-white hover:border-purple-600/40 shadow-sm"
+              }`}
+          >
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <span className="overline text-[10px] text-purple-600 font-bold">CRM Token & Closures</span>
+                <span className="text-[9px] font-bold text-eminence-muted uppercase">Today</span>
+              </div>
+              <h4 className="font-serif text-2xl text-purple-700">₹{(stats?.daily_crm_revenue || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h4>
+            </div>
+            <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
+              <span>{stats?.daily_crm_details?.length || 0} Invoices</span>
+              <span className="text-purple-600 uppercase tracking-wider">View Details</span>
+            </div>
+          </div>
+
           {/* Daily Leads Count Card */}
           <div
             onClick={() => setSelectedDailyDetail(selectedDailyDetail === "LEADS" ? null : "LEADS")}
@@ -9661,6 +9682,65 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       {(!stats?.daily_services_details || stats?.daily_services_details?.length === 0) && (
                         <tr>
                           <td colSpan="7" className="text-center py-8 text-eminence-muted italic">No service bills generated today.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* Details for CRM Invoices */}
+            {selectedDailyDetail === "CRM_INVOICES" && (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="font-serif text-lg text-gray-800">CRM Token & Closure Invoices Today</h4>
+                  <p className="text-xs text-eminence-muted">Lead conversions (Token Received / Converted) with payment receipts</p>
+                </div>
+                <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
+                  <table className="w-full text-xs text-left">
+                    <thead>
+                      <tr className="text-[10px] uppercase text-eminence-muted tracking-wider bg-eminence-surface/50 border-b border-eminence-border/10">
+                        <th className="px-4 py-2.5">Time</th>
+                        <th className="px-4 py-2.5">Client</th>
+                        <th className="px-4 py-2.5">Phone</th>
+                        <th className="px-4 py-2.5">Type</th>
+                        <th className="px-4 py-2.5">Payment</th>
+                        <th className="px-4 py-2.5 text-right">Amount</th>
+                        <th className="px-4 py-2.5">Invoice</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {stats?.daily_crm_details?.map((item, idx) => {
+                        const isClosure = item.details?.toLowerCase().includes("closure") || item.details?.toLowerCase().includes("converted");
+                        return (
+                          <tr key={idx} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10">
+                            <td className="px-4 py-3 font-mono text-[10px] text-gray-500">
+                              {item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : "N/A"}
+                            </td>
+                            <td className="px-4 py-3 font-bold text-gray-800">{item.name}</td>
+                            <td className="px-4 py-3 text-gray-600">{item.details?.split("|")[0]?.replace("Phone:", "").trim() || "—"}</td>
+                            <td className="px-4 py-3">
+                              <span className={`px-2 py-0.5 rounded-full text-[9px] uppercase font-bold ${isClosure ? "bg-purple-50 text-purple-700 border border-purple-200" : "bg-amber-50 text-amber-700 border border-amber-200"}`}>
+                                {isClosure ? "Closure" : "Token"}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-gray-600">{item.details?.split("|")[1]?.trim() || "—"}</td>
+                            <td className="px-4 py-3 text-right font-serif font-bold text-purple-700">+₹{item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
+                            <td className="px-4 py-3">
+                              {item.id && (
+                                <a href={`https://jainilhairstudio.com/api/orders/${item.id}/invoice`} target="_blank" rel="noreferrer"
+                                  className="px-2 py-1 rounded text-[9px] bg-purple-600 text-white uppercase font-bold hover:bg-purple-700 transition-colors">
+                                  Invoice
+                                </a>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {(!stats?.daily_crm_details || stats?.daily_crm_details?.length === 0) && (
+                        <tr>
+                          <td colSpan="7" className="text-center py-8 text-eminence-muted italic">No CRM invoices generated today.</td>
                         </tr>
                       )}
                     </tbody>
@@ -12684,7 +12764,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
 
   const handleUpdatePayroll = async (uid) => {
     try {
-      await api.patch(`/admin/employees/${uid}`, {
+      await api.patch(`/admin/employees/${uid}/payroll`, {
         base_salary: Number(payrollForm.base_salary),
         commission_rate: Number(payrollForm.commission_rate) / 100, // Convert percentage back to decimal
         allowed_weekoffs: payrollForm.allowed_weekoffs ? Number(payrollForm.allowed_weekoffs) : 0
@@ -12698,6 +12778,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
       toast.error("Failed to update payroll configuration");
     }
   };
+
 
   const handleDeleteCommission = async (item) => {
     // 1. Service Provider Order Item Commission
