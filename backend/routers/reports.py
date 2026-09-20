@@ -48,19 +48,25 @@ def get_payroll(month: Optional[str] = Query(None), user: dict = Depends(require
     try:
         year, mon = int(filter_val[:4]), int(filter_val[5:7])
         days_in_month = calendar.monthrange(year, mon)[1]
+        next_month_year = year if mon < 12 else year + 1
+        next_month_mon = mon + 1 if mon < 12 else 1
+        next_month_start = f"{next_month_year}-{next_month_mon:02d}-01"
+        month_start = f"{filter_val}-01"
     except:
         days_in_month = 30
+        next_month_start = filter_val + "-32"
+        month_start = filter_val + "-01"
 
     payroll_cfg = get_payroll_config()
 
     emp_res = supabase.table("users").select("*").in_("role", ["employee", "sales", "service"]).execute()
     employees = emp_res.data
 
-    orders_res = supabase.table("orders").select("*").ilike("created_at", f"{filter_val}%").execute()
+    orders_res = supabase.table("orders").select("*").gte("created_at", month_start).lt("created_at", next_month_start).execute()
     orders = orders_res.data
 
     try:
-        ms_res = supabase.table("manual_sales").select("*").ilike("date", f"{filter_val}%").execute()
+        ms_res = supabase.table("manual_sales").select("*").gte("date", month_start).lt("date", next_month_start).execute()
         manual_sales = ms_res.data
     except:
         manual_sales = []
