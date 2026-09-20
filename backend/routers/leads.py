@@ -1,5 +1,6 @@
 import time
-from fastapi import APIRouter, HTTPException, Depends, Request
+from datetime import datetime, timedelta
+from fastapi import APIRouter, HTTPException, Depends, Request, Query
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -255,10 +256,17 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             "date": eff_date or payment_ts[:10],
             "recorded_by": user["name"]
         }
-        # The following were removed because they don't exist in Supabase leads schema:
-        # payments, total_sale_amount
-
+        existing_data = lead_dict.get("data") or {}
+        existing_data["total_sale_amount"] = data.sale_amount
+        existing_data["pending_payment"] = float(data.pending_amount) if hasattr(data, "pending_amount") and data.pending_amount else 0.0
+        existing_data["payment_mode"] = data.payment_mode or "Not Specified"
         
+        # Initialize payments list if it doesn't exist
+        if "payments" not in existing_data:
+            existing_data["payments"] = []
+        existing_data["payments"].append(payment)
+        
+        update_data["data"] = existing_data
         ptype = "Token" if data.outcome == "Token Received" else "Closure Amount"
         pmode = data.payment_mode or "Not Specified"
         date_str = f" | Date: {eff_date}" if eff_date else ""
@@ -268,24 +276,51 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             "timestamp": now_iso()
         })
         
-        # Optionally create an order for receipt generation
+        # Create an order for receipt generation (must use correct schema)
         order_id = new_id()
+        crm_order_data = {
+            "id": order_id,
+            "lead_id": lid,
+            "full_name": lead_dict.get("name", "Valued Client"),
+            "phone": lead_dict.get("phone", ""),
+            "total": data.sale_amount,
+            "amount_paid": data.sale_amount,
+            "pending_amount": float(data.pending_amount) if hasattr(data, "pending_amount") and data.pending_amount else 0.0,
+            "payment_method": pmode,
+            "split_payments": [{"amount": data.sale_amount, "method": pmode}],
+            "items": [{
+                "name": ptype,
+                "price": data.sale_amount,
+                "qty": 1,
+                "line_total": data.sale_amount,
+                "type": "crm",
+                "service_provider": user["id"]
+            }],
+            "branch": lead_dict.get("branch", ""),
+            "employee_id": user["id"],
+            "employee_name": user.get("name", ""),
+            "status": "completed",
+            "address": "In-Store / Direct",
+            "created_at": payment_ts,
+            "notes": f"CRM {ptype} | Amount Paid: ₹{data.sale_amount:,.2f} | Pending Due: ₹{(data.pending_amount or 0):,.2f}",
+            "next_appointment_date": "",
+            "next_appointment_time": "",
+        }
         order_doc = {
             "id": order_id,
             "lead_id": lid,
-            "customer_name": lead_dict.get("name", "Valued Client"),
-            "customer_phone": lead_dict.get("phone", ""),
-            "total": data.sale_amount,
-            "payment_mode": pmode,
-            "items": [{"name": ptype, "price": data.sale_amount, "qty": 1}],
-            "created_at": now_iso(),
-            "branch": lead_dict.get("branch", ""),
-            "employee_id": user["id"]
+            "phone": lead_dict.get("phone", ""),
+            "total_amount": float(data.sale_amount),
+            "status": "completed",
+            "created_at": payment_ts,
+            "updated_at": payment_ts,
+            "order_data": crm_order_data,
         }
         try:
             supabase.table("orders").insert(order_doc).execute()
-        except:
-            pass
+        except Exception as e:
+            print(f"Error inserting CRM order: {e}")
+            order_id = None
 
     # pending_amount column does not exist in Supabase leads schema
     if notes_to_add:
@@ -320,9 +355,19 @@ def schedule_visit(lid: str, data: dict, user: dict = Depends(require_employee))
 
 
 @router.get("/sales/dashboard")
-def get_sales_dashboard(user: dict = Depends(require_employee)):
+def get_sales_dashboard(
+    date: Optional[str] = Query(None),
+    period: Optional[str] = Query("daily"),
+    results_date: Optional[str] = Query(None),
+    results_period: Optional[str] = Query("daily"),
+    start_date: Optional[str] = Query(None),
+    end_date: Optional[str] = Query(None),
+    res_start_date: Optional[str] = Query(None),
+    res_end_date: Optional[str] = Query(None),
+    user: dict = Depends(require_employee)
+):
     try:
-        fields = "created_at, updated_at, status, grade, follow_up_date, assigned_to, branch, section"
+        fields = "created_at, updated_at, status, grade, follow_up_date, assigned_to, branch, section, data"
         role = user.get("role", "")
         if role == "sales":
             res = supabase.table("leads").select(fields).eq("assigned_to", user.get("id")).limit(1000).execute()
@@ -339,20 +384,118 @@ def get_sales_dashboard(user: dict = Depends(require_employee)):
         else:
             res = supabase.table("leads").select(fields).order("created_at", desc=True).limit(1000).execute()
             docs = res.data
-        
-        today = now_iso()[:10]
-        inactive = ["converted", "closed", "dead", "visit scheduled dead", "recycled"]
-        
+
+        target_date = date if date else now_iso()[:10]
+        res_date = results_date if results_date else target_date
+
+        def get_range(target, p, s=None, e=None):
+            try:
+                dt = datetime.fromisoformat(target)
+                if p == "daily":
+                    return target, target
+                if p == "weekly":
+                    start = (dt - timedelta(days=dt.weekday())).isoformat()[:10]
+                    end = (dt - timedelta(days=dt.weekday()) + timedelta(days=6)).isoformat()[:10]
+                    return start, end
+                if p == "monthly":
+                    return target[:7] + "-01", target[:7] + "-31"
+                if p == "quarterly":
+                    q = (dt.month - 1) // 3
+                    sm = q * 3 + 1
+                    em = sm + 2
+                    return f"{dt.year:04d}-{sm:02d}-01", f"{dt.year:04d}-{em:02d}-31"
+                if p == "yearly":
+                    return f"{dt.year:04d}-01-01", f"{dt.year:04d}-12-31"
+                if p == "custom":
+                    return s if s else target, e if e else target
+            except:
+                return target, target
+            return target, target
+
+        p_start, p_end = get_range(target_date, period, start_date, end_date)
+        r_start, r_end = get_range(res_date, results_period, res_start_date, res_end_date)
+
+        def is_in(ts, start, end):
+            if not ts: return False
+            return start <= ts[:10] <= end
+
+        def get_effective_ts(p, d):
+            if p.get("type") == "token":
+                if d.get("token_received_date"):
+                    return d.get("token_received_date")
+                if d.get("token_received_at"):
+                    return d.get("token_received_at")
+                return p.get("date") or p.get("timestamp") or ""
+            elif p.get("type") == "closure":
+                if d.get("converted_date"):
+                    return d.get("converted_date")
+                if d.get("converted_at"):
+                    return d.get("converted_at")
+                return p.get("date") or p.get("timestamp") or ""
+            return p.get("date") or p.get("timestamp") or ""
+
+        # Periodic Stats (Leads/Sales in selected period)
+        period_sales = 0.0
+        for d in docs:
+            d_data = d.get("data") or {}
+            for p in d_data.get("payments", []):
+                if isinstance(p, dict):
+                    eff_ts = get_effective_ts(p, d_data)
+                    if is_in(eff_ts, p_start, p_end):
+                        period_sales += float(p.get("amount", 0.0))
+
+        # Result Stats (Conversions/Visits in selected results period)
+        def check_result(d, status_list):
+            if d.get("status") not in status_list: return False
+            d_data = d.get("data") or {}
+            if "converted" in status_list or "closed" in status_list:
+                dt_str = d_data.get("converted_date") or d_data.get("converted_at") or d.get("updated_at") or ""
+            elif "token received" in status_list:
+                dt_str = d_data.get("token_received_date") or d_data.get("token_received_at") or d.get("updated_at") or ""
+            elif "visited" in status_list:
+                dt_str = d_data.get("visited_date") or d.get("updated_at") or ""
+            elif "dead" in status_list:
+                dt_str = d_data.get("dead_at") or d.get("updated_at") or ""
+            else:
+                dt_str = d.get("updated_at") or ""
+            return is_in(dt_str, r_start, r_end)
+
+        this_month = now_iso()[:7]
+        monthly_sales = 0.0
+        for d in docs:
+            d_data = d.get("data") or {}
+            for p in d_data.get("payments", []):
+                if isinstance(p, dict):
+                    eff_ts = get_effective_ts(p, d_data)
+                    if eff_ts and eff_ts[:7] == this_month:
+                        monthly_sales += float(p.get("amount", 0.0))
+
         stats = {
             "open": {
-                "overdues": len([d for d in docs if d.get("follow_up_date") and d.get("follow_up_date") < today and d.get("status") not in inactive]),
-                "due_today": len([d for d in docs if d.get("follow_up_date") == today and d.get("status") not in inactive]),
+                "overdues": len([d for d in docs if d.get("follow_up_date") and d.get("follow_up_date") < target_date and d.get("status") not in ["converted", "dead"]]),
+                "due_today": len([d for d in docs if d.get("follow_up_date") == target_date and d.get("status") not in ["converted", "dead"]]),
                 "total_assigned": len(docs),
-                "opportunities": len([d for d in docs if d.get("grade") in ["Hot", "Warm"] and d.get("status") not in inactive]),
+                "opportunities": len([d for d in docs if d.get("grade") in ["Hot", "Warm"] and d.get("status") not in ["converted", "dead"]]),
+                "todays_sales": round(period_sales, 2), 
+            },
+            "periodic": {
+                "leads": len([d for d in docs if is_in(d.get("created_at"), p_start, p_end)]),
+                "calls_made": 0,
+                "activities_completed": 0,
+                "messages_sent": 0,
+                "sales": round(period_sales, 2)
             },
             "result": {
-                "converted": len([d for d in docs if d.get("status") in ["converted", "closed"]]),
-                "dead": len([d for d in docs if d.get("status") == "dead"]),
+                "converted": len([d for d in docs if check_result(d, ["converted", "closed"])]),
+                "token_received": len([d for d in docs if check_result(d, ["token received"])]),
+                "visited": len([d for d in docs if check_result(d, ["visited"])]),
+                "recycled": len([d for d in docs if check_result(d, ["recycled"])]),
+                "dead": len([d for d in docs if check_result(d, ["dead"])]),
+                "closed_won": len([d for d in docs if check_result(d, ["converted", "closed"]) and d.get("grade") in ["Hot", "Warm"]]),
+                "on_hold": len([d for d in docs if check_result(d, ["in process"]) and d.get("grade") == "Cold"]),
+                "closed_lost": len([d for d in docs if check_result(d, ["dead"]) and d.get("grade") in ["Hot", "Warm"]]),
+                "monthly_sales": round(monthly_sales, 2),
+                "monthly_target": user.get("monthly_target", 100000.0)
             }
         }
         return stats
@@ -360,7 +503,8 @@ def get_sales_dashboard(user: dict = Depends(require_employee)):
         print(f"Error in get_sales_dashboard: {e}")
         return {
             "open": {"overdues": 0, "due_today": 0, "total_assigned": 0, "opportunities": 0},
-            "result": {"converted": 0, "dead": 0}
+            "periodic": {"leads": 0, "calls_made": 0, "activities_completed": 0, "messages_sent": 0, "sales": 0},
+            "result": {"converted": 0, "token_received": 0, "visited": 0, "recycled": 0, "dead": 0, "closed_won": 0, "on_hold": 0, "closed_lost": 0, "monthly_sales": 0, "monthly_target": 100000.0}
         }
 
 @router.delete("/leads/{lid}")

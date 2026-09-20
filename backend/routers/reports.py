@@ -22,14 +22,14 @@ def get_payroll(month: Optional[str] = Query(None), user: dict = Depends(require
         manual_sales = []
     
     # 2. Leads payments (sales commission)
-    leads_res = supabase.table("leads").select("id,name,payments,assigned_to,status").execute()
+    leads_res = supabase.table("leads").select("id,name,data,assigned_to,status").execute()
     all_payments = []
     for lead in leads_res.data:
         emp_id = lead.get("assigned_to")
         if not emp_id or emp_id == "walkin" or lead.get("status") not in ["converted", "closed"]:
             continue
             
-        payments = lead.get("payments") or []
+        payments = lead.get("data", {}).get("payments") or []
         for p in payments:
             if isinstance(p, dict):
                 p_type = (p.get("type") or "").strip().lower()
@@ -67,7 +67,7 @@ def get_payroll(month: Optional[str] = Query(None), user: dict = Depends(require
         for p in emp_payments:
             amt = float(p.get("amount") or 0)
             comm_rate = float(emp.get("commission_rate") or 0)
-            comm = amt * (comm_rate / 100) if comm_rate > 0 else 0
+            comm = amt * comm_rate if comm_rate > 0 else 0
             
             daily_comms.append({
                 "date": p.get("timestamp")[:10] if p.get("timestamp") else "",
