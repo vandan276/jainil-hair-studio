@@ -220,34 +220,34 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* User Account / Staff Dashboard */}
+            {/* User Account / Staff Dashboard / Login Button */}
             {user ? (
-              <div className="hidden sm:flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <a 
                   href={user.role === "admin" ? "/admin" : (user.role === "sales" ? "/sales-panel" : (user.role === "service" ? "/service-panel" : (user.role === "receptionist" ? "/receptionist-panel" : "/dashboard")))} 
-                  className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] font-medium text-[#142820] hover:text-[#0F5A3B] bg-[#F2F7F4] border border-[#D8E6DF] px-3 py-1.5 rounded-full transition-colors" 
+                  className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] font-semibold text-[#0F5A3B] bg-[#E8F3EE] hover:bg-[#D5E6DE] border border-[#0F5A3B]/20 px-3 py-1.5 rounded-full transition-colors" 
                   data-testid="nav-dashboard"
                 >
                   <User size={13} className="text-[#0F5A3B]" /> 
-                  <span>{user.role === "admin" ? t("admin") : (user.role === "sales" ? t("salesPanel") : (user.role === "service" ? "Service" : (user.role === "receptionist" ? "Reception" : t("account"))))}</span>
+                  <span>{user.role === "admin" ? "Admin" : (user.role === "sales" ? "Sales" : (user.role === "service" ? "Service" : (user.role === "receptionist" ? "Reception" : "Dashboard")))}</span>
                 </a>
                 <button 
                   onClick={() => { logout(); nav("/"); }} 
-                  className="p-1.5 rounded-full text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all" 
-                  title={t("signOut")}
+                  className="p-1.5 rounded-full text-rose-500 hover:bg-rose-50 border border-rose-200 transition-all" 
+                  title="Logout"
                   data-testid="nav-logout"
                 >
-                  <LogOut size={15} />
+                  <LogOut size={14} />
                 </button>
               </div>
             ) : (
               <Link 
                 to="/login" 
-                className="hidden sm:flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] font-medium text-[#556B61] hover:text-[#142820] px-2.5 py-1.5 rounded-full hover:bg-[#F2F7F4] transition-colors" 
+                className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.16em] font-semibold text-[#142820] hover:text-[#0F5A3B] bg-white hover:bg-[#E8F3EE] border border-[#D8E6DF] hover:border-[#0F5A3B] px-3.5 py-1.5 rounded-full shadow-2xs transition-all" 
                 data-testid="nav-login"
               >
-                <User size={14} />
-                <span>{t("signIn")}</span>
+                <User size={14} className="text-[#0F5A3B]" />
+                <span>Login</span>
               </Link>
             )}
 
