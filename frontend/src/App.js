@@ -34,7 +34,10 @@ import Billing from "@/pages/Billing";
 
 function Layout({ children }) {
   const location = useLocation();
-  const isLanding = location.pathname === "/" || location.pathname === "/men" || location.pathname === "/women";
+  const isLanding = location.pathname === "/" || 
+                    location.pathname === "/men" || 
+                    location.pathname === "/women" ||
+                    location.pathname === "/services";
   const isStaffArea = location.pathname.startsWith("/admin") || 
                       location.pathname.startsWith("/sales-panel") || 
                       location.pathname.startsWith("/receptionist-panel") || 
