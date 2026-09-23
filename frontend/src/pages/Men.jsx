@@ -58,7 +58,7 @@ export default function Men() {
       img: "/assets/slider/slide4.jpeg",
       tag: "Best for Breathability",
       life: "3-5 Months",
-      price: "₹14,999"
+      price: "On Consultation"
     },
     {
       title: "Silk Top Skin Base",
@@ -66,7 +66,7 @@ export default function Men() {
       img: "/assets/slider/slide2.jpeg",
       tag: "Undetectable Parting",
       life: "4-6 Months",
-      price: "₹18,999"
+      price: "On Consultation"
     },
     {
       title: "Hybrid Monofilament",
@@ -74,7 +74,7 @@ export default function Men() {
       img: "/assets/slider/slide1.jpeg",
       tag: "Maximum Durability",
       life: "6-9 Months",
-      price: "₹16,499"
+      price: "On Consultation"
     },
   ];
 
@@ -368,7 +368,9 @@ export default function Men() {
                         <Clock size={13} className="text-[#0F5A3B]" />
                         <span>Lifespan: {item.life}</span>
                       </span>
-                      <span className="font-bold text-[#142820]">From {item.price}</span>
+                      <span className="font-semibold text-[#0F5A3B] text-[11px] uppercase tracking-wider bg-[#E8F3EE] px-2.5 py-0.5 rounded-full border border-[#D5E4DD]">
+                        On Consultation
+                      </span>
                     </div>
                   </div>
                 </div>

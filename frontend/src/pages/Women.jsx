@@ -35,7 +35,7 @@ export default function Women() {
       desc: "Our handcrafted silk-base toppers feature multi-directional parting that looks identical to a natural scalp. Lightweight and secured with tension-free micro-clips that never pull your biological roots.",
       image: "/assets/beautiful_female_model_202604251523.jpeg",
       tag: "Best for Crown Thinning",
-      price: "From ₹12,500",
+      price: "On Consultation",
       time: "45 min fitting"
     },
     {
@@ -45,7 +45,7 @@ export default function Women() {
       desc: "Premium 100% Virgin Indian Remy hair extensions. Available in seamless clip-in or gentle tape-in methods, hand-blended with your natural hair texture, highlights, or balayage.",
       image: "/assets/make_the_girl_202604251826.jpeg",
       tag: "Instant Density & Length",
-      price: "From ₹8,999",
+      price: "On Consultation",
       time: "60 min session"
     },
     {
@@ -55,7 +55,7 @@ export default function Women() {
       desc: "Featherlight Swiss lace meticulously hand-knotted with baby hairs for an invisible frontal contour. Can be styled pulled back, into ponytails, or swept to the side.",
       image: "/assets/realistic_human_hair_202604251524.jpeg",
       tag: "Undetectable Front",
-      price: "From ₹11,999",
+      price: "On Consultation",
       time: "45 min fitting"
     },
     {
@@ -65,7 +65,7 @@ export default function Women() {
       desc: "Silky, hypoallergenic breathable cap bases engineered specifically for sensitive scalps. Provides 360-degree natural coverage with maximum ventilation and featherlight comfort.",
       image: "/assets/after_indian.png",
       tag: "Complete Coverage",
-      price: "From ₹19,999",
+      price: "On Consultation",
       time: "90 min fitting"
     }
   ];
@@ -361,7 +361,9 @@ export default function Women() {
                       <Clock size={12} className="text-[#0F5A3B]" />
                       {sol.time}
                     </span>
-                    <span className="font-bold text-[#142820]">{sol.price}</span>
+                    <span className="font-semibold text-[#0F5A3B] text-[11px] uppercase tracking-wider bg-[#E8F3EE] px-2.5 py-0.5 rounded-full border border-[#D5E4DD]">
+                      On Consultation
+                    </span>
                   </div>
 
                   <Link

@@ -290,12 +290,12 @@ export default function Services() {
                       </div>
                     </div>
 
-                    {/* Card Footer: Starting Price & Book Button */}
+                    {/* Card Footer: Consultation & Book Button */}
                     <div className="mt-5 pt-1 flex items-center justify-between gap-3">
                       <div className="flex flex-col">
-                        <span className="text-[10px] uppercase tracking-wider text-[#889E94] font-medium leading-none">Starting from</span>
-                        <span className="font-serif text-2xl font-medium text-[#142820] leading-none mt-1">
-                          ₹{Number(s.price || 0).toLocaleString("en-IN")}
+                        <span className="text-[10px] uppercase tracking-wider text-[#889E94] font-medium leading-none">Pricing</span>
+                        <span className="text-xs font-semibold uppercase tracking-wider text-[#0F5A3B] leading-none mt-1.5">
+                          On Consultation
                         </span>
                       </div>
 

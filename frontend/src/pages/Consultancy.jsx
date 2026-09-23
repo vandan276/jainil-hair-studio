@@ -367,12 +367,12 @@ export default function Consultancy() {
 
               {/* Q6 */}
               <div>
-                <p className="text-sm font-medium mb-3">6 - Budget Range</p>
+                <p className="text-sm font-medium mb-3">6 - Budget Preference</p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {[
-                    { label: "Basic", range: "₹9,000 to ₹15,000" },
-                    { label: "Recommended Standard", range: "₹18,000 to ₹26,000" },
-                    { label: "Premium", range: "Above ₹30,000" }
+                    { label: "Basic", range: "Standard Care & Restoration" },
+                    { label: "Recommended Standard", range: "Advanced Integration & Volume" },
+                    { label: "Premium", range: "Bespoke Luxury & Undetectable Parting" }
                   ].map(opt => (
                     <label key={opt.label} className={`border p-4 text-center cursor-pointer transition-all ${formData.budget_range === opt.label ? 'border-jainil-gold bg-jainil-gold/5' : 'border-jainil-border hover:border-jainil-gold/50'}`}>
                       <input type="radio" name="budget_range" value={opt.label} checked={formData.budget_range === opt.label} onChange={handleChange} className="hidden" />

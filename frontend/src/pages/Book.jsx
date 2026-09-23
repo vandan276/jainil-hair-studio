@@ -54,7 +54,7 @@ export default function Book() {
               className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 text-jainil-text focus:outline-none focus:border-jainil-gold">
               <option value="">{t("selectService")}</option>
               {services.map((s) => (
-                <option key={s.id} value={s.id}>{s.name} · ₹{s.price.toLocaleString("en-IN")}</option>
+                <option key={s.id} value={s.id}>{s.name}{s.duration_min ? ` · ${s.duration_min} mins` : ""}</option>
               ))}
             </select>
           </div>
@@ -104,15 +104,15 @@ export default function Book() {
             <div className="flex justify-between"><span className="text-jainil-muted">{t("duration")}</span><span>{selectedService?.duration_min || "—"} {t("min")}</span></div>
             <div className="flex justify-between"><span className="text-jainil-muted">{t("date")}</span><span>{date || "—"}</span></div>
             <div className="flex justify-between"><span className="text-jainil-muted">{t("time")}</span><span>{time || "—"}</span></div>
-            <div className="border-t border-jainil-border pt-3 flex justify-between text-jainil-gold font-serif text-2xl">
-              <span>{t("total")}</span>
-              <span>₹{selectedService ? selectedService.price.toLocaleString("en-IN") : 0}</span>
+            <div className="border-t border-jainil-border pt-3 flex justify-between items-center text-[#0F5A3B]">
+              <span className="text-xs uppercase tracking-wider text-jainil-muted font-sans">Pricing</span>
+              <span className="text-sm font-semibold uppercase tracking-wider text-[#0F5A3B] font-sans">On Consultation</span>
             </div>
           </div>
           <button type="submit" disabled={loading} className="btn-gold w-full mt-6" data-testid="book-submit-btn">
             {loading ? t("confirming") : t("confirmBooking")}
           </button>
-          <p className="text-xs text-jainil-muted mt-4 leading-relaxed">{t("payAtSalon")}</p>
+          <p className="text-xs text-jainil-muted mt-4 leading-relaxed">Confidential scalp assessment and tailored pricing provided during your 1-on-1 private suite consultation.</p>
         </aside>
       </form>
     </div>
