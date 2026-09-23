@@ -207,7 +207,7 @@ export default function Landing() {
   return (
     <div data-testid="landing-page" className="bg-[#FAFDFB] text-[#142820] font-sans antialiased selection:bg-[#0F5A3B] selection:text-white">
       {/* ─── HERO SECTION ──────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-28 sm:pt-32 md:pt-40 pb-16 md:pb-24 border-b border-[#E0EBE5]">
+      <section className="relative overflow-hidden pt-28 sm:pt-32 md:pt-40 pb-12 md:pb-16 border-b border-[#E0EBE5]">
         {/* Subtle background decoration */}
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#EBF5F0]/60 to-transparent pointer-events-none" />
         <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E8F3EE]/50 rounded-full blur-3xl pointer-events-none" />
@@ -323,7 +323,7 @@ export default function Landing() {
       </section>
 
       {/* ─── TRUST PILLARS STRIP ───────────────────────────────────────────────── */}
-      <section className="py-14 bg-[#F6FAF8] border-b border-[#E0EBE5]">
+      <section className="py-8 bg-[#F6FAF8] border-b border-[#E0EBE5]">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {TRUST_PILLARS.map((item, idx) => (
             <div key={idx} className="flex items-start gap-4">
