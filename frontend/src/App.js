@@ -22,6 +22,8 @@ import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
 import Admin from "@/pages/Admin";
 import Men from "@/pages/Men";
+import Women from "@/pages/Women";
+import Services from "@/pages/Services";
 import SalesPanel from "@/pages/SalesPanel";
 import Consultancy from "@/pages/Consultancy";
 import AttendanceVerify from "@/pages/AttendanceVerify";
@@ -32,7 +34,7 @@ import Billing from "@/pages/Billing";
 
 function Layout({ children }) {
   const location = useLocation();
-  const isLanding = location.pathname === "/";
+  const isLanding = location.pathname === "/" || location.pathname === "/men" || location.pathname === "/women";
   const isStaffArea = location.pathname.startsWith("/admin") || 
                       location.pathname.startsWith("/sales-panel") || 
                       location.pathname.startsWith("/receptionist-panel") || 
@@ -104,8 +106,9 @@ function AppContent() {
   return (
     <Routes location={location} key={location.pathname}>
       <Route path="/" element={<Layout><Landing /></Layout>} />
-      <Route path="/services" element={<Layout><Landing /></Layout>} />
-      <Route path="/men" element={<Navigate to="/" replace />} />
+      <Route path="/services" element={<Layout><Services /></Layout>} />
+      <Route path="/men" element={<Layout><Men /></Layout>} />
+      <Route path="/women" element={<Layout><Women /></Layout>} />
       <Route path="/book" element={<Layout><ProtectedRoute><Book /></ProtectedRoute></Layout>} />
       <Route path="/shop" element={<Navigate to="/" replace />} />
       <Route path="/shop/:id" element={<Navigate to="/" replace />} />

@@ -339,6 +339,100 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* ─── DEDICATED STUDIOS: MEN & WOMEN ────────────────────────────────────── */}
+      <section className="py-16 md:py-24 bg-[#FAFDFB] border-b border-[#E0EBE5]">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          
+          <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
+            <span className="text-[11px] uppercase tracking-[0.25em] font-semibold text-[#0F5A3B]">
+              Specialized Care
+            </span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-light text-[#142820]">
+              Dedicated Studios for Men & Women
+            </h2>
+            <div className="w-12 h-px bg-[#0F5A3B] mx-auto mt-3" />
+            <p className="text-sm text-[#556B61] font-light leading-relaxed">
+              Explore specialized non-surgical hair restoration engineered for your unique lifestyle and crown density.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Men's Studio Card */}
+            <Link
+              to="/men"
+              className="group relative rounded-3xl overflow-hidden border border-[#D5E4DD] bg-white shadow-md hover:shadow-xl transition-all duration-500 flex flex-col justify-between"
+            >
+              <div className="aspect-[16/10] overflow-hidden relative bg-[#E8F3EE]">
+                <img
+                  src="/assets/slider/slide4.jpeg"
+                  alt="Men's Hair Systems"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-[#0F5A3B] text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border border-[#D5E4DD]">
+                  Men's Studio
+                </div>
+                <div className="absolute bottom-5 left-5 right-5 text-white">
+                  <h3 className="font-serif text-2xl sm:text-3xl font-normal leading-snug">
+                    Men's Hair Systems
+                  </h3>
+                  <p className="text-white/80 text-xs sm:text-sm font-light mt-1 line-clamp-2">
+                    Undetectable Swiss lace, poly skin hairlines, and active lifestyle durability.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-white flex items-center justify-between border-t border-[#E0EBE5]">
+                <span className="text-xs uppercase tracking-[0.16em] font-semibold text-[#0F5A3B] group-hover:text-[#0A3D27] flex items-center gap-2">
+                  <span>Explore Men's Hair Systems</span>
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[11px] text-[#556B61] font-medium bg-[#E8F3EE] px-2.5 py-1 rounded-full">
+                  100% Breathable
+                </span>
+              </div>
+            </Link>
+
+            {/* Women's Studio Card */}
+            <Link
+              to="/women"
+              className="group relative rounded-3xl overflow-hidden border border-[#D5E4DD] bg-white shadow-md hover:shadow-xl transition-all duration-500 flex flex-col justify-between"
+            >
+              <div className="aspect-[16/10] overflow-hidden relative bg-[#E8F3EE]">
+                <img
+                  src="/assets/beautiful_female_model_202604251523.jpeg"
+                  alt="Women's Hair Enhancements"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm text-[#0F5A3B] text-[10px] uppercase tracking-widest font-bold px-3 py-1 rounded-full border border-[#D5E4DD]">
+                  Women's Studio
+                </div>
+                <div className="absolute bottom-5 left-5 right-5 text-white">
+                  <h3 className="font-serif text-2xl sm:text-3xl font-normal leading-snug">
+                    Women's Crown Toppers & Volume
+                  </h3>
+                  <p className="text-white/80 text-xs sm:text-sm font-light mt-1 line-clamp-2">
+                    100% private suites, silk-base partings, and gentle tension-free volume.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-6 bg-white flex items-center justify-between border-t border-[#E0EBE5]">
+                <span className="text-xs uppercase tracking-[0.16em] font-semibold text-[#0F5A3B] group-hover:text-[#0A3D27] flex items-center gap-2">
+                  <span>Explore Women's Solutions</span>
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[11px] text-[#0F5A3B] font-medium bg-[#E8F3EE] px-2.5 py-1 rounded-full">
+                  100% Private Suites
+                </span>
+              </div>
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
       {/* ─── SIGNATURE SERVICES ────────────────────────────────────────────────── */}
       <section className="py-24 md:py-32 bg-white">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">

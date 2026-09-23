@@ -1,9 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useLang, LANGUAGES } from "@/context/LanguageContext";
-import { ShoppingBag, Menu, X, User, Globe, LogOut } from "lucide-react";
+import { 
+  Menu, 
+  X, 
+  User, 
+  Globe, 
+  LogOut, 
+  Calendar, 
+  Phone, 
+  ChevronDown
+} from "lucide-react";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -14,158 +23,357 @@ export default function Navbar() {
   const [langOpen, setLangOpen] = useState(false);
   const nav = useNavigate();
   const location = useLocation();
-
-  const isHero = location.pathname === "/" || location.pathname === "/men";
+  const langRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const isEmployee = user && ["admin", "sales", "service", "employee", "receptionist"].includes(user.role);
-  
-  const links = user && user.role === "receptionist" ? [
-    { to: "/receptionist-panel", label: "Receptionist Panel" },
-    { to: "/billing", label: t("billing") || "Billing" }
-  ] : user && user.role === "service" ? [
-    { to: "/service-panel", label: "Service Panel" },
-    { to: "/billing", label: t("billing") || "Billing" }
-  ] : isEmployee ? [
-    { to: "/billing", label: t("billing") || "Billing" }
-  ] : [
-    { to: "/", label: t("home") },
+  // Close dropdown when clicked outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (langRef.current && !langRef.current.contains(e.target)) {
+        setLangOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  const isStaff = user && ["admin", "sales", "service", "employee", "receptionist"].includes(user.role);
+
+  // Main customer links
+  const customerLinks = [
+    { to: "/", label: t("home") || "Home", testId: "nav-home" },
+    { to: "/men", label: t("men") || "Men", testId: "nav-men", badge: "Systems" },
+    { to: "/women", label: t("women") || "Women", testId: "nav-women", badge: "Toppers" },
+    { to: "/services", label: t("services") || "Services", testId: "nav-services" },
+    { to: "/consultancy", label: "Hair Quiz", testId: "nav-consultancy" },
   ];
 
-  const solid = true;
-  const isMenPage = location.pathname === "/men";
-  const txt = "text-jainil-text";
+  // Staff specific links
+  const staffLinks = user?.role === "receptionist" ? [
+    { to: "/receptionist-panel", label: "Receptionist Panel" },
+    { to: "/billing", label: t("billing") || "Billing" }
+  ] : user?.role === "service" ? [
+    { to: "/service-panel", label: "Service Panel" },
+    { to: "/billing", label: t("billing") || "Billing" }
+  ] : user?.role === "sales" ? [
+    { to: "/sales-panel", label: "Sales Panel" },
+    { to: "/billing", label: t("billing") || "Billing" }
+  ] : user?.role === "admin" ? [
+    { to: "/admin", label: "Admin Dashboard" },
+    { to: "/billing", label: t("billing") || "Billing" }
+  ] : [];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <div className="transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-jainil-border shadow-sm">
-        <div className="max-w-[1500px] mx-auto px-3 sm:px-6 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
-          <nav className="hidden lg:flex items-center gap-10 flex-1">
-            {links.map((l) => {
-              const isStaffPath = l.to.startsWith("/billing") || l.to.startsWith("/consultancy") || l.to.startsWith("/admin") || l.to.endsWith("-panel");
-              return isStaffPath ? (
-                <a
-                  key={l.to}
-                  href={l.to}
-                  className={`text-[12px] uppercase tracking-[0.18em] font-medium transition-colors duration-300 ${location.pathname === l.to ? "text-jainil-gold" : `${txt} hover:opacity-70`}`}
-                >
-                  {l.label}
-                </a>
-              ) : (
-                <NavLink
-                  key={l.to}
-                  to={l.to}
-                  end={l.to === "/"}
-                  data-testid={`nav-${l.to.replace("/", "") || "home"}`}
-                  className={({ isActive }) =>
-                    `text-[12px] uppercase tracking-[0.18em] font-medium transition-colors duration-300 ${isActive ? "text-jainil-gold" : `${txt} hover:opacity-70`}`
-                  }
-                >
-                  {l.label}
-                </NavLink>
-              );
-            })}
-          </nav>
+      {/* Top subtle announcement/studio branch bar */}
+      <div className="bg-[#0F5A3B] text-white text-[11px] py-1 px-4 sm:px-6 hidden md:block">
+        <div className="max-w-[1500px] mx-auto flex items-center justify-between font-light tracking-wide">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5 text-[#D1EADB]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#52D19D] animate-pulse" />
+              Vadodara Studios · Sama-Savli & Sevasi Branches
+            </span>
+            <span className="text-white/30">•</span>
+            <span className="text-white/80">100% Private 1-on-1 Styling Suites</span>
+          </div>
 
-          <Link to="/" className="flex items-center gap-2 lg:absolute lg:left-1/2 lg:-translate-x-1/2 group py-1" data-testid="nav-logo">
+          <div className="flex items-center gap-5">
+            <a 
+              href="tel:+917779055771" 
+              className="flex items-center gap-1.5 text-white/90 hover:text-white transition-colors"
+            >
+              <Phone size={12} className="text-[#D1EADB]" />
+              <span>+91 77790 55771</span>
+            </a>
+            <span className="text-white/30">•</span>
+            <Link to="/book" className="text-[#D1EADB] hover:text-white font-medium transition-colors">
+              Book Confidential Trial
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Glassmorphism Navigation Bar */}
+      <div 
+        className={`transition-all duration-300 ${
+          scrolled 
+            ? "bg-[#FAFDFB]/95 backdrop-blur-md border-b border-[#E0EBE5] shadow-[0_4px_20px_-4px_rgba(15,90,59,0.08)] py-2 sm:py-2.5" 
+            : "bg-[#FAFDFB]/90 backdrop-blur-sm border-b border-[#E0EBE5]/80 py-2.5 sm:py-3.5"
+        }`}
+      >
+        <div className="max-w-[1500px] mx-auto px-4 sm:px-6 lg:px-12 flex items-center justify-between gap-4">
+          
+          {/* Brand Logo */}
+          <Link 
+            to="/" 
+            className="flex items-center gap-2 group shrink-0" 
+            data-testid="nav-logo"
+            aria-label="Jainil Hair Studio Home"
+          >
             <img 
               src="/assets/Logo/Jainil Studio.svg" 
-              alt="Jainil Hair Studio Logo" 
-              className="h-8 sm:h-10 md:h-14 lg:h-16 w-auto object-contain transition-transform duration-300 group-hover:scale-105" 
+              alt="Jainil Hair Studio" 
+              className="h-9 sm:h-11 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]" 
             />
           </Link>
 
-          <div className="flex items-center gap-3 sm:gap-5 lg:flex-1 lg:justify-end">
-            {/* Language switcher */}
-            <div className="relative">
-              <button onClick={() => setLangOpen(!langOpen)} className={`flex items-center gap-1 text-[11px] uppercase tracking-[0.18em] font-medium ${txt} hover:opacity-70`} data-testid="nav-language">
-                <Globe size={14} />
-                <span>{LANGUAGES.find((l) => l.code === lang)?.label || "EN"}</span>
+          {/* Desktop Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+            {customerLinks.map((l) => (
+              <NavLink
+                key={l.to}
+                to={l.to}
+                end={l.to === "/"}
+                data-testid={l.testId}
+                className={({ isActive }) =>
+                  `relative px-3.5 py-1.5 rounded-full text-[12px] uppercase tracking-[0.16em] font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                    isActive
+                      ? "bg-[#E8F3EE] text-[#0F5A3B] font-semibold shadow-xs"
+                      : "text-[#142820] hover:text-[#0F5A3B] hover:bg-[#F2F7F4]"
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <span>{l.label}</span>
+                    {l.badge && (
+                      <span className={`text-[9px] uppercase px-1.5 py-0.2 rounded-full tracking-wider font-semibold transition-colors ${
+                        isActive 
+                          ? "bg-[#0F5A3B] text-white" 
+                          : "bg-[#E0EBE5] text-[#556B61]"
+                      }`}>
+                        {l.badge}
+                      </span>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
+
+            {/* Quick staff links if logged in as staff */}
+            {isStaff && staffLinks.length > 0 && (
+              <div className="flex items-center ml-2 pl-2 border-l border-[#D8E6DF] gap-1">
+                {staffLinks.map((sl) => (
+                  <a
+                    key={sl.to}
+                    href={sl.to}
+                    className="text-[11px] uppercase tracking-[0.14em] font-semibold text-[#0F5A3B] bg-[#E8F3EE] hover:bg-[#D5E6DE] px-3 py-1.5 rounded-full transition-colors"
+                  >
+                    {sl.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </nav>
+
+          {/* Right Action Icons & Book CTA */}
+          <div className="flex items-center gap-2.5 sm:gap-3.5">
+            
+            {/* Language Switcher */}
+            <div className="relative" ref={langRef}>
+              <button 
+                onClick={() => setLangOpen(!langOpen)} 
+                className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.16em] font-medium text-[#142820] hover:text-[#0F5A3B] hover:bg-[#F2F7F4] px-2.5 py-1.5 rounded-full border border-transparent hover:border-[#E0EBE5] transition-all"
+                data-testid="nav-language"
+                aria-label="Select Language"
+              >
+                <Globe size={14} className="text-[#0F5A3B]" />
+                <span className="font-semibold">{LANGUAGES.find((l) => l.code === lang)?.label || "EN"}</span>
+                <ChevronDown size={12} className={`text-[#556B61] transition-transform duration-200 ${langOpen ? "rotate-180" : ""}`} />
               </button>
+
               {langOpen && (
-                <div className="absolute right-0 top-full mt-2 bg-white border border-jainil-border min-w-[140px] shadow-lg z-50" data-testid="lang-dropdown">
+                <div 
+                  className="absolute right-0 top-full mt-2 bg-white rounded-2xl border border-[#D8E6DF] min-w-[150px] shadow-xl py-1.5 z-50 animate-fade-in overflow-hidden" 
+                  data-testid="lang-dropdown"
+                >
+                  <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-[#556B61] border-b border-[#F0F5F2] font-semibold">
+                    Language / ભાષા
+                  </div>
                   {LANGUAGES.map((l) => (
                     <button
                       key={l.code}
                       onClick={() => { setLang(l.code); setLangOpen(false); }}
                       data-testid={`lang-${l.code}`}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-jainil-surface ${lang === l.code ? "text-jainil-gold font-semibold" : "text-jainil-text"}`}
+                      className={`w-full text-left px-3.5 py-2 text-xs flex items-center justify-between transition-colors ${
+                        lang === l.code 
+                          ? "bg-[#E8F3EE] text-[#0F5A3B] font-semibold" 
+                          : "text-[#142820] hover:bg-[#F6FAF8]"
+                      }`}
                     >
-                      {l.name}
+                      <span>{l.name}</span>
+                      {lang === l.code && <span className="w-1.5 h-1.5 rounded-full bg-[#0F5A3B]" />}
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
+            {/* User Account / Staff Dashboard */}
             {user ? (
-              <>
+              <div className="hidden sm:flex items-center gap-2">
                 <a 
                   href={user.role === "admin" ? "/admin" : (user.role === "sales" ? "/sales-panel" : (user.role === "service" ? "/service-panel" : (user.role === "receptionist" ? "/receptionist-panel" : "/dashboard")))} 
-                  className={`hidden md:flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] font-medium ${txt} hover:opacity-70`} 
+                  className="flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] font-medium text-[#142820] hover:text-[#0F5A3B] bg-[#F2F7F4] border border-[#D8E6DF] px-3 py-1.5 rounded-full transition-colors" 
                   data-testid="nav-dashboard"
                 >
-                  <User size={16} /> {user.role === "admin" ? t("admin") : (user.role === "sales" ? t("salesPanel") : (user.role === "service" ? "Service Panel" : (user.role === "receptionist" ? "Receptionist Panel" : t("account"))))}
+                  <User size={13} className="text-[#0F5A3B]" /> 
+                  <span>{user.role === "admin" ? t("admin") : (user.role === "sales" ? t("salesPanel") : (user.role === "service" ? "Service" : (user.role === "receptionist" ? "Reception" : t("account"))))}</span>
                 </a>
-                <button onClick={() => { logout(); nav("/"); }} className="hidden md:flex items-center gap-1.5 text-[10px] uppercase tracking-[0.18em] font-bold border border-rose-400/40 text-rose-500 px-4 py-1.5 rounded-full hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:shadow-lg hover:shadow-rose-500/20 transition-all duration-300" data-testid="nav-logout">
-                  <LogOut size={13} />
-                  {t("signOut")}
+                <button 
+                  onClick={() => { logout(); nav("/"); }} 
+                  className="p-1.5 rounded-full text-rose-500 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-all" 
+                  title={t("signOut")}
+                  data-testid="nav-logout"
+                >
+                  <LogOut size={15} />
                 </button>
-              </>
+              </div>
             ) : (
-              <Link to="/login" className={`hidden md:flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] font-medium ${txt} hover:opacity-70`} data-testid="nav-login">
-                <User size={16} /> {t("signIn")}
+              <Link 
+                to="/login" 
+                className="hidden sm:flex items-center gap-1.5 text-[11px] uppercase tracking-[0.14em] font-medium text-[#556B61] hover:text-[#142820] px-2.5 py-1.5 rounded-full hover:bg-[#F2F7F4] transition-colors" 
+                data-testid="nav-login"
+              >
+                <User size={14} />
+                <span>{t("signIn")}</span>
               </Link>
             )}
 
+            {/* Book Appointment CTA Button */}
+            <Link
+              to="/book"
+              className="inline-flex items-center gap-2 bg-[#0F5A3B] hover:bg-[#0A3D27] text-white px-4 sm:px-5 py-2 rounded-full font-medium text-[11px] sm:text-xs uppercase tracking-[0.16em] transition-all duration-300 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+              data-testid="nav-book-button"
+            >
+              <Calendar size={13} />
+              <span className="hidden xs:inline">Book</span>
+              <span>Appointment</span>
+            </Link>
 
-
-            <button onClick={() => setOpen(!open)} className={`lg:hidden ${txt}`} data-testid="nav-menu-toggle">
-              {open ? <X size={22} /> : <Menu size={22} />}
+            {/* Mobile Menu Toggle Button */}
+            <button 
+              onClick={() => setOpen(!open)} 
+              className="lg:hidden p-2 rounded-xl text-[#142820] hover:bg-[#F2F7F4] transition-colors border border-transparent hover:border-[#E0EBE5]" 
+              data-testid="nav-menu-toggle"
+              aria-label="Toggle navigation menu"
+            >
+              {open ? <X size={22} className="text-[#0F5A3B]" /> : <Menu size={22} />}
             </button>
           </div>
         </div>
 
+        {/* Mobile Slide-down Drawer */}
         {open && (
-          <div className="lg:hidden border-t border-jainil-border bg-white">
-            <div className="px-6 py-6 flex flex-col gap-4">
-              {links.map((l) => {
-                const isStaffPath = l.to.startsWith("/billing") || l.to.startsWith("/consultancy") || l.to.startsWith("/admin") || l.to.endsWith("-panel");
-                return isStaffPath ? (
-                  <a key={l.to} href={l.to}
-                    className="text-sm font-medium text-jainil-text hover:text-jainil-gold uppercase tracking-[0.18em]">
-                    {l.label}
-                  </a>
-                ) : (
-                  <NavLink key={l.to} to={l.to} onClick={() => setOpen(false)}
-                    className="text-sm font-medium text-jainil-text hover:text-jainil-gold uppercase tracking-[0.18em]">
-                    {l.label}
-                  </NavLink>
-                );
-              })}
+          <div className="lg:hidden border-t border-[#E0EBE5] bg-white/98 backdrop-blur-md px-5 py-6 space-y-6 shadow-2xl animate-fade-in">
+            {/* Navigation Links */}
+            <div className="flex flex-col space-y-1.5">
+              {customerLinks.map((l) => (
+                <NavLink
+                  key={l.to}
+                  to={l.to}
+                  end={l.to === "/"}
+                  onClick={() => setOpen(false)}
+                  className={({ isActive }) =>
+                    `px-4 py-3 rounded-2xl text-xs uppercase tracking-[0.18em] font-medium flex items-center justify-between transition-all ${
+                      isActive
+                        ? "bg-[#E8F3EE] text-[#0F5A3B] font-bold"
+                        : "text-[#142820] hover:bg-[#F6FAF8]"
+                    }`
+                  }
+                >
+                  <span>{l.label}</span>
+                  {l.badge && (
+                    <span className="text-[9px] uppercase px-2 py-0.5 rounded-full bg-[#0F5A3B]/10 text-[#0F5A3B] font-bold">
+                      {l.badge}
+                    </span>
+                  )}
+                </NavLink>
+              ))}
+
+              {/* Staff links in mobile menu if logged in */}
+              {isStaff && staffLinks.length > 0 && (
+                <div className="pt-3 border-t border-[#E0EBE5] space-y-1.5">
+                  <div className="px-4 text-[10px] uppercase tracking-wider text-[#556B61] font-bold">
+                    Staff Portal
+                  </div>
+                  {staffLinks.map((sl) => (
+                    <a
+                      key={sl.to}
+                      href={sl.to}
+                      onClick={() => setOpen(false)}
+                      className="block px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider font-semibold text-[#0F5A3B] bg-[#E8F3EE]"
+                    >
+                      {sl.label}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Studio Info & Quick WhatsApp in Mobile Drawer */}
+            <div className="bg-[#FAFDFB] p-4 rounded-2xl border border-[#E0EBE5] space-y-3">
+              <div className="flex items-center justify-between text-xs text-[#556B61]">
+                <span>Vadodara Studios:</span>
+                <span className="font-semibold text-[#0F5A3B]">Sama-Savli & Sevasi</span>
+              </div>
+              <div className="flex gap-2">
+                <a
+                  href="tel:+917779055771"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#FAFDFB] hover:bg-[#E8F3EE] text-[#0F5A3B] border border-[#0F5A3B]/30 py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors"
+                >
+                  <Phone size={13} />
+                  <span>Call Us</span>
+                </a>
+                <a
+                  href="https://wa.me/917779055771?text=Hello%20Jainil%20Hair%20Studio,%20I%20would%20like%20to%20inquire%20about%20an%20appointment."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 bg-[#0F5A3B] hover:bg-[#0A3D27] text-white py-2.5 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors"
+                >
+                  <Calendar size={13} />
+                  <span>Book Consultation</span>
+                </a>
+              </div>
+            </div>
+
+            {/* Auth in Mobile Drawer */}
+            <div className="pt-2 border-t border-[#E0EBE5] flex items-center justify-between">
               {user ? (
                 <>
-                  <a 
-                    href={user.role === "admin" ? "/admin" : (user.role === "sales" ? "/sales-panel" : (user.role === "service" ? "/service-panel" : (user.role === "receptionist" ? "/receptionist-panel" : "/dashboard")))} 
-                    className="text-sm font-medium text-jainil-text uppercase tracking-[0.18em]"
+                  <div className="text-xs text-[#142820]">
+                    Signed in as <span className="font-bold">{user.name || user.email}</span>
+                  </div>
+                  <button
+                    onClick={() => { logout(); setOpen(false); nav("/"); }}
+                    className="flex items-center gap-1.5 text-xs font-bold text-rose-500 uppercase tracking-wider px-3 py-1.5 rounded-lg border border-rose-200 hover:bg-rose-50 transition-colors"
                   >
-                    {user.role === "admin" ? t("admin") : (user.role === "sales" ? t("salesPanel") : (user.role === "service" ? "Service Panel" : (user.role === "receptionist" ? "Receptionist Panel" : t("account"))))}
-                  </a>
-                  <button onClick={() => { logout(); setOpen(false); nav("/"); }} className="flex items-center gap-2 text-sm font-bold text-rose-500 uppercase tracking-[0.18em] border border-rose-400/30 px-4 py-2 rounded-full hover:bg-rose-500 hover:text-white transition-all">
-                    <LogOut size={15} />
-                    {t("signOut")}
+                    <LogOut size={13} />
+                    <span>{t("signOut")}</span>
                   </button>
                 </>
               ) : (
-                <Link to="/login" onClick={() => setOpen(false)} className="text-sm font-medium text-jainil-text uppercase tracking-[0.18em]">{t("signIn")}</Link>
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="w-full text-center py-2.5 rounded-xl border border-[#D8E6DF] text-xs uppercase tracking-wider font-semibold text-[#142820] hover:bg-[#F2F7F4] transition-colors"
+                >
+                  {t("signIn")}
+                </Link>
               )}
             </div>
+
           </div>
         )}
       </div>
