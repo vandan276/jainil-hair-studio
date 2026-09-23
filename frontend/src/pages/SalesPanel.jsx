@@ -592,6 +592,11 @@ export default function SalesPanel() {
   };
 
   const openEditModal = (lead) => {
+    const latestNote = Array.isArray(lead.notes) && lead.notes.length > 0 
+      ? (typeof lead.notes[lead.notes.length - 1] === 'object' ? lead.notes[lead.notes.length - 1].text : lead.notes[lead.notes.length - 1])
+      : "";
+    const existingComment = lead.comment || lead.data?.comment || latestNote || "";
+
     setEditLeadForm({
       id: lead.id,
       name: lead.name,
@@ -602,6 +607,7 @@ export default function SalesPanel() {
       source: lead.source || "Manual",
       city: lead.city || "",
       hair_condition: lead.hair_condition || "",
+      comment: existingComment,
       is_repeated: lead.is_repeated || false,
       consulted_by: lead.consulted_by || "",
       status: lead.status,
@@ -1763,6 +1769,15 @@ export default function SalesPanel() {
                     </p>
                   </div>
 
+                  {selectedLead.comment && (
+                    <div className="col-span-1 sm:col-span-2">
+                      <label className="text-xs text-gray-400 uppercase tracking-wide">Latest Comment</label>
+                      <p className="font-medium text-gray-800 mt-1 bg-yellow-50/70 border border-yellow-200/80 p-3 rounded-xl text-xs leading-relaxed">
+                        {selectedLead.comment}
+                      </p>
+                    </div>
+                  )}
+
                   <div>
                     <label className="text-xs text-gray-400 uppercase tracking-wide">Customer Type</label>
                     <p className="mt-1">
@@ -2730,11 +2745,22 @@ export default function SalesPanel() {
                   <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Hair Condition</label>
                   <input
                     type="text"
-                    value={editLeadForm.hair_condition}
+                    value={editLeadForm.hair_condition || ""}
                     onChange={e => setEditLeadForm({...editLeadForm, hair_condition: e.target.value})}
                     placeholder="e.g. Hair Fall, Thinning"
                     className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all"
                   />
+                </div>
+
+                <div className="col-span-1 sm:col-span-2">
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase mb-2 tracking-widest">Comment</label>
+                  <textarea
+                    rows={3}
+                    value={editLeadForm.comment || ""}
+                    onChange={e => setEditLeadForm({...editLeadForm, comment: e.target.value})}
+                    placeholder="Enter comment, client remarks, or consultation notes..."
+                    className="w-full border border-gray-100 bg-gray-50/50 rounded-xl p-3 text-sm focus:ring-2 focus:ring-gray-900 focus:outline-none transition-all resize-y"
+                  ></textarea>
                 </div>
               </div>
 

@@ -47,6 +47,7 @@ class CallLogIn(BaseModel):
     sale_amount: Optional[float] = None
     pending_amount: Optional[float] = None
     payment_mode: Optional[str] = None
+    txn_id: Optional[str] = None
     consulted_by: Optional[str] = None
 
 @router.post("/leads")
@@ -108,7 +109,35 @@ def list_leads(user: dict = Depends(require_employee)):
         print(f"Error in list_leads: {e}")
         return []
 
-
+@router.get("/leads/duplicates")
+def get_duplicate_leads(user: dict = Depends(require_employee)):
+    import os
+    # Get the webhook secret (for the frontend to generate the webhook url)
+    secret_res = supabase.table("settings").select("data").eq("id", "meta_config").execute()
+    secret = "jainil_secret_123"
+    if secret_res.data:
+        secret = secret_res.data[0].get("data", {}).get("webhook_secret", secret)
+    
+    # Get all leads
+    res = supabase.table("leads").select("*").execute()
+    leads = [unpack_data(d, "data")[0] for d in res.data]
+    
+    by_phone = {}
+    for d in leads:
+        phone = d.get("phone")
+        if phone:
+            phone_clean = "".join(filter(str.isdigit, phone))
+            if len(phone_clean) >= 10:
+                phone_key = phone_clean[-10:]
+                by_phone.setdefault(phone_key, []).append(d)
+                
+    duplicates = {}
+    for phone_key, group in by_phone.items():
+        if len(group) > 1:
+            display_phone = group[0].get("phone")
+            duplicates[display_phone] = group
+            
+    return {"secret": secret, "duplicates": duplicates}
 @router.get("/leads/{lid}")
 def get_lead(lid: str, user: dict = Depends(require_employee)):
     res = supabase.table("leads").select("*").eq("id", lid).execute()
@@ -144,8 +173,25 @@ async def update_lead(lid: str, request: Request, user: dict = Depends(require_e
             if field in date_cols and value == "":
                 value = None
             update_data[field] = value
-        elif field not in ["id", "created_at", "updated_at", "created_by", "notes", "data"]:
+        elif field not in ["id", "created_at", "updated_at", "created_by", "notes", "data", "new_note"]:
             existing_data[field] = value
+
+    # If comment is provided and changed/new, log it into notes history
+    if "comment" in data:
+        new_comment_val = (data.get("comment") or "").strip()
+        old_comment_val = (existing_data.get("comment") or "").strip()
+        existing_data["comment"] = new_comment_val
+        if new_comment_val and new_comment_val != old_comment_val:
+            current_notes = existing_lead.get("notes") or []
+            note = {"text": f"Comment: {new_comment_val}", "author": user.get("name") or "Staff", "timestamp": now_iso()}
+            current_notes.append(note)
+            update_data["notes"] = current_notes
+
+    if data.get("new_note"):
+        current_notes = update_data.get("notes") or existing_lead.get("notes") or []
+        note = {"text": data["new_note"], "author": user.get("name") or "Staff", "timestamp": now_iso()}
+        current_notes.append(note)
+        update_data["notes"] = current_notes
             
     update_data["data"] = existing_data
     
@@ -214,30 +260,59 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
     update_data = {"updated_at": now_iso()}
     
     if data.outcome == "Not Picked Up":
-        update_data["status"] = "in process"
+        if data.grade and data.grade.lower() == "dead" and not data.next_followup_date:
+            update_data["status"] = "dead"
+            update_data["grade"] = "Dead"
+            update_data["follow_up_date"] = None
+            update_data["follow_up_time"] = None
+        else:
+            update_data["status"] = "in process"
+            if data.grade: update_data["grade"] = data.grade
+            update_data["follow_up_date"] = data.next_followup_date
+            update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome in ["Said No", "Not Interested"]:
         update_data["status"] = "dead"
+        update_data["follow_up_date"] = None
+        update_data["follow_up_time"] = None
+    elif data.outcome == "Visit Scheduled Dead":
+        update_data["status"] = "visit scheduled dead"
+        update_data["follow_up_date"] = None
+        update_data["follow_up_time"] = None
     elif data.outcome in ["Picked Up", "Interested (Follow-up)"]:
         update_data["status"] = "in process"
         if data.grade: update_data["grade"] = data.grade
-        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
-        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
+        update_data["follow_up_date"] = data.next_followup_date
+        update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Visit Scheduled":
         update_data["status"] = "visit"
-        if data.next_followup_date: update_data["follow_up_date"] = data.next_followup_date
-        if data.next_followup_time: update_data["follow_up_time"] = data.next_followup_time
+        update_data["follow_up_date"] = data.next_followup_date
+        update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Visited":
         update_data["status"] = "visited"
+        update_data["follow_up_date"] = data.next_followup_date
+        update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Token Received":
         update_data["status"] = "token received"
+        update_data["follow_up_date"] = data.next_followup_date
+        update_data["follow_up_time"] = data.next_followup_time
     elif data.outcome == "Converted":
         update_data["status"] = "converted"
         update_data["follow_up_date"] = None
         update_data["follow_up_time"] = None
 
     notes_to_add = []
+    
+    # Always log the call outcome, even without a comment, and include schedule info
+    note_text = f"Call Outcome: {data.outcome}"
+    if data.next_followup_date:
+        note_text += f" - Scheduled for {data.next_followup_date}"
+        if data.next_followup_time:
+            note_text += f" at {data.next_followup_time}"
+            
     if data.comment:
-        notes_to_add.append({"text": f"Call: {data.outcome} - {data.comment}", "author": user.get("name"), "timestamp": now_iso()})
+        note_text += f" | Note: {data.comment}"
+        
+    notes_to_add.append({"text": note_text, "author": user.get("name"), "timestamp": now_iso()})
         
     if data.outcome == "Visited" and data.consulted_by:
         notes_to_add.append({"text": f"SYSTEM: Customer visited and was consulted by {data.consulted_by}", "author": "System", "timestamp": now_iso()})
@@ -256,9 +331,19 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             "date": eff_date or payment_ts[:10],
             "recorded_by": user["name"]
         }
+        if hasattr(data, "txn_id") and data.txn_id:
+            payment["txn_id"] = data.txn_id
         existing_data = lead_dict.get("data") or {}
-        existing_data["total_sale_amount"] = data.sale_amount
-        existing_data["pending_payment"] = float(data.pending_amount) if hasattr(data, "pending_amount") and data.pending_amount else 0.0
+        
+        if data.outcome == "Converted":
+            prev_total = float(existing_data.get("total_sale_amount") or 0)
+            existing_data["total_sale_amount"] = prev_total + data.sale_amount
+            existing_data["pending_payment"] = 0.0
+        else:
+            prev_total = float(existing_data.get("total_sale_amount") or 0)
+            existing_data["total_sale_amount"] = prev_total + data.sale_amount
+            existing_data["pending_payment"] = float(data.pending_amount) if hasattr(data, "pending_amount") and data.pending_amount else 0.0
+            
         existing_data["payment_mode"] = data.payment_mode or "Not Specified"
         
         # Initialize payments list if it doesn't exist
@@ -266,12 +351,16 @@ def log_call(lid: str, data: CallLogIn, user: dict = Depends(require_employee)):
             existing_data["payments"] = []
         existing_data["payments"].append(payment)
         
+        # Double check sanity: calculate from payments directly
+        existing_data["total_sale_amount"] = sum([float(p.get("amount", 0)) for p in existing_data["payments"]])
+        
         update_data["data"] = existing_data
         ptype = "Token" if data.outcome == "Token Received" else "Closure Amount"
         pmode = data.payment_mode or "Not Specified"
         date_str = f" | Date: {eff_date}" if eff_date else ""
+        txn_str = f" (Ref: {data.txn_id})" if hasattr(data, "txn_id") and data.txn_id else ""
         notes_to_add.append({
-            "text": f"SYSTEM: {user.get('name')} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{date_str}", 
+            "text": f"SYSTEM: {user.get('name')} collected {ptype} of ₹{data.sale_amount:,.2f} via {pmode}{txn_str}{date_str}", 
             "author": "System", 
             "timestamp": now_iso()
         })
@@ -512,3 +601,32 @@ def delete_lead(lid: str, user: dict = Depends(require_employee)):
     # You might want to restrict this to admins or allow anyone in sales to delete
     res = supabase.table("leads").delete().eq("id", lid).execute()
     return {"ok": True}
+
+
+@router.delete("/leads/{lid}/payments/{payment_ts}")
+def delete_payment(lid: str, payment_ts: str, user: dict = Depends(require_employee)):
+    res = supabase.table("leads").select("*").eq("id", lid).execute()
+    if not res.data:
+        raise HTTPException(404, "Lead not found")
+        
+    lead_dict = res.data[0]
+    existing_data = lead_dict.get("data") or {}
+    payments = existing_data.get("payments") or []
+    
+    # Filter out the payment with the matching timestamp
+    new_payments = [p for p in payments if p.get("timestamp") != payment_ts]
+    
+    if len(new_payments) == len(payments):
+        raise HTTPException(404, "Payment not found")
+        
+    existing_data["payments"] = new_payments
+    existing_data["total_sale_amount"] = sum([float(p.get("amount", 0)) for p in new_payments])
+    
+    update_data = {
+        "data": existing_data,
+        "updated_at": now_iso()
+    }
+    
+    supabase.table("leads").update(update_data).eq("id", lid).execute()
+    
+    return {"message": "Payment deleted successfully"}
