@@ -249,59 +249,64 @@ export default function Services() {
                 return (
                   <div
                     key={s.id}
-                    className="bg-white rounded-3xl p-7 border border-[#E0EBE5] hover:border-[#0F5A3B] hover:shadow-lg transition-all duration-300 flex flex-col justify-between group"
+                    className="bg-white rounded-2xl p-6 sm:p-7 border border-[#E2ECE6] hover:border-[#0F5A3B] hover:shadow-[0_12px_32px_rgba(15,90,59,0.08)] transition-all duration-300 flex flex-col justify-between group"
                     data-testid={`service-${s.id}`}
                   >
                     <div>
                       {/* Top Badges */}
-                      <div className="flex items-center justify-between gap-2 mb-5">
-                        <span className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wider font-bold text-[#0F5A3B] bg-[#E8F3EE] px-3 py-1 rounded-full border border-[#D5E4DD]">
-                          <IconComponent size={12} />
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold text-[#0F5A3B] bg-[#E8F3EE] px-3 py-1 rounded-full border border-[#D5E4DD]">
+                          <IconComponent size={13} className="shrink-0 text-[#0F5A3B]" />
                           <span>{s.category || "Ritual"}</span>
                         </span>
 
                         {s.service_for && (
-                          <span className="text-[10px] uppercase tracking-wider font-medium text-[#556B61] bg-[#FAFDFB] border border-[#E0EBE5] px-2.5 py-0.5 rounded-full">
+                          <span className="inline-flex items-center text-[10px] uppercase tracking-wider font-semibold text-[#556B61] bg-[#FAFDFB] border border-[#E0EBE5] px-2.5 py-1 rounded-full">
                             {s.service_for}
                           </span>
                         )}
                       </div>
 
                       {/* Service Title */}
-                      <h3 className="font-serif text-2xl font-normal text-[#142820] mb-2.5 group-hover:text-[#0F5A3B] transition-colors">
+                      <h3 className="font-serif text-xl sm:text-2xl font-normal text-[#142820] group-hover:text-[#0F5A3B] transition-colors leading-snug mt-4 mb-2">
                         {cleanName}
                       </h3>
 
                       {/* Service Description */}
-                      <p className="text-xs text-[#556B61] font-light leading-relaxed mb-6">
+                      <p className="text-sm text-[#556B61] font-light leading-relaxed min-h-[44px] line-clamp-2">
                         {desc}
                       </p>
+
+                      {/* Session Specs Bar */}
+                      <div className="mt-4 pt-3.5 pb-3 border-t border-b border-[#EDF4F0] flex items-center justify-between text-xs text-[#556B61]">
+                        <span className="inline-flex items-center gap-1.5 font-medium text-[#142820]">
+                          <Clock size={13} className="text-[#0F5A3B]" />
+                          <span>{s.duration_min || 30} mins session</span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0F5A3B] bg-[#E8F3EE] px-2.5 py-0.5 rounded-full">
+                          <Sparkles size={11} />
+                          <span>Private Suite</span>
+                        </span>
+                      </div>
                     </div>
 
-                    {/* Bottom Duration, Pricing & Book Button */}
-                    <div className="pt-5 border-t border-[#F0F5F2] space-y-4">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-[#556B61] flex items-center gap-1.5 font-light">
-                          <Clock size={13} className="text-[#0F5A3B]" />
-                          <span>{s.duration_min || 30} mins</span>
+                    {/* Card Footer: Starting Price & Book Button */}
+                    <div className="mt-5 pt-1 flex items-center justify-between gap-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] uppercase tracking-wider text-[#889E94] font-medium leading-none">Starting from</span>
+                        <span className="font-serif text-2xl font-medium text-[#142820] leading-none mt-1">
+                          ₹{Number(s.price || 0).toLocaleString("en-IN")}
                         </span>
-
-                        <div className="text-right">
-                          <span className="text-[10px] uppercase tracking-wider text-[#889E94] mr-1">From</span>
-                          <span className="font-serif text-xl font-medium text-[#142820]">
-                            ₹{Number(s.price || 0).toLocaleString("en-IN")}
-                          </span>
-                        </div>
                       </div>
 
                       <Link
                         to="/book"
                         state={{ service: s }}
-                        className="w-full inline-flex items-center justify-center gap-2 bg-[#FAFDFB] hover:bg-[#0F5A3B] text-[#0F5A3B] hover:text-white border border-[#0F5A3B]/30 hover:border-[#0F5A3B] py-3 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-300 shadow-2xs group-hover:shadow-sm"
+                        className="inline-flex items-center gap-1.5 bg-[#0F5A3B] hover:bg-[#142820] text-white px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider transition-all duration-200 shadow-xs hover:shadow-md group/btn shrink-0"
                         data-testid={`book-${s.id}`}
                       >
-                        <span>Book Appointment</span>
-                        <ChevronRight size={13} />
+                        <span>Book Service</span>
+                        <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
 
