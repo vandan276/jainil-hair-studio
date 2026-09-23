@@ -54,7 +54,7 @@ export default function ProductDetail() {
     { name: "Golden Blonde", hex: "#c5a076" },
   ];
 
-  if (!product) return <div className="max-w-[1400px] mx-auto px-6 py-20 text-eminence-muted font-serif">✦ Loading…</div>;
+  if (!product) return <div className="max-w-[1400px] mx-auto px-6 py-20 text-jainil-muted font-serif">✦ Loading…</div>;
 
   const onAdd = () => {
     const colorName = COLORS.find(c => c.hex === selectedColor)?.name;
@@ -113,7 +113,7 @@ export default function ProductDetail() {
 
   return (
     <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-20" data-testid="product-detail-page">
-      <Link to="/shop" className="inline-flex items-center gap-1 text-xs uppercase tracking-[0.2em] text-eminence-muted hover:text-eminence-gold mb-10" data-testid="back-to-shop">
+      <Link to="/shop" className="inline-flex items-center gap-1 text-xs uppercase tracking-[0.2em] text-jainil-muted hover:text-jainil-gold mb-10" data-testid="back-to-shop">
         <ChevronLeft size={14} /> Shop
       </Link>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
@@ -121,7 +121,7 @@ export default function ProductDetail() {
         <div className="lg:col-span-1 order-2 lg:order-1 flex lg:flex-col gap-3 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
           {gallery.map((m, idx) => (
             <button key={idx} onClick={() => setActiveMedia(m.url)}
-              className={`flex-shrink-0 w-20 h-20 border-2 transition-all ${activeMedia === m.url ? "border-eminence-gold scale-105" : "border-transparent opacity-60 hover:opacity-100"}`}>
+              className={`flex-shrink-0 w-20 h-20 border-2 transition-all ${activeMedia === m.url ? "border-jainil-gold scale-105" : "border-transparent opacity-60 hover:opacity-100"}`}>
               {m.type === "video" ? (
                 <div className="w-full h-full bg-black flex items-center justify-center text-[10px] text-white">VIDEO</div>
               ) : (
@@ -132,7 +132,7 @@ export default function ProductDetail() {
         </div>
 
         {/* MAIN VIEW */}
-        <div className="lg:col-span-6 order-1 lg:order-2 aspect-square bg-eminence-surface overflow-hidden border border-eminence-border/30">
+        <div className="lg:col-span-6 order-1 lg:order-2 aspect-square bg-jainil-surface overflow-hidden border border-jainil-border/30">
           {activeMedia?.match(/\.(mp4|webm|ogg)$/i) || gallery.find(g => g.url === activeMedia)?.type === "video" ? (
             <video key={activeMedia} src={getMediaUrl(activeMedia)} className="w-full h-full object-cover" autoPlay muted loop playsInline
               onError={(e) => { e.target.style.display = "none"; }} />
@@ -143,7 +143,7 @@ export default function ProductDetail() {
                 e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(product.name)}&size=800&background=f5f0eb&color=2a2118&font-size=0.15&bold=true`;
               }} />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center text-eminence-muted gap-3">
+            <div className="w-full h-full flex flex-col items-center justify-center text-jainil-muted gap-3">
               <span className="text-6xl opacity-10">✦</span>
               <span className="text-xs uppercase tracking-widest">No Image</span>
             </div>
@@ -154,37 +154,37 @@ export default function ProductDetail() {
         <div className="lg:col-span-5 order-3">
           <p className="overline mb-3">{product.category}</p>
           <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-4">{product.name}</h1>
-          <p className="font-serif text-3xl text-eminence-gold mb-6">₹{product.price.toLocaleString("en-IN")}</p>
+          <p className="font-serif text-3xl text-jainil-gold mb-6">₹{product.price.toLocaleString("en-IN")}</p>
           {/* PRODUCT INFO ACCORDIONS */}
-          <div className="border-t border-eminence-border/30 mt-12 pt-8 space-y-6">
+          <div className="border-t border-jainil-border/30 mt-12 pt-8 space-y-6">
             <details className="group">
               <summary className="list-none flex items-center justify-between cursor-pointer py-2">
-                <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-eminence-text">{t("description")}</span>
-                <Plus size={14} className="group-open:hidden text-eminence-gold" />
-                <Minus size={14} className="hidden group-open:block text-eminence-gold" />
+                <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-jainil-text">{t("description")}</span>
+                <Plus size={14} className="group-open:hidden text-jainil-gold" />
+                <Minus size={14} className="hidden group-open:block text-jainil-gold" />
               </summary>
-              <div className="mt-6 text-eminence-muted text-sm leading-relaxed whitespace-pre-line animate-fade-down">
+              <div className="mt-6 text-jainil-muted text-sm leading-relaxed whitespace-pre-line animate-fade-down">
                 {product.description}
               </div>
             </details>
 
             <details className="group">
-              <summary className="list-none flex items-center justify-between cursor-pointer py-2 border-t border-eminence-border/10 pt-6">
-                <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-eminence-text">{t("specifications")}</span>
-                <Plus size={14} className="group-open:hidden text-eminence-gold" />
-                <Minus size={14} className="hidden group-open:block text-eminence-gold" />
+              <summary className="list-none flex items-center justify-between cursor-pointer py-2 border-t border-jainil-border/10 pt-6">
+                <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-jainil-text">{t("specifications")}</span>
+                <Plus size={14} className="group-open:hidden text-jainil-gold" />
+                <Minus size={14} className="hidden group-open:block text-jainil-gold" />
               </summary>
-              <div className="mt-6 text-eminence-muted text-sm leading-relaxed animate-fade-down">
+              <div className="mt-6 text-jainil-muted text-sm leading-relaxed animate-fade-down">
                 <ul className="space-y-3">
-                  <li className="flex justify-between border-b border-eminence-border/5 pb-2">
+                  <li className="flex justify-between border-b border-jainil-border/5 pb-2">
                     <span className="opacity-60">{t("material")}</span>
                     <span className="font-medium">{t("premiumHair")}</span>
                   </li>
-                  <li className="flex justify-between border-b border-eminence-border/5 pb-2">
+                  <li className="flex justify-between border-b border-jainil-border/5 pb-2">
                     <span className="opacity-60">{t("style")}</span>
                     <span className="font-medium">{t("salonFinish")}</span>
                   </li>
-                  <li className="flex justify-between border-b border-eminence-border/5 pb-2">
+                  <li className="flex justify-between border-b border-jainil-border/5 pb-2">
                     <span className="opacity-60">{t("durability")}</span>
                     <span className="font-medium">{t("longLasting")}</span>
                   </li>
@@ -193,12 +193,12 @@ export default function ProductDetail() {
             </details>
 
             <details className="group">
-              <summary className="list-none flex items-center justify-between cursor-pointer py-2 border-t border-eminence-border/10 pt-6">
-                <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-eminence-text">{t("shippingReturns")}</span>
-                <Plus size={14} className="group-open:hidden text-eminence-gold" />
-                <Minus size={14} className="hidden group-open:block text-eminence-gold" />
+              <summary className="list-none flex items-center justify-between cursor-pointer py-2 border-t border-jainil-border/10 pt-6">
+                <span className="text-[11px] uppercase tracking-[0.3em] font-bold text-jainil-text">{t("shippingReturns")}</span>
+                <Plus size={14} className="group-open:hidden text-jainil-gold" />
+                <Minus size={14} className="hidden group-open:block text-jainil-gold" />
               </summary>
-              <div className="mt-6 text-eminence-muted text-sm leading-relaxed animate-fade-down">
+              <div className="mt-6 text-jainil-muted text-sm leading-relaxed animate-fade-down">
                 <p>{t("freeShipIndia")}</p>
                 <p className="mt-4">{t("hygienePolicy")}</p>
               </div>
@@ -207,7 +207,7 @@ export default function ProductDetail() {
 
           {/* COLOR SELECTION */}
           <div className="mb-10">
-            <label className="text-[10px] uppercase tracking-[0.3em] text-eminence-muted block mb-4 font-bold">{t("selectColor")}</label>
+            <label className="text-[10px] uppercase tracking-[0.3em] text-jainil-muted block mb-4 font-bold">{t("selectColor")}</label>
             <div className="flex gap-4">
               {COLORS.map((c) => (
                 <button 
@@ -215,7 +215,7 @@ export default function ProductDetail() {
                   onClick={() => setSelectedColor(c.hex)}
                   className={`group relative flex flex-col items-center gap-2`}
                 >
-                  <div className={`w-8 h-8 rounded-full border-2 p-1 transition-all ${selectedColor === c.hex ? "border-eminence-gold scale-110 shadow-lg" : "border-transparent opacity-60 hover:opacity-100"}`}>
+                  <div className={`w-8 h-8 rounded-full border-2 p-1 transition-all ${selectedColor === c.hex ? "border-jainil-gold scale-110 shadow-lg" : "border-transparent opacity-60 hover:opacity-100"}`}>
                     <div className="w-full h-full rounded-full" style={{ backgroundColor: c.hex }} />
                   </div>
                   <span className={`text-[8px] uppercase tracking-wider transition-opacity ${selectedColor === c.hex ? "opacity-100 font-bold" : "opacity-0"}`}>{c.name}</span>
@@ -226,10 +226,10 @@ export default function ProductDetail() {
 
           <div className="flex items-center gap-6 mb-12">
             <span className="overline">{t("qty")}</span>
-            <div className={`flex items-center border border-eminence-border ${product.stock === 0 ? "opacity-30 pointer-events-none" : ""}`}>
-              <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2 hover:text-eminence-gold" data-testid="qty-minus"><Minus size={14} /></button>
+            <div className={`flex items-center border border-jainil-border ${product.stock === 0 ? "opacity-30 pointer-events-none" : ""}`}>
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-3 py-2 hover:text-jainil-gold" data-testid="qty-minus"><Minus size={14} /></button>
               <span className="px-4" data-testid="qty-value">{qty}</span>
-              <button onClick={() => setQty(qty + 1)} className={`px-3 py-2 hover:text-eminence-gold ${qty >= product.stock ? "opacity-30 pointer-events-none" : ""}`} data-testid="qty-plus"><Plus size={14} /></button>
+              <button onClick={() => setQty(qty + 1)} className={`px-3 py-2 hover:text-jainil-gold ${qty >= product.stock ? "opacity-30 pointer-events-none" : ""}`} data-testid="qty-plus"><Plus size={14} /></button>
             </div>
             {product.stock > 0 && product.stock <= 5 && <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider">Only {product.stock} left!</span>}
           </div>
@@ -243,14 +243,14 @@ export default function ProductDetail() {
             {product.stock === 0 ? "Out of Stock" : t("addToCart")}
           </button>
 
-          <div className="mt-12 border-t border-eminence-border pt-6 grid grid-cols-2 gap-6 text-sm">
+          <div className="mt-12 border-t border-jainil-border pt-6 grid grid-cols-2 gap-6 text-sm">
             <div>
               <p className="overline mb-1">{t("stock")}</p>
-              <p className={`${product.stock === 0 ? "text-red-500 font-bold" : "text-eminence-muted"}`}>
+              <p className={`${product.stock === 0 ? "text-red-500 font-bold" : "text-jainil-muted"}`}>
                 {product.stock === 0 ? "Out of Stock" : `${product.stock} ${t("units")}`}
               </p>
             </div>
-            <div><p className="overline mb-1">{t("delivery")}</p><p className="text-eminence-muted">3–5 days · Vadodara</p></div>
+            <div><p className="overline mb-1">{t("delivery")}</p><p className="text-jainil-muted">3–5 days · Vadodara</p></div>
           </div>
         </div>
       </div>
@@ -262,34 +262,34 @@ export default function ProductDetail() {
         <div className="grid md:grid-cols-2 gap-16">
           <div>
             {reviews.length === 0 ? (
-              <p className="text-eminence-muted italic">{t("noReviews")}</p>
+              <p className="text-jainil-muted italic">{t("noReviews")}</p>
             ) : (
               <div className="space-y-8">
                 {reviews.map((r) => (
-                  <div key={r.id} className="border-b border-eminence-border pb-6 last:border-0" data-testid={`review-${r.id}`}>
+                  <div key={r.id} className="border-b border-jainil-border pb-6 last:border-0" data-testid={`review-${r.id}`}>
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <p className="font-medium">{r.user_name}</p>
                         {user && (r.user_id === user.id || user.role === "admin") && editingReviewId !== r.id && (
-                          <button onClick={() => startEdit(r)} className="text-xs text-eminence-gold hover:underline uppercase tracking-wider text-[10px]" data-testid={`edit-review-btn-${r.id}`}>
+                          <button onClick={() => startEdit(r)} className="text-xs text-jainil-gold hover:underline uppercase tracking-wider text-[10px]" data-testid={`edit-review-btn-${r.id}`}>
                             {t("edit") || "Edit"}
                           </button>
                         )}
                       </div>
                       <div className="flex gap-0.5">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i} className={i < r.rating ? "text-eminence-gold" : "text-eminence-border"}>★</span>
+                          <span key={i} className={i < r.rating ? "text-jainil-gold" : "text-jainil-border"}>★</span>
                         ))}
                       </div>
                     </div>
                     {editingReviewId === r.id ? (
-                      <div className="bg-eminence-surface p-4 border border-eminence-border space-y-4 mt-2">
+                      <div className="bg-jainil-surface p-4 border border-jainil-border space-y-4 mt-2">
                         <div>
                           <label className="text-[9px] uppercase tracking-[0.2em] mb-1.5 block">{t("rating")}</label>
                           <div className="flex gap-2">
                             {[1, 2, 3, 4, 5].map((s) => (
                               <button key={s} type="button" onClick={() => setEditReviewData({ ...editReviewData, rating: s })}
-                                className={`text-xl transition-colors ${s <= editReviewData.rating ? "text-eminence-gold" : "text-eminence-border"}`}>
+                                className={`text-xl transition-colors ${s <= editReviewData.rating ? "text-jainil-gold" : "text-jainil-border"}`}>
                                 ★
                               </button>
                             ))}
@@ -298,11 +298,11 @@ export default function ProductDetail() {
                         <div>
                           <label className="text-[9px] uppercase tracking-[0.2em] mb-1.5 block">{t("comment")}</label>
                           <textarea value={editReviewData.comment} onChange={(e) => setEditReviewData({ ...editReviewData, comment: e.target.value })}
-                            className="w-full bg-transparent border border-eminence-border p-3 text-sm focus:border-eminence-gold outline-none h-20 resize-none"
+                            className="w-full bg-transparent border border-jainil-border p-3 text-sm focus:border-jainil-gold outline-none h-20 resize-none"
                             placeholder={t("comment")}></textarea>
                         </div>
                         <div className="flex gap-3 justify-end text-xs">
-                          <button onClick={cancelEdit} disabled={updatingReview} className="px-4 py-2 border border-eminence-border text-eminence-muted hover:text-white uppercase tracking-wider text-[10px]">
+                          <button onClick={cancelEdit} disabled={updatingReview} className="px-4 py-2 border border-jainil-border text-jainil-muted hover:text-white uppercase tracking-wider text-[10px]">
                             {t("cancel") || "Cancel"}
                           </button>
                           <button onClick={() => saveEdit(r.id)} disabled={updatingReview} className="btn-gold px-4 py-2 uppercase tracking-wider text-[10px]">
@@ -311,7 +311,7 @@ export default function ProductDetail() {
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-eminence-muted leading-relaxed">{r.comment}</p>
+                      <p className="text-sm text-jainil-muted leading-relaxed">{r.comment}</p>
                     )}
                   </div>
                 ))}
@@ -319,7 +319,7 @@ export default function ProductDetail() {
             )}
           </div>
 
-          <div className="bg-eminence-surface p-8 border border-eminence-border h-fit">
+          <div className="bg-jainil-surface p-8 border border-jainil-border h-fit">
             <h3 className="font-serif text-xl mb-6">{t("writeReview")}</h3>
             <form onSubmit={submitReview} className="space-y-4">
               <div>
@@ -327,7 +327,7 @@ export default function ProductDetail() {
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((s) => (
                     <button key={s} type="button" onClick={() => setNewReview({ ...newReview, rating: s })}
-                      className={`text-2xl transition-colors ${s <= newReview.rating ? "text-eminence-gold" : "text-eminence-border"}`}>
+                      className={`text-2xl transition-colors ${s <= newReview.rating ? "text-jainil-gold" : "text-jainil-border"}`}>
                       ★
                     </button>
                   ))}
@@ -336,7 +336,7 @@ export default function ProductDetail() {
               <div>
                 <label className="text-[10px] uppercase tracking-[0.2em] mb-2 block">{t("comment")}</label>
                 <textarea value={newReview.comment} onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                  className="w-full bg-transparent border border-eminence-border p-3 text-sm focus:border-eminence-gold outline-none h-24 resize-none"
+                  className="w-full bg-transparent border border-jainil-border p-3 text-sm focus:border-jainil-gold outline-none h-24 resize-none"
                   placeholder={t("comment")}></textarea>
               </div>
               <button type="submit" disabled={submitting} className="btn-gold w-full text-xs uppercase tracking-widest">

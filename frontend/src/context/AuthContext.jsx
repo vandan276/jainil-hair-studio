@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const { data } = await api.post("/auth/login", { email, password });
-    if (data.token) localStorage.setItem("eminence_token", data.token);
+    if (data.token) localStorage.setItem("jainil_token", data.token);
     setUser(data);
     await checkAttendance(data);
     return data;
@@ -56,14 +56,14 @@ export function AuthProvider({ children }) {
 
   const register = async (payload) => {
     const { data } = await api.post("/auth/register", payload);
-    if (data.token) localStorage.setItem("eminence_token", data.token);
+    if (data.token) localStorage.setItem("jainil_token", data.token);
     setUser(data);
     return data;
   };
 
   const logout = async () => {
     try { await api.post("/auth/logout"); } catch {}
-    localStorage.removeItem("eminence_token");
+    localStorage.removeItem("jainil_token");
     setUser(null);
   };
 

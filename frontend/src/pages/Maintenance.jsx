@@ -75,13 +75,13 @@ export default function Maintenance() {
           <div className="space-y-5">
             <button
               onClick={handleWhatsAppClick}
-              className="w-full bg-eminence-gold hover:bg-[#c5a030] text-black py-4.5 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs flex justify-center items-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_8px_30px_rgba(212,175,55,0.2)] cursor-pointer"
+              className="w-full bg-jainil-gold hover:bg-[#c5a030] text-black py-4.5 rounded-2xl font-bold uppercase tracking-[0.2em] text-xs flex justify-center items-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-[0_8px_30px_rgba(212,175,55,0.2)] cursor-pointer"
             >
               <MessageSquare size={16} fill="currentColor" />
               Book via WhatsApp
             </button>
             
-            <p className="text-[10px] text-eminence-muted/70 tracking-[0.2em] uppercase font-medium">
+            <p className="text-[10px] text-jainil-muted/70 tracking-[0.2em] uppercase font-medium">
               We will be back online shortly
             </p>
           </div>
@@ -97,14 +97,14 @@ export default function Maintenance() {
             href="https://fyndevs.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-eminence-gold transition-colors duration-300"
+            className="hover:text-jainil-gold transition-colors duration-300"
           >
             FynDevs
           </a>
         </span>
         <a
           href="/login"
-          className="text-[9px] tracking-[0.3em] uppercase text-eminence-muted/20 hover:text-eminence-gold transition-colors duration-300 font-medium py-1 px-3 border border-white/0 hover:border-eminence-gold/10 hover:bg-eminence-gold/5 rounded-full"
+          className="text-[9px] tracking-[0.3em] uppercase text-jainil-muted/20 hover:text-jainil-gold transition-colors duration-300 font-medium py-1 px-3 border border-white/0 hover:border-jainil-gold/10 hover:bg-jainil-gold/5 rounded-full"
         >
           Staff Atelier Access
         </a>

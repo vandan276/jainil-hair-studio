@@ -6,7 +6,7 @@ import { toast } from "sonner";
 const STATUS_COLORS = {
   pending: "bg-yellow-100 text-yellow-800 border-yellow-300",
   confirmed: "bg-emerald-100 text-emerald-800 border-emerald-300",
-  completed: "bg-eminence-text text-white border-eminence-text",
+  completed: "bg-jainil-text text-white border-jainil-text",
   cancelled: "bg-red-100 text-red-800 border-red-300",
 };
 
@@ -79,18 +79,18 @@ export default function BookingsCalendar() {
     <div className="space-y-6" data-testid="bookings-calendar">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button onClick={prev} className="p-2 border border-eminence-border hover:border-eminence-text" data-testid="cal-prev"><ChevronLeft size={16} /></button>
+          <button onClick={prev} className="p-2 border border-jainil-border hover:border-jainil-text" data-testid="cal-prev"><ChevronLeft size={16} /></button>
           <h3 className="font-serif text-2xl">{MONTH_NAMES[month - 1]} {year}</h3>
-          <button onClick={next} className="p-2 border border-eminence-border hover:border-eminence-text" data-testid="cal-next"><ChevronRight size={16} /></button>
+          <button onClick={next} className="p-2 border border-jainil-border hover:border-jainil-text" data-testid="cal-next"><ChevronRight size={16} /></button>
         </div>
-        <div className="text-sm text-eminence-muted">
-          Total this month: <span className="text-eminence-text font-semibold">{Object.values(data.days).reduce((s, arr) => s + arr.length, 0)}</span>
+        <div className="text-sm text-jainil-muted">
+          Total this month: <span className="text-jainil-text font-semibold">{Object.values(data.days).reduce((s, arr) => s + arr.length, 0)}</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-px bg-eminence-border border border-eminence-border">
+      <div className="grid grid-cols-7 gap-px bg-jainil-border border border-jainil-border">
         {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
-          <div key={d} className="bg-eminence-surface text-center py-2 text-[10px] uppercase tracking-[0.2em] text-eminence-muted font-semibold">{d}</div>
+          <div key={d} className="bg-jainil-surface text-center py-2 text-[10px] uppercase tracking-[0.2em] text-jainil-muted font-semibold">{d}</div>
         ))}
         {grid.map((cell, i) => {
           if (!cell) return <div key={`empty-${i}`} className="bg-white aspect-[5/4]" />;
@@ -110,12 +110,12 @@ export default function BookingsCalendar() {
               key={cell.dateStr}
               onClick={() => setSelected(cell.dateStr)}
               data-testid={`cal-day-${cell.dateStr}`}
-              className={`bg-white aspect-[5/4] p-2 text-left hover:bg-eminence-surface transition-colors ${isSel ? "ring-2 ring-eminence-text ring-inset" : ""}`}
+              className={`bg-white aspect-[5/4] p-2 text-left hover:bg-jainil-surface transition-colors ${isSel ? "ring-2 ring-jainil-text ring-inset" : ""}`}
             >
-              <div className={`text-sm font-semibold ${isToday ? "text-eminence-gold" : "text-eminence-text"}`}>{cell.d}</div>
+              <div className={`text-sm font-semibold ${isToday ? "text-jainil-gold" : "text-jainil-text"}`}>{cell.d}</div>
               {cnt > 0 && (
                 <div className="mt-1">
-                  <span className={`inline-block text-[10px] px-2 py-0.5 ${hasConflict ? "bg-red-100 text-red-800" : "bg-eminence-surfaceAlt text-eminence-text"}`}>
+                  <span className={`inline-block text-[10px] px-2 py-0.5 ${hasConflict ? "bg-red-100 text-red-800" : "bg-jainil-surfaceAlt text-jainil-text"}`}>
                     {cnt} {cnt === 1 ? "booking" : "bookings"}{hasConflict ? " · conflict" : ""}
                   </span>
                 </div>
@@ -126,25 +126,25 @@ export default function BookingsCalendar() {
       </div>
 
       {selected && (
-        <div className="border border-eminence-border bg-white p-6" data-testid="cal-day-detail">
+        <div className="border border-jainil-border bg-white p-6" data-testid="cal-day-detail">
           <h4 className="font-serif text-xl mb-4">{selected} · {selectedBookings.length} {selectedBookings.length === 1 ? "booking" : "bookings"}</h4>
           {selectedBookings.length === 0 ? (
-            <p className="text-eminence-muted text-sm">No bookings on this day.</p>
+            <p className="text-jainil-muted text-sm">No bookings on this day.</p>
           ) : (
             <div className="space-y-2">
               {selectedBookings.map((b) => (
-                <div key={b.id} className="flex items-center gap-4 p-3 border border-eminence-border" data-testid={`cal-booking-${b.id}`}>
-                  <div className="w-20 font-mono text-sm text-eminence-text">{b.time}</div>
+                <div key={b.id} className="flex items-center gap-4 p-3 border border-jainil-border" data-testid={`cal-booking-${b.id}`}>
+                  <div className="w-20 font-mono text-sm text-jainil-text">{b.time}</div>
                   <div className="flex-1">
                     <div className="font-semibold">{b.user_name}</div>
-                    <div className="text-xs text-eminence-muted">{b.service_name} · with {b.stylist_name}</div>
+                    <div className="text-xs text-jainil-muted">{b.service_name} · with {b.stylist_name}</div>
                   </div>
                   <select value={b.status} onChange={(e) => updateStatus(b.id, e.target.value)}
                     className={`text-[10px] uppercase tracking-wider px-2 py-1 border ${STATUS_COLORS[b.status] || ""}`}
                     data-testid={`cal-status-${b.id}`}>
                     {["pending","confirmed","completed","cancelled"].map((s) => <option key={s} value={s}>{s}</option>)}
                   </select>
-                  <div className="w-20 text-right text-eminence-gold font-semibold">₹{b.service_price.toLocaleString("en-IN")}</div>
+                  <div className="w-20 text-right text-jainil-gold font-semibold">₹{b.service_price.toLocaleString("en-IN")}</div>
                 </div>
               ))}
             </div>

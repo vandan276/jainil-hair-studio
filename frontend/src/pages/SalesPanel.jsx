@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "@/lib/api";
 import { toast } from "sonner";
@@ -181,7 +182,7 @@ export default function SalesPanel() {
   // Retargeting States
   const [selectedLeadsForBulk, setSelectedLeadsForBulk] = useState([]);
   const [showBulkModal, setShowBulkModal] = useState(false);
-  const [bulkMessage, setBulkMessage] = useState("Hello! We haven't seen you in a while at Eminence. We have some exciting new offers for you. Would you like to book an appointment?");
+  const [bulkMessage, setBulkMessage] = useState("Hello! We haven't seen you in a while at Jainil. We have some exciting new offers for you. Would you like to book an appointment?");
   const [retargetingStatusFilter, setRetargetingStatusFilter] = useState("all");
   const [retargetingGradeFilter, setRetargetingGradeFilter] = useState("all");
 
@@ -976,25 +977,25 @@ export default function SalesPanel() {
 
             <button 
               onClick={() => setShowDuplicateModal(true)}
-              className="border border-eminence-border hover:border-eminence-gold hover:text-eminence-gold text-eminence-muted px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors bg-white font-medium"
+              className="border border-jainil-border hover:border-jainil-gold hover:text-jainil-gold text-jainil-muted px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors bg-white font-medium"
             >
               <User size={16} /> Duplicate Leads
             </button>
             <button 
               onClick={() => setShowLeaveModal(true)}
-              className="border border-eminence-border hover:border-eminence-gold hover:text-eminence-gold text-eminence-muted px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors bg-white font-medium"
+              className="border border-jainil-border hover:border-jainil-gold hover:text-jainil-gold text-jainil-muted px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors bg-white font-medium"
             >
               <Calendar size={16} /> Manage Leaves
             </button>
             <button
               onClick={() => { window.location.href = "/consultancy"; }}
-              className="border border-eminence-gold text-eminence-gold hover:bg-eminence-gold hover:text-white px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors bg-white font-medium"
+              className="border border-jainil-gold text-jainil-gold hover:bg-jainil-gold hover:text-white px-4 py-2 rounded text-sm flex items-center gap-2 transition-colors bg-white font-medium"
             >
               <Scissors size={16} /> Consultancy
             </button>
             <button 
               onClick={() => setShowAddLeadModal(true)}
-              className="bg-eminence-text text-white px-4 py-2 rounded text-sm flex items-center gap-2 hover:bg-black"
+              className="bg-jainil-text text-white px-4 py-2 rounded text-sm flex items-center gap-2 hover:bg-black"
             >
               <Plus size={16} /> Add Lead
             </button>
@@ -1306,7 +1307,7 @@ export default function SalesPanel() {
                     placeholder="Search leads..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-eminence-gold focus:ring-1 focus:ring-eminence-gold"
+                    className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-jainil-gold focus:ring-1 focus:ring-jainil-gold"
                   />
                 </div>
                 
@@ -1316,7 +1317,7 @@ export default function SalesPanel() {
                     type="date"
                     value={leadFilterStartDate}
                     onChange={(e) => setLeadFilterStartDate(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1.5 text-xs sm:text-sm text-gray-600 focus:outline-none focus:border-eminence-gold"
+                    className="border border-gray-300 rounded px-2 py-1.5 text-xs sm:text-sm text-gray-600 focus:outline-none focus:border-jainil-gold"
                     title="Start Date (Created At)"
                   />
                   <span className="text-gray-400 text-xs sm:text-sm">to</span>
@@ -1324,7 +1325,7 @@ export default function SalesPanel() {
                     type="date"
                     value={leadFilterEndDate}
                     onChange={(e) => setLeadFilterEndDate(e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1.5 text-xs sm:text-sm text-gray-600 focus:outline-none focus:border-eminence-gold"
+                    className="border border-gray-300 rounded px-2 py-1.5 text-xs sm:text-sm text-gray-600 focus:outline-none focus:border-jainil-gold"
                     title="End Date (Created At)"
                   />
                   {(leadFilterStartDate || leadFilterEndDate) && (
@@ -1362,7 +1363,7 @@ export default function SalesPanel() {
                     <button 
                       onClick={() => setShowBulkModal(true)}
                       disabled={selectedLeadsForBulk.length === 0}
-                      className="bg-eminence-gold text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-black disabled:opacity-50 disabled:hover:bg-eminence-gold transition-colors"
+                      className="bg-jainil-gold text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-black disabled:opacity-50 disabled:hover:bg-jainil-gold transition-colors"
                     >
                       <MessageSquare size={14} /> Bulk WhatsApp ({selectedLeadsForBulk.length})
                     </button>
@@ -1402,7 +1403,7 @@ export default function SalesPanel() {
                     )}
                     <th className="px-6 py-4 tracking-widest font-bold">Client Information</th>
                     <th className="px-6 py-4 tracking-widest font-bold">Direct Contact</th>
-                    <th className="px-6 py-4 tracking-widest font-bold">{activeTab === "Converted" ? "Converted Date" : "Next Follow-up"}</th>
+                    <th className="px-6 py-4 tracking-widest font-bold">{activeTab === "Converted" ? "Converted Date" : activeTab === "Visited" ? "Last Visited Date" : "Next Follow-up"}</th>
                     <th className="px-6 py-4 tracking-widest font-bold">Pipeline Status</th>
                     {activeTab === "Token Received" ? (
                       <>
@@ -1444,12 +1445,12 @@ export default function SalesPanel() {
                             <Star 
                               size={16} 
                               fill={lead.is_favorite ? "#C9A57B" : "none"} 
-                              className={`transition-colors ${lead.is_favorite ? "text-eminence-gold" : "text-gray-300 group-hover/star:text-gray-400"}`} 
+                              className={`transition-colors ${lead.is_favorite ? "text-jainil-gold" : "text-gray-300 group-hover/star:text-gray-400"}`} 
                             />
                           </div>
                           <div>
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-gray-900 text-base group-hover:text-eminence-gold transition-colors">{lead.name}</span>
+                              <span className="font-bold text-gray-900 text-base group-hover:text-jainil-gold transition-colors">{lead.name}</span>
                               {lead.is_repeated && (
                                 <span className="bg-purple-100 text-purple-700 text-[9px] font-bold px-1.5 py-0.5 rounded border border-purple-200 uppercase tracking-wider" title="Repeated Customer">
                                   Repeated
@@ -1508,10 +1509,14 @@ export default function SalesPanel() {
                             <span className="text-emerald-700 font-bold">
                               {lead.converted_date ? new Date(lead.converted_date).toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' }) : new Date(lead.converted_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                             </span>
+                          ) : activeTab === "Visited" ? (
+                            <span className="text-indigo-700 font-bold">
+                              {lead.data?.visited_date ? new Date(lead.data.visited_date).toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' }) : (lead.updated_at ? new Date(lead.updated_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "Unknown")}
+                            </span>
                           ) : (
                             <span className="text-gray-900 font-bold">{lead.follow_up_date ? new Date(lead.follow_up_date).toLocaleDateString('en-GB', { timeZone: 'UTC', day: '2-digit', month: 'short', year: 'numeric' }) : "Not Scheduled"}</span>
                           )}
-                          {lead.follow_up_time && lead.status !== "converted" && (
+                          {lead.follow_up_time && lead.status !== "converted" && activeTab !== "Visited" && (
                             <div className="flex items-center gap-1 text-[10px] text-gray-400 font-bold uppercase mt-1 tracking-wider">
                               <Clock size={10} /> {lead.follow_up_time} • {lead.follow_up_type || "Call"}
                             </div>
@@ -1570,7 +1575,7 @@ export default function SalesPanel() {
                             {lead.branch} • {lead.section}
                           </div>
                           {(lead.consulted_by || lead.assigned_to_name) && (
-                            <div className="text-[10px] text-eminence-gold font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1">
+                            <div className="text-[10px] text-jainil-gold font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1">
                               <span>By:</span> {lead.consulted_by || lead.assigned_to_name}
                             </div>
                           )}
@@ -1609,7 +1614,7 @@ export default function SalesPanel() {
             {/* Modal Header */}
             <div className="bg-white px-4 sm:px-6 py-3.5 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3 shrink-0">
               <div className="flex items-center gap-3 sm:gap-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-eminence-gold/10 text-eminence-gold rounded-full flex items-center justify-center font-bold text-lg sm:text-xl shrink-0">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-jainil-gold/10 text-jainil-gold rounded-full flex items-center justify-center font-bold text-lg sm:text-xl shrink-0">
                   {selectedLead.name.charAt(0)}
                 </div>
                 <div>
@@ -1753,7 +1758,7 @@ export default function SalesPanel() {
                   <div>
                     <label className="text-xs text-gray-400 uppercase tracking-wide">Consulted By</label>
                     <p className="font-semibold text-gray-800 mt-1 flex items-center gap-1.5">
-                      <User size={14} className="text-eminence-gold" />
+                      <User size={14} className="text-jainil-gold" />
                       {selectedLead.consulted_by || selectedLead.assigned_to_name || "Not Assigned"}
                     </p>
                   </div>
@@ -2249,7 +2254,7 @@ export default function SalesPanel() {
                     required
                     value={transferTargetId}
                     onChange={e => setTransferTargetId(e.target.value)}
-                    className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
+                    className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-white"
                   >
                     <option value="">— Select employee —</option>
                     {allEmployees.map(emp => (
@@ -2296,8 +2301,8 @@ export default function SalesPanel() {
       />
 
       {/* ADD LEAD MODAL */}
-      {showAddLeadModal && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-black/60 backdrop-blur-md">
+      {showAddLeadModal && typeof document !== 'undefined' && createPortal(
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999999, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', overflowY: 'auto' }}>
           <div className="bg-white w-full max-w-2xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20 max-h-[90vh] flex flex-col">
             <div className="bg-gray-900 px-6 sm:px-8 py-4 sm:py-6 flex justify-between items-center shrink-0">
               <div>
@@ -2474,11 +2479,11 @@ export default function SalesPanel() {
             </form>
           </div>
         </div>
-      )}
+      , document.body)}
 
       {/* EDIT LEAD MODAL */}
-      {showEditLeadModal && editLeadForm && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-black/60 backdrop-blur-md">
+      {showEditLeadModal && editLeadForm && typeof document !== 'undefined' && createPortal(
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999999, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', overflowY: 'auto' }}>
           <div className="bg-white w-full max-w-2xl my-auto rounded-3xl shadow-2xl overflow-hidden animate-fade-in border border-white/20 max-h-[90vh] flex flex-col">
             <div className="bg-gray-900 px-6 sm:px-8 py-4 sm:py-6 flex justify-between items-center shrink-0">
               <div>
@@ -2751,7 +2756,7 @@ export default function SalesPanel() {
             </form>
           </div>
         </div>
-      )}
+      , document.body)}
 
       {/* Leave Calendar Modal */}
       {showLeaveModal && (
@@ -2886,7 +2891,7 @@ export default function SalesPanel() {
                         }}
                         className={`aspect-square p-2 flex flex-col justify-between text-left transition-all border ${bgClass}`}
                       >
-                        <span className={`text-xs font-bold ${isToday ? "bg-eminence-gold text-white w-5 h-5 rounded-full flex items-center justify-center -m-1" : ""}`}>{d}</span>
+                        <span className={`text-xs font-bold ${isToday ? "bg-jainil-gold text-white w-5 h-5 rounded-full flex items-center justify-center -m-1" : ""}`}>{d}</span>
                         {label && (
                           <span className={`text-[8px] font-bold uppercase tracking-wide px-1 rounded block text-center w-full ${labelClass}`}>{label}</span>
                         )}
@@ -2949,7 +2954,7 @@ const DuplicateLeadsModal = ({ show, onClose, onViewLead }) => {
 
   if (!show) return null;
 
-  const secret = data?.secret || "eminence_secret_123";
+  const secret = data?.secret || "jainil_secret_123";
   const duplicates = data?.duplicates || {};
   const duplicateGroups = Object.entries(duplicates);
 
@@ -3097,7 +3102,7 @@ const BulkMessageModal = ({ show, onClose, onSend, message, setMessage, selected
               rows="6"
               value={message}
               onChange={e => setMessage(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-4 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+              className="w-full border border-gray-200 rounded-lg p-4 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
               placeholder="Type your message here..."
             ></textarea>
             <p className="text-[10px] text-gray-400 mt-2">Note: Personalized names are not yet supported in bulk mode. Use a general greeting.</p>
@@ -3112,7 +3117,7 @@ const BulkMessageModal = ({ show, onClose, onSend, message, setMessage, selected
             </button>
             <button 
               onClick={onSend}
-              className="flex-1 px-4 py-3 text-sm font-bold text-white bg-eminence-text rounded-lg hover:bg-black"
+              className="flex-1 px-4 py-3 text-sm font-bold text-white bg-jainil-text rounded-lg hover:bg-black"
             >
               Start Sending
             </button>
@@ -3162,7 +3167,7 @@ function ConsultationsPanel({ consultations, refresh }) {
             placeholder="Search consultations..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-eminence-gold focus:ring-1 focus:ring-eminence-gold"
+            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:border-jainil-gold focus:ring-1 focus:ring-jainil-gold"
           />
         </div>
         <div className="text-xs text-gray-400 font-medium uppercase tracking-widest">
@@ -3172,43 +3177,43 @@ function ConsultationsPanel({ consultations, refresh }) {
 
       <div className="space-y-4">
         {filtered.map((c) => (
-          <div key={c.id} className="eminence-card bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300">
+          <div key={c.id} className="jainil-card bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-300">
             <div className="p-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4">
               
               <div className="flex items-center gap-4 min-w-[250px]">
-                <div className="w-10 h-10 rounded-full bg-eminence-gold/10 flex items-center justify-center text-eminence-gold">
+                <div className="w-10 h-10 rounded-full bg-jainil-gold/10 flex items-center justify-center text-jainil-gold">
                   <User size={18} />
                 </div>
                 <div>
                   <p className="font-serif text-lg leading-tight text-gray-800">{c.name}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Phone size={12} className="text-eminence-muted" />
-                    <span className="text-xs text-eminence-muted">{c.phone}</span>
+                    <Phone size={12} className="text-jainil-muted" />
+                    <span className="text-xs text-jainil-muted">{c.phone}</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-6 md:gap-12 text-center md:text-left">
                 <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Date</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Date</p>
                   <p className="text-sm font-medium">{c.date || "N/A"}</p>
                 </div>
                 
                 <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Location</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Location</p>
                   <p className="text-sm font-medium flex items-center gap-1">
-                    <MapPin size={12} className="text-eminence-gold" />
+                    <MapPin size={12} className="text-jainil-gold" />
                     {c.location || "N/A"}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Consulted By</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Consulted By</p>
                   <p className="text-sm font-medium">{c.consulted_by || "Unknown"}</p>
                 </div>
 
                 <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Status</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Status</p>
                   <span className="text-xs uppercase tracking-wider font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">
                     {c.status || "New"}
                   </span>
@@ -3232,7 +3237,7 @@ function ConsultationsPanel({ consultations, refresh }) {
                 </button>
                 <button 
                   onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
-                  className="text-xs uppercase tracking-widest text-eminence-gold hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-gray-200 rounded-full hover:bg-gray-50"
+                  className="text-xs uppercase tracking-widest text-jainil-gold hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-gray-200 rounded-full hover:bg-gray-50"
                 >
                   {expandedId === c.id ? "Hide Details" : "View Details"}
                   {expandedId === c.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -3247,22 +3252,22 @@ function ConsultationsPanel({ consultations, refresh }) {
                   
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Expected Look</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Expected Look</h4>
                       <p className="text-sm text-gray-700">{c.expected_look || "Not Specified"}</p>
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Lifestyle</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Lifestyle</h4>
                       <p className="text-sm text-gray-700">{c.lifestyle || "Not Specified"}</p>
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Reason for Visit</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Reason for Visit</h4>
                       <p className="text-sm text-gray-700">{c.reason || "Not Specified"}</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Past Treatments</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Past Treatments</h4>
                       {c.past_treatments && c.past_treatments.length > 0 ? (
                         <ul className="list-disc pl-4 text-sm text-gray-700">
                           {c.past_treatments.map((pt, i) => <li key={i}>{pt}</li>)}
@@ -3270,7 +3275,7 @@ function ConsultationsPanel({ consultations, refresh }) {
                       ) : <p className="text-sm text-gray-500 italic">None reported</p>}
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Additional Queries</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Additional Queries</h4>
                       {c.additional_questions && c.additional_questions.length > 0 ? (
                         <ul className="list-disc pl-4 text-sm text-gray-700">
                           {c.additional_questions.map((aq, i) => <li key={i}>{aq}</li>)}
@@ -3301,7 +3306,7 @@ function ConsultationsPanel({ consultations, refresh }) {
                         </div>
                         <div className="flex justify-between">
                           <span className="text-xs text-gray-400">Follow Up:</span>
-                          <span className="text-xs font-bold text-eminence-gold">{c.follow_up_date || "None"}</span>
+                          <span className="text-xs font-bold text-jainil-gold">{c.follow_up_date || "None"}</span>
                         </div>
                       </div>
                     </div>
@@ -3324,7 +3329,7 @@ function ConsultationsPanel({ consultations, refresh }) {
       </div>
       
       {filtered.length === 0 && (
-        <div className="py-20 text-center text-eminence-muted">
+        <div className="py-20 text-center text-jainil-muted">
           <p className="italic">No consultations found.</p>
         </div>
       )}

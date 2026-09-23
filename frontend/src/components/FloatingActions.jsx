@@ -26,7 +26,7 @@ export default function FloatingActions() {
       {/* 1. WHATSAPP BUTTON & POPUP */}
       <div className="relative pointer-events-auto">
         {waOpen && (
-          <div className="absolute bottom-16 right-0 w-[300px] bg-white border border-eminence-border shadow-2xl rounded-lg overflow-hidden animate-fade-in">
+          <div className="absolute bottom-16 right-0 w-[300px] bg-white border border-jainil-border shadow-2xl rounded-lg overflow-hidden animate-fade-in">
             <div className="flex items-center justify-between p-4 bg-[#25D366] text-white">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
@@ -46,7 +46,7 @@ export default function FloatingActions() {
                 value={msg}
                 onChange={(e) => setMsg(e.target.value)}
                 rows={2}
-                className="w-full border border-eminence-border p-2 text-xs focus:outline-none focus:border-[#25D366] rounded mb-3"
+                className="w-full border border-jainil-border p-2 text-xs focus:outline-none focus:border-[#25D366] rounded mb-3"
               />
               <button onClick={sendWa} className="w-full bg-[#25D366] hover:bg-[#1faa55] text-white py-2 text-[10px] uppercase tracking-wider font-bold transition-colors rounded">
                 Send Message
@@ -75,7 +75,7 @@ export default function FloatingActions() {
       {/* 3. EXPERT CONSULTATION WIDGET (NOW AT BOTTOM) */}
       <button 
         onClick={consultExpert}
-        className="pointer-events-auto group flex items-center gap-3 bg-eminence-gold text-white px-6 py-3 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20"
+        className="pointer-events-auto group flex items-center gap-3 bg-jainil-gold text-white px-6 py-3 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 border border-white/20"
       >
         <div className="relative">
           <Video size={20} className="drop-shadow-md" />

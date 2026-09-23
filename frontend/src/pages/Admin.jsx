@@ -160,13 +160,13 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
   return (
     <div className="max-w-4xl mx-auto">
       {/* ── Booking Form ── */}
-      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-eminence-border shadow-sm overflow-hidden">
+      <form onSubmit={handleSubmit} className="bg-white rounded-2xl border border-jainil-border shadow-sm overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-eminence-border flex items-center gap-3 bg-eminence-surface">
-          <Calendar size={18} className="text-eminence-gold" />
+        <div className="px-6 py-4 border-b border-jainil-border flex items-center gap-3 bg-jainil-surface">
+          <Calendar size={18} className="text-jainil-gold" />
           <div>
             <h3 className="font-serif text-base font-semibold text-gray-900">Take Appointment</h3>
-            <p className="text-[10px] text-eminence-muted uppercase tracking-wider">Reception</p>
+            <p className="text-[10px] text-jainil-muted uppercase tracking-wider">Reception</p>
           </div>
         </div>
 
@@ -174,29 +174,29 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
           {/* Client Info */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Client Name *</label>
-              <input value={customerName} onChange={e => setCustomerName(e.target.value)} required placeholder="Full name" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Client Name *</label>
+              <input value={customerName} onChange={e => setCustomerName(e.target.value)} required placeholder="Full name" className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Phone *</label>
-              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} required placeholder="+91 99999 99999" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Phone *</label>
+              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} required placeholder="+91 99999 99999" className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Email (optional)</label>
-              <input value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="client@email.com" className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Email (optional)</label>
+              <input value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="client@email.com" className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Date *</label>
-              <input type="date" value={date} onChange={e => setDate(e.target.value)} required min={today} className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Date *</label>
+              <input type="date" value={date} onChange={e => setDate(e.target.value)} required min={today} className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
           </div>
 
           {/* Services Table */}
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-2">Services</label>
-            <div className="border border-eminence-border rounded-xl overflow-hidden">
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-2">Services</label>
+            <div className="border border-jainil-border rounded-xl overflow-hidden">
               {/* Table Header */}
-              <div className="grid grid-cols-[1.8fr_1.4fr_0.9fr_0.9fr_0.7fr_0.8fr_auto] gap-1 bg-eminence-surface px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-eminence-muted border-b border-eminence-border">
+              <div className="grid grid-cols-[1.8fr_1.4fr_0.9fr_0.9fr_0.7fr_0.8fr_auto] gap-1 bg-jainil-surface px-3 py-2 text-[9px] font-bold uppercase tracking-wider text-jainil-muted border-b border-jainil-border">
                 <span>Service</span>
                 <span>Provider</span>
                 <span>Start</span>
@@ -206,13 +206,13 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                 <span></span>
               </div>
               {/* Rows */}
-              <div className="divide-y divide-eminence-border/50">
+              <div className="divide-y divide-jainil-border/50">
                 {rows.map((row) => (
                   <div key={row.id} className="grid grid-cols-[1.8fr_1.4fr_0.9fr_0.9fr_0.7fr_0.8fr_auto] gap-1 items-center px-3 py-2">
                     <select
                       value={row.service_id}
                       onChange={e => pickService(row.id, e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-jainil-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                     >
                       <option value="">-- Service --</option>
                       {services.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -220,7 +220,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                     <select
                       value={row.stylist_id}
                       onChange={e => updateRow(row.id, "stylist_id", e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-jainil-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                     >
                       <option value="">Any</option>
                       {serviceStaff.map(e => <option key={e.id} value={e.id}>{e.name}</option>)}
@@ -228,7 +228,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                     <select
                       value={row.start_time}
                       onChange={e => updateRow(row.id, "start_time", e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-1.5 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-jainil-border/60 rounded-lg px-1.5 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                     >
                       <option value="">--:--</option>
                       {TIMES_HALF.map(t => <option key={t} value={t}>{t}</option>)}
@@ -236,7 +236,7 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                     <select
                       value={row.end_time}
                       onChange={e => updateRow(row.id, "end_time", e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-1.5 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-jainil-border/60 rounded-lg px-1.5 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                     >
                       <option value="">--:--</option>
                       {TIMES_HALF.map(t => <option key={t} value={t}>{t}</option>)}
@@ -247,14 +247,14 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                       min={0}
                       onChange={e => updateRow(row.id, "discount", e.target.value)}
                       placeholder="0"
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-jainil-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                     />
                     <input
                       type="number"
                       value={row.price}
                       min={0}
                       onChange={e => updateRow(row.id, "price", e.target.value)}
-                      className="w-full bg-white border border-eminence-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                      className="w-full bg-white border border-jainil-border/60 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                     />
                     <button type="button" onClick={() => removeRow(row.id)} disabled={rows.length === 1} className="p-1 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-20">
                       <X size={14} />
@@ -263,8 +263,8 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
                 ))}
               </div>
               {/* Add row */}
-              <div className="px-3 py-2 border-t border-eminence-border/50 bg-eminence-surface/40">
-                <button type="button" onClick={addRow} className="flex items-center gap-1.5 text-xs font-bold text-eminence-gold hover:text-eminence-gold/70 transition-colors">
+              <div className="px-3 py-2 border-t border-jainil-border/50 bg-jainil-surface/40">
+                <button type="button" onClick={addRow} className="flex items-center gap-1.5 text-xs font-bold text-jainil-gold hover:text-jainil-gold/70 transition-colors">
                   <Plus size={14} /> Add Service
                 </button>
               </div>
@@ -272,25 +272,25 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
           </div>
 
           {/* Billing */}
-          <div className="bg-eminence-surface/50 rounded-xl border border-eminence-border/50 p-4 space-y-2">
+          <div className="bg-jainil-surface/50 rounded-xl border border-jainil-border/50 p-4 space-y-2">
             <div className="flex justify-between text-xs text-gray-600"><span>Subtotal</span><span className="font-bold">₹{subtotal.toFixed(2)}</span></div>
             <div className="flex items-center justify-between text-xs text-gray-600">
               <span>Discount (₹)</span>
-              <input type="number" min={0} value={discount} onChange={e => setDiscount(e.target.value)} className="w-24 bg-white border border-eminence-border rounded-lg px-2 py-1 text-xs text-right focus:outline-none focus:border-eminence-gold" />
+              <input type="number" min={0} value={discount} onChange={e => setDiscount(e.target.value)} className="w-24 bg-white border border-jainil-border rounded-lg px-2 py-1 text-xs text-right focus:outline-none focus:border-jainil-gold" />
             </div>
             <div className="flex items-center justify-between text-xs text-gray-600">
               <span>Tax (%)</span>
-              <input type="number" min={0} max={100} value={tax} onChange={e => setTax(e.target.value)} className="w-24 bg-white border border-eminence-border rounded-lg px-2 py-1 text-xs text-right focus:outline-none focus:border-eminence-gold" />
+              <input type="number" min={0} max={100} value={tax} onChange={e => setTax(e.target.value)} className="w-24 bg-white border border-jainil-border rounded-lg px-2 py-1 text-xs text-right focus:outline-none focus:border-jainil-gold" />
             </div>
-            <div className="flex justify-between text-sm font-bold text-gray-900 border-t border-eminence-border pt-2"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
+            <div className="flex justify-between text-sm font-bold text-gray-900 border-t border-jainil-border pt-2"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
             <div className="flex items-center justify-between text-xs text-gray-600 pt-1">
               <div className="flex items-center gap-2">
                 <span>Advance</span>
-                <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} className="bg-white border border-eminence-border rounded-lg px-2 py-1 text-[10px] focus:outline-none focus:border-eminence-gold">
+                <select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)} className="bg-white border border-jainil-border rounded-lg px-2 py-1 text-[10px] focus:outline-none focus:border-jainil-gold">
                   {PAYMENT_METHODS.map(m => <option key={m}>{m}</option>)}
                 </select>
               </div>
-              <input type="number" min={0} value={advance} onChange={e => setAdvance(e.target.value)} placeholder="0" className="w-24 bg-white border border-eminence-border rounded-lg px-2 py-1 text-xs text-right focus:outline-none focus:border-eminence-gold" />
+              <input type="number" min={0} value={advance} onChange={e => setAdvance(e.target.value)} placeholder="0" className="w-24 bg-white border border-jainil-border rounded-lg px-2 py-1 text-xs text-right focus:outline-none focus:border-jainil-gold" />
             </div>
             <div className="flex justify-between text-xs text-gray-600"><span>Pending Dues</span><span className="font-bold text-amber-600">₹{pending.toFixed(2)}</span></div>
           </div>
@@ -298,8 +298,8 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
           {/* Status + Notes */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Appointment Status</label>
-              <select value={apptStatus} onChange={e => setApptStatus(e.target.value)} className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Appointment Status</label>
+              <select value={apptStatus} onChange={e => setApptStatus(e.target.value)} className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold">
                 {APPOINTMENT_STATUSES.map(s => <option key={s}>{s}</option>)}
               </select>
             </div>
@@ -307,20 +307,20 @@ function AdminAppointmentsPage({ services, employees, appointments, branch, onRe
           </div>
 
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Notes</label>
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="Write notes about appointment here..." className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold resize-none" />
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Notes</label>
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="Write notes about appointment here..." className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold resize-none" />
           </div>
 
           {/* Send SMS / WhatsApp */}
           <div>
-            <label className="block text-[10px] font-bold uppercase tracking-wider text-eminence-muted mb-1.5">Send Notification On</label>
+            <label className="block text-[10px] font-bold uppercase tracking-wider text-jainil-muted mb-1.5">Send Notification On</label>
             <div className="flex gap-6">
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={sendSms} onChange={e => setSendSms(e.target.checked)} className="rounded border-gray-300 accent-eminence-gold" />
+                <input type="checkbox" checked={sendSms} onChange={e => setSendSms(e.target.checked)} className="rounded border-gray-300 accent-jainil-gold" />
                 <span>SMS</span>
               </label>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <input type="checkbox" checked={sendWa} onChange={e => setSendWa(e.target.checked)} className="rounded border-gray-300 accent-eminence-gold" />
+                <input type="checkbox" checked={sendWa} onChange={e => setSendWa(e.target.checked)} className="rounded border-gray-300 accent-jainil-gold" />
                 <span>WhatsApp</span>
               </label>
             </div>
@@ -656,7 +656,7 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
       )}
 
       {/* Date Navigation */}
-      <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-eminence-border shadow-sm">
+      <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-jainil-border shadow-sm">
         <div className="flex gap-1">
           <button onClick={prevDay} className="px-3 py-1 bg-gray-800 text-white text-xs font-bold rounded-l hover:bg-gray-700">&lt;</button>
           <button onClick={nextDay} className="px-3 py-1 bg-gray-800 text-white text-xs font-bold rounded-r hover:bg-gray-700">&gt;</button>
@@ -671,7 +671,7 @@ function DashboardScheduler({ appointments, employees, stats, orders = [], leads
       </div>
 
       {/* Grid Container */}
-      <div className="bg-white border border-eminence-border rounded-lg shadow-sm overflow-x-auto">
+      <div className="bg-white border border-jainil-border rounded-lg shadow-sm overflow-x-auto">
         <div className="min-w-[800px]">
           {/* Header Row (Employees + Consultancy) */}
           <div className="flex border-b border-gray-200">
@@ -1068,7 +1068,7 @@ function InlineEditInput({ value, onSave, placeholder, type = "text", className 
       onChange={(e) => setVal(e.target.value)}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
-      className={`bg-transparent border border-eminence-border rounded px-2 py-1 text-xs text-gray-800 focus:outline-none focus:border-eminence-gold ${className}`}
+      className={`bg-transparent border border-jainil-border rounded px-2 py-1 text-xs text-gray-800 focus:outline-none focus:border-jainil-gold ${className}`}
     />
   );
 }
@@ -1077,7 +1077,7 @@ export default function Admin() {
   const { t } = useLang();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const isSuperAdmin = user?.email === "superadmin@jainil.com" || user?.email === "superadmin@jainilhairsaloon.com" || user?.email === "superadmin@eminence.com" || user?.email?.startsWith("superadmin@") || user?.role === "super_admin" || user?.is_super_admin === true;
+  const isSuperAdmin = user?.email === "superadmin@jainil.com" || user?.email === "superadmin@jainilhairsaloon.com" || user?.email === "superadmin@jainil.com" || user?.email?.startsWith("superadmin@") || user?.role === "super_admin" || user?.is_super_admin === true;
   const [selectedBranch, setSelectedBranch] = useState(isSuperAdmin ? "" : (user?.branch || "Baroda"));
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -1124,9 +1124,9 @@ export default function Admin() {
     { id: "o2", title: "Weekday Pampering", discount: "Flat ₹500 OFF", description: "Applicable on any hair spa session", expires: "2026-06-30", active: true }
   ]);
   const [smsLogs, setSmsLogs] = useState([
-    { id: "s1", recipient: "9876543210", text: "Hi Priya! Your hair spa session is scheduled for tomorrow at 2 PM. See you at Eminence Salon!", status: "Delivered", date: "2026-06-01 10:15" },
+    { id: "s1", recipient: "9876543210", text: "Hi Priya! Your hair spa session is scheduled for tomorrow at 2 PM. See you at Jainil Salon!", status: "Delivered", date: "2026-06-01 10:15" },
     { id: "s2", recipient: "9123456789", text: "Hey Rohan, we noticed it has been 30 days since your hair cut. Book today and get 10% off!", status: "Delivered", date: "2026-05-30 14:00" },
-    { id: "s3", recipient: "9988776655", text: "Eminence Salon: Enjoy our 20% discount on packages this summer. Code: SUMMER20.", status: "Sent", date: "2026-05-28 09:30" }
+    { id: "s3", recipient: "9988776655", text: "Jainil Salon: Enjoy our 20% discount on packages this summer. Code: SUMMER20.", status: "Sent", date: "2026-05-28 09:30" }
   ]);
   const [productStockSearch, setProductStockSearch] = useState("");
 
@@ -1729,7 +1729,7 @@ export default function Admin() {
                       } ${tab === item.k ? "bg-gray-100 font-bold text-gray-900" : "hover:bg-gray-50 text-gray-700"}`}
                   >
                     {item.label}
-                    {item.superOnly && <span className="ml-1.5 text-[9px] font-bold uppercase tracking-wider text-eminence-gold">Super Admin</span>}
+                    {item.superOnly && <span className="ml-1.5 text-[9px] font-bold uppercase tracking-wider text-jainil-gold">Super Admin</span>}
                   </button>
                 ))}
               </div>
@@ -1841,7 +1841,7 @@ export default function Admin() {
           {
             h: t("status"), k: (r) => (
               <select value={r.status} onChange={(e) => updateOrder(r.id, e.target.value)} data-testid={`order-status-${r.id}`}
-                className="bg-transparent border border-eminence-border px-2 py-1 text-xs uppercase tracking-wider">
+                className="bg-transparent border border-jainil-border px-2 py-1 text-xs uppercase tracking-wider">
                 {STATUSES_ORDER.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             )
@@ -1855,12 +1855,12 @@ export default function Admin() {
           <div className="flex flex-wrap justify-between items-center bg-white p-6 rounded-2xl border border-gray-200 shadow-sm gap-4">
             <div>
               <h2 className="font-serif text-2xl text-gray-800">Current Stock Levels</h2>
-              <p className="text-xs text-eminence-muted">Real-time status of salon physical products and stock levels.</p>
+              <p className="text-xs text-jainil-muted">Real-time status of salon physical products and stock levels.</p>
             </div>
             <div className="flex items-center gap-3 w-full md:w-auto">
               {isSuperAdmin && (
                 <div className="flex items-center gap-2 bg-white/80 border border-gray-200 rounded-xl px-3 py-1.5 shadow-sm">
-                  <span className="text-[10px] font-bold text-eminence-gold uppercase tracking-wider">Branch:</span>
+                  <span className="text-[10px] font-bold text-jainil-gold uppercase tracking-wider">Branch:</span>
                   <select
                     value={selectedBranch}
                     onChange={(e) => setSelectedBranch(e.target.value)}
@@ -1875,13 +1875,13 @@ export default function Admin() {
                 </div>
               )}
               <div className="relative flex-1 md:w-64">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-gold" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-gold" />
                 <input
                   type="text"
                   placeholder="Search products..."
                   value={productStockSearch}
                   onChange={e => setProductStockSearch(e.target.value)}
-                  className="w-full bg-eminence-surface border border-eminence-border pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-xl bg-gray-50"
+                  className="w-full bg-jainil-surface border border-jainil-border pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-xl bg-gray-50"
                 />
               </div>
               <button onClick={refresh} className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold uppercase rounded-lg whitespace-nowrap">
@@ -1940,7 +1940,7 @@ export default function Admin() {
                         <td className="px-6 py-4">
                           <div className="font-bold text-gray-900">{p.name}</div>
                           {(p.volume || p.measurement_unit) && (
-                            <div className="text-[10px] text-eminence-muted mt-0.5 font-semibold uppercase tracking-wider">
+                            <div className="text-[10px] text-jainil-muted mt-0.5 font-semibold uppercase tracking-wider">
                               {p.volume ? `${p.volume} ` : ""}{p.measurement_unit || ""}
                             </div>
                           )}
@@ -1952,7 +1952,7 @@ export default function Admin() {
                         <td className="px-6 py-4 text-center">
                           <button
                             onClick={() => handleViewProductHistory(p)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:text-eminence-gold bg-eminence-surface hover:bg-eminence-gold/10 border border-eminence-border/10 rounded-lg shadow-sm hover:shadow transition-all"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-700 hover:text-jainil-gold bg-jainil-surface hover:bg-jainil-gold/10 border border-jainil-border/10 rounded-lg shadow-sm hover:shadow transition-all"
                             title="View product history log"
                           >
                             <Clock size={13} />
@@ -2053,7 +2053,7 @@ export default function Admin() {
           { h: t("fullName"), k: (r) => r.name },
           { h: t("email"), k: (r) => r.email },
           { h: t("phone"), k: (r) => r.phone || "—" },
-          { h: t("role"), k: (r) => <span className="uppercase text-xs tracking-wider text-eminence-gold">{r.role}</span> },
+          { h: t("role"), k: (r) => <span className="uppercase text-xs tracking-wider text-jainil-gold">{r.role}</span> },
           { h: t("joined"), k: (r) => new Date(r.created_at).toLocaleDateString() },
         ]} />
       )}
@@ -2063,11 +2063,11 @@ export default function Admin() {
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-fade-in">
           <div>
             <h2 className="font-serif text-2xl text-gray-800">{getReportTitle(tab).label}</h2>
-            <p className="text-xs text-eminence-muted">{getReportTitle(tab).desc}</p>
+            <p className="text-xs text-jainil-muted">{getReportTitle(tab).desc}</p>
           </div>
           {isSuperAdmin && (
             <div className="flex items-center gap-2 bg-white/80 border border-gray-200 rounded-xl px-3 py-1.5 shadow-sm">
-              <span className="text-[10px] font-bold text-eminence-gold uppercase tracking-wider">Branch:</span>
+              <span className="text-[10px] font-bold text-jainil-gold uppercase tracking-wider">Branch:</span>
               <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
@@ -2085,7 +2085,7 @@ export default function Admin() {
       )}
       {tab.startsWith("reports-") && isRefreshing ? (
         <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm animate-pulse my-6">
-          <svg className="animate-spin h-10 w-10 text-eminence-gold mb-4" viewBox="0 0 24 24" fill="none">
+          <svg className="animate-spin h-10 w-10 text-jainil-gold mb-4" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -2214,12 +2214,12 @@ export default function Admin() {
       {selectedHistoryProduct && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col animate-fade-in">
-            <div className="p-6 bg-eminence-surface border-b border-gray-100 flex justify-between items-center">
+            <div className="p-6 bg-jainil-surface border-b border-gray-100 flex justify-between items-center">
               <div>
                 <h4 className="font-serif text-xl text-gray-900 flex items-center gap-2">
-                  <Clock className="text-eminence-gold" size={20} /> Product History Log
+                  <Clock className="text-jainil-gold" size={20} /> Product History Log
                 </h4>
-                <p className="text-xs text-eminence-muted">
+                <p className="text-xs text-jainil-muted">
                   Detailed sale, salon usage, and stock log for <strong className="text-gray-900">{selectedHistoryProduct.name}</strong>
                 </p>
               </div>
@@ -2228,21 +2228,21 @@ export default function Admin() {
 
             <div className="p-6 overflow-y-auto flex-1 space-y-4">
               {/* Product Stats Quick Info */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-eminence-surface/40 p-4 rounded-xl border border-eminence-border/10 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-jainil-surface/40 p-4 rounded-xl border border-jainil-border/10 text-xs">
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Product ID</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Product ID</span>
                   <span className="font-mono font-bold text-gray-900">{selectedHistoryProduct.id}</span>
                 </div>
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Category</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Category</span>
                   <span className="font-bold text-gray-900">{selectedHistoryProduct.category || "—"}</span>
                 </div>
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Selling Price</span>
-                  <span className="font-serif font-bold text-eminence-gold text-sm">₹{Number(selectedHistoryProduct.price || 0).toLocaleString("en-IN")}</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Selling Price</span>
+                  <span className="font-serif font-bold text-jainil-gold text-sm">₹{Number(selectedHistoryProduct.price || 0).toLocaleString("en-IN")}</span>
                 </div>
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Current Stock</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Current Stock</span>
                   <span className={`font-bold text-sm ${selectedHistoryProduct.stock <= 5 ? "text-red-500" : "text-emerald-600"}`}>
                     {selectedHistoryProduct.stock} units
                   </span>
@@ -2251,20 +2251,20 @@ export default function Admin() {
 
               {isLoadingHistory ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eminence-gold" />
-                  <p className="text-xs text-eminence-muted">Fetching usage and sale logs...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-jainil-gold" />
+                  <p className="text-xs text-jainil-muted">Fetching usage and sale logs...</p>
                 </div>
               ) : productHistory.length === 0 ? (
-                <div className="text-center py-16 bg-eminence-surface/20 border border-dashed border-eminence-border rounded-xl">
+                <div className="text-center py-16 bg-jainil-surface/20 border border-dashed border-jainil-border rounded-xl">
                   <Clock className="mx-auto text-gray-300 mb-2" size={32} />
                   <p className="text-sm font-semibold text-gray-700">No History Logs Found</p>
-                  <p className="text-xs text-eminence-muted mt-1">This product has no recorded stock logs, salon usages, or sales.</p>
+                  <p className="text-xs text-jainil-muted mt-1">This product has no recorded stock logs, salon usages, or sales.</p>
                 </div>
               ) : (
-                <div className="border border-eminence-border/10 rounded-xl overflow-hidden bg-white">
+                <div className="border border-jainil-border/10 rounded-xl overflow-hidden bg-white">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-eminence-surface border-b border-eminence-border/20 text-eminence-muted uppercase font-bold text-[9px] tracking-wider">
+                      <tr className="bg-jainil-surface border-b border-jainil-border/20 text-jainil-muted uppercase font-bold text-[9px] tracking-wider">
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Activity</th>
                         <th className="px-4 py-3 text-right">Quantity</th>
@@ -2314,7 +2314,7 @@ export default function Admin() {
                             </td>
                             <td className="px-4 py-3.5 text-gray-500">
                               <div className="font-semibold text-gray-700">{item.employee_name}</div>
-                              {item.remarks && <div className="text-[10px] text-eminence-muted mt-0.5 italic">"{item.remarks}"</div>}
+                              {item.remarks && <div className="text-[10px] text-jainil-muted mt-0.5 italic">"{item.remarks}"</div>}
                             </td>
                           </tr>
                         );
@@ -2325,7 +2325,7 @@ export default function Admin() {
               )}
             </div>
 
-            <div className="p-6 bg-eminence-surface border-t border-gray-100 flex justify-end">
+            <div className="p-6 bg-jainil-surface border-t border-gray-100 flex justify-end">
               <button
                 onClick={() => setSelectedHistoryProduct(null)}
                 className="px-5 py-2.5 bg-gray-900 hover:bg-black text-white text-xs uppercase tracking-widest font-bold rounded-lg transition-all"
@@ -2493,14 +2493,14 @@ function AdminPermissionsPanel({ currentPermissions, onSaved }) {
     <div className="space-y-8 animate-fade-in">
       {/* Header */}
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-8 rounded-2xl shadow-xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-eminence-gold/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-jainil-gold/5 rounded-full -translate-y-1/2 translate-x-1/2" />
         <div className="relative">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-eminence-gold/20 border border-eminence-gold/40 flex items-center justify-center">
-              <Settings size={20} className="text-eminence-gold" />
+            <div className="w-10 h-10 rounded-xl bg-jainil-gold/20 border border-jainil-gold/40 flex items-center justify-center">
+              <Settings size={20} className="text-jainil-gold" />
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-widest font-bold text-eminence-gold/80">Super Admin</p>
+              <p className="text-[10px] uppercase tracking-widest font-bold text-jainil-gold/80">Super Admin</p>
               <h2 className="font-serif text-2xl text-white">Admin Access Control</h2>
             </div>
           </div>
@@ -2513,7 +2513,7 @@ function AdminPermissionsPanel({ currentPermissions, onSaved }) {
             </div>
             <div className="w-32 bg-white/10 h-1.5 rounded-full overflow-hidden">
               <div
-                className="bg-eminence-gold h-full transition-all duration-300"
+                className="bg-jainil-gold h-full transition-all duration-300"
                 style={{ width: `${(checkedCount / totalCount) * 100}%` }}
               />
             </div>
@@ -2534,7 +2534,7 @@ function AdminPermissionsPanel({ currentPermissions, onSaved }) {
           disabled={saving}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold uppercase tracking-wider transition-all shadow-md ${saved
             ? "bg-emerald-500 text-white"
-            : "bg-eminence-gold hover:bg-[#c5a030] text-black"
+            : "bg-jainil-gold hover:bg-[#c5a030] text-black"
             } disabled:opacity-60`}
         >
           {saving ? (
@@ -2565,11 +2565,11 @@ function AdminPermissionsPanel({ currentPermissions, onSaved }) {
                       onChange={() => toggleGroup(group.tabs)}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-eminence-gold" />
+                    <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-jainil-gold" />
                   </label>
                   <span className="font-bold text-sm text-gray-800 uppercase tracking-wider">{group.group}</span>
                 </div>
-                <span className="text-[10px] text-eminence-muted font-bold bg-eminence-surface px-2 py-0.5 rounded-full border border-eminence-border">
+                <span className="text-[10px] text-jainil-muted font-bold bg-jainil-surface px-2 py-0.5 rounded-full border border-jainil-border">
                   {groupCheckedCount}/{group.tabs.length}
                 </span>
               </div>
@@ -2969,24 +2969,24 @@ function DailyReportsPanel({ stats, orders, reportsData, expenses }) {
           <div>
             <label className="text-xs text-gray-500 block mb-1">From Date</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 text-eminence-gold" size={16} />
+              <Calendar className="absolute left-3 top-2.5 text-jainil-gold" size={16} />
               <input
                 type="date"
                 value={fromDate}
                 onChange={e => setFromDate(e.target.value)}
-                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-eminence-gold text-gray-800 rounded cursor-pointer"
+                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-jainil-gold text-gray-800 rounded cursor-pointer"
               />
             </div>
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">To Date</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 text-eminence-gold" size={16} />
+              <Calendar className="absolute left-3 top-2.5 text-jainil-gold" size={16} />
               <input
                 type="date"
                 value={toDate}
                 onChange={e => setToDate(e.target.value)}
-                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-eminence-gold text-gray-800 rounded cursor-pointer"
+                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-jainil-gold text-gray-800 rounded cursor-pointer"
               />
             </div>
           </div>
@@ -3011,21 +3011,21 @@ function DailyReportsPanel({ stats, orders, reportsData, expenses }) {
         </div>
       </div>
 
-      <div className="eminence-card p-6">
+      <div className="jainil-card p-6">
         <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="w-full text-xs text-left text-gray-700">
-            <thead className="bg-[#0b1f3c] text-white border-b border-eminence-border/50 uppercase tracking-wider text-[10px]">
+            <thead className="bg-[#0b1f3c] text-white border-b border-jainil-border/50 uppercase tracking-wider text-[10px]">
               <tr>
-                <th rowSpan="2" className="px-3 py-4 text-center border-r border-eminence-border/30">Sr. no</th>
-                <th rowSpan="2" className="px-3 py-4 border-r border-eminence-border/30 whitespace-nowrap">Bill Date</th>
-                <th colSpan="9" className="px-3 py-2 text-center border-b border-eminence-border/30 border-r border-eminence-border/30">Sales Breakdown</th>
-                <th rowSpan="2" className="px-3 py-4 text-right border-r border-eminence-border/30 whitespace-nowrap">Total Invoice Amount</th>
-                <th rowSpan="2" className="px-3 py-4 text-right border-r border-eminence-border/30 whitespace-nowrap">Discount</th>
-                <th rowSpan="2" className="px-3 py-4 text-right border-r border-eminence-border/30 whitespace-nowrap">Net Sale</th>
-                <th rowSpan="2" className="px-3 py-4 text-left border-r border-eminence-border/30 whitespace-nowrap">Tax (Inc / Exc)</th>
-                <th rowSpan="2" className="px-3 py-4 text-right border-r border-eminence-border/30 whitespace-nowrap">Grand Sale</th>
-                <th rowSpan="2" className="px-3 py-4 text-right border-r border-eminence-border/30 whitespace-nowrap font-bold text-eminence-gold">Total Collection</th>
-                <th colSpan="9" className="px-3 py-2 text-center border-b border-eminence-border/30">Collections Mode Breakdown</th>
+                <th rowSpan="2" className="px-3 py-4 text-center border-r border-jainil-border/30">Sr. no</th>
+                <th rowSpan="2" className="px-3 py-4 border-r border-jainil-border/30 whitespace-nowrap">Bill Date</th>
+                <th colSpan="9" className="px-3 py-2 text-center border-b border-jainil-border/30 border-r border-jainil-border/30">Sales Breakdown</th>
+                <th rowSpan="2" className="px-3 py-4 text-right border-r border-jainil-border/30 whitespace-nowrap">Total Invoice Amount</th>
+                <th rowSpan="2" className="px-3 py-4 text-right border-r border-jainil-border/30 whitespace-nowrap">Discount</th>
+                <th rowSpan="2" className="px-3 py-4 text-right border-r border-jainil-border/30 whitespace-nowrap">Net Sale</th>
+                <th rowSpan="2" className="px-3 py-4 text-left border-r border-jainil-border/30 whitespace-nowrap">Tax (Inc / Exc)</th>
+                <th rowSpan="2" className="px-3 py-4 text-right border-r border-jainil-border/30 whitespace-nowrap">Grand Sale</th>
+                <th rowSpan="2" className="px-3 py-4 text-right border-r border-jainil-border/30 whitespace-nowrap font-bold text-jainil-gold">Total Collection</th>
+                <th colSpan="9" className="px-3 py-2 text-center border-b border-jainil-border/30">Collections Mode Breakdown</th>
               </tr>
               <tr className="bg-[#0b1f3c]/80 text-[9px]">
                 <th className="px-2 py-2 text-right">Service Amt</th>
@@ -3036,7 +3036,7 @@ function DailyReportsPanel({ stats, orders, reportsData, expenses }) {
                 <th className="px-2 py-2 text-right">Wallet Amt (Accrued)</th>
                 <th className="px-2 py-2 text-right">Pending Received</th>
                 <th className="px-2 py-2 text-right">Appointment Advance</th>
-                <th className="px-2 py-2 text-right border-r border-eminence-border/30">Pending Payment</th>
+                <th className="px-2 py-2 text-right border-r border-jainil-border/30">Pending Payment</th>
 
                 <th className="px-2 py-2 text-right">Cash</th>
                 <th className="px-2 py-2 text-right">Card</th>
@@ -3089,9 +3089,9 @@ function DailyReportsPanel({ stats, orders, reportsData, expenses }) {
               )}
             </tbody>
             {dailyReportRows.length > 0 && (
-              <tfoot className="bg-[#0b1f3c] font-bold text-white border-t border-eminence-border/50">
+              <tfoot className="bg-[#0b1f3c] font-bold text-white border-t border-jainil-border/50">
                 <tr className="align-middle">
-                  <td colSpan="2" className="px-3 py-4 text-center border-r border-eminence-border/30 text-white font-serif uppercase tracking-wider">Total</td>
+                  <td colSpan="2" className="px-3 py-4 text-center border-r border-jainil-border/30 text-white font-serif uppercase tracking-wider">Total</td>
 
                   <td className="px-2 py-4 text-right">{formatNumber(sums.service_amount)}</td>
                   <td className="px-2 py-4 text-right">{formatNumber(sums.product_amount)}</td>
@@ -3101,17 +3101,17 @@ function DailyReportsPanel({ stats, orders, reportsData, expenses }) {
                   <td className="px-2 py-4 text-right text-amber-300">{formatNumber(sums.wallet_amount)}</td>
                   <td className="px-2 py-4 text-right text-emerald-400">{formatNumber(sums.pending_received)}</td>
                   <td className="px-2 py-4 text-right">{formatNumber(sums.appointment_advance)}</td>
-                  <td className="px-2 py-4 text-right text-rose-400 border-r border-eminence-border/30">{formatNumber(sums.pending_payment)}</td>
+                  <td className="px-2 py-4 text-right text-rose-400 border-r border-jainil-border/30">{formatNumber(sums.pending_payment)}</td>
 
-                  <td className="px-3 py-4 text-right text-white border-r border-eminence-border/30">{formatNumber(sums.total_invoice_amount)}</td>
-                  <td className="px-3 py-4 text-right text-rose-300 border-r border-eminence-border/30">-{formatNumber(sums.discount)}</td>
-                  <td className="px-3 py-4 text-right text-white border-r border-eminence-border/30">{formatNumber(sums.net_sale)}</td>
-                  <td className="px-3 py-4 text-left text-[10px] text-eminence-muted border-r border-eminence-border/30 leading-relaxed whitespace-nowrap">
+                  <td className="px-3 py-4 text-right text-white border-r border-jainil-border/30">{formatNumber(sums.total_invoice_amount)}</td>
+                  <td className="px-3 py-4 text-right text-rose-300 border-r border-jainil-border/30">-{formatNumber(sums.discount)}</td>
+                  <td className="px-3 py-4 text-right text-white border-r border-jainil-border/30">{formatNumber(sums.net_sale)}</td>
+                  <td className="px-3 py-4 text-left text-[10px] text-jainil-muted border-r border-jainil-border/30 leading-relaxed whitespace-nowrap">
                     <div>Inc: {formatNumber(sums.tax_inclusive)}</div>
                     <div>Exc: {formatNumber(sums.tax)}</div>
                   </td>
-                  <td className="px-3 py-4 text-right text-white border-r border-eminence-border/30">{formatNumber(sums.grand_sale)}</td>
-                  <td className="px-3 py-4 text-right text-eminence-gold border-r border-eminence-border/30 font-extrabold">{formatNumber(sums.total_collection)}</td>
+                  <td className="px-3 py-4 text-right text-white border-r border-jainil-border/30">{formatNumber(sums.grand_sale)}</td>
+                  <td className="px-3 py-4 text-right text-jainil-gold border-r border-jainil-border/30 font-extrabold">{formatNumber(sums.total_collection)}</td>
 
                   <td className="px-2 py-4 text-right">{formatNumber(sums.cash)}</td>
                   <td className="px-2 py-4 text-right">{formatNumber(sums.card)}</td>
@@ -3382,24 +3382,24 @@ function DaySummaryPanel({ stats, orders = [], reportsData = [], expenses = [], 
           <div>
             <label className="text-xs text-gray-500 block mb-1">From Date</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 text-eminence-gold" size={16} />
+              <Calendar className="absolute left-3 top-2.5 text-jainil-gold" size={16} />
               <input
                 type="date"
                 value={fromDate}
                 onChange={e => setFromDate(e.target.value)}
-                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-eminence-gold text-gray-800 rounded cursor-pointer"
+                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-jainil-gold text-gray-800 rounded cursor-pointer"
               />
             </div>
           </div>
           <div>
             <label className="text-xs text-gray-500 block mb-1">To Date</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-2.5 text-eminence-gold" size={16} />
+              <Calendar className="absolute left-3 top-2.5 text-jainil-gold" size={16} />
               <input
                 type="date"
                 value={toDate}
                 onChange={e => setToDate(e.target.value)}
-                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-eminence-gold text-gray-800 rounded cursor-pointer"
+                className="bg-white border border-gray-300 px-3 py-2 pl-9 text-sm focus:outline-none focus:border-jainil-gold text-gray-800 rounded cursor-pointer"
               />
             </div>
           </div>
@@ -3432,7 +3432,7 @@ function DaySummaryPanel({ stats, orders = [], reportsData = [], expenses = [], 
       </div>
 
       {/* Detailed Table */}
-      <div className="eminence-card p-6 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+      <div className="jainil-card p-6 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
         <h3 className="font-serif text-lg text-gray-900 mb-4 px-1">Detailed Breakdown</h3>
         <div className="overflow-x-auto rounded-lg border border-gray-200">
           <table className="w-full text-sm text-left text-gray-700">
@@ -3703,7 +3703,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
           <h2 className="font-serif text-2xl text-gray-900">Billing Reports</h2>
           <button
             onClick={exportCSV}
-            className="flex items-center gap-2 bg-eminence-gold text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg hover:bg-eminence-gold/90 transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-jainil-gold text-white text-xs font-bold uppercase tracking-wider px-4 py-2.5 rounded-lg hover:bg-jainil-gold/90 transition-colors shadow-sm"
           >
             <Download size={14} />
             Export
@@ -3717,12 +3717,12 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
             <div className="flex gap-2 items-center">
               <input
                 type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold bg-white"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold bg-white"
               />
               <span className="text-gray-400 text-xs">–</span>
               <input
                 type="date" value={toDate} onChange={e => setToDate(e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold bg-white"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold bg-white"
               />
             </div>
           </div>
@@ -3730,7 +3730,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Service Provider</label>
             <select
               value={serviceProvider} onChange={e => setServiceProvider(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold bg-white text-gray-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold bg-white text-gray-500"
             >
               <option value="">Autocomplete (Service provider name)</option>
               {allProviders.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -3740,7 +3740,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Service</label>
             <select
               value={serviceFilter} onChange={e => setServiceFilter(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold bg-white text-gray-500"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold bg-white text-gray-500"
             >
               <option value="">Autocomplete (Service name)</option>
               {allServices.map(s => <option key={s} value={s}>{s}</option>)}
@@ -3783,7 +3783,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
             <span className="text-sm text-gray-500">Search:</span>
             <input
               type="text" value={search} onChange={e => { setSearch(e.target.value); setPage(1); }}
-              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-eminence-gold w-48"
+              className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-jainil-gold w-48"
               placeholder=""
             />
           </div>
@@ -3855,7 +3855,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                         </button>
                         <button
                           onClick={() => downloadOrderInvoice(api, o.id)}
-                          className="flex items-center gap-1 bg-eminence-gold hover:bg-eminence-gold/90 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded transition-colors"
+                          className="flex items-center gap-1 bg-jainil-gold hover:bg-jainil-gold/90 text-white text-[10px] font-bold uppercase px-2.5 py-1 rounded transition-colors"
                         >
                           <Printer size={10} /> Invoice
                         </button>
@@ -3902,7 +3902,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`px-3 py-1.5 text-xs border rounded transition ${p === page ? "bg-eminence-gold text-white border-eminence-gold" : "border-gray-200 hover:bg-white"}`}
+                  className={`px-3 py-1.5 text-xs border rounded transition ${p === page ? "bg-jainil-gold text-white border-jainil-gold" : "border-gray-200 hover:bg-white"}`}
                 >{p}</button>
               ) : null;
             })}
@@ -3943,7 +3943,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                       <p className="text-xs font-semibold text-gray-800">{it.name}</p>
                       <p className="text-[10px] text-gray-400">{it.is_service ? "Service" : "Product"} × {it.quantity}</p>
                     </div>
-                    <span className="text-sm font-bold text-eminence-gold">₹{it.line_total?.toLocaleString("en-IN")}</span>
+                    <span className="text-sm font-bold text-jainil-gold">₹{it.line_total?.toLocaleString("en-IN")}</span>
                   </div>
                 ))}
               </div>
@@ -3952,7 +3952,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => { downloadOrderInvoice(api, viewOrder.id); setViewOrder(null); }}
-                className="flex-1 flex items-center justify-center gap-2 bg-eminence-gold text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-eminence-gold/90 transition"
+                className="flex-1 flex items-center justify-center gap-2 bg-jainil-gold text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-jainil-gold/90 transition"
               >
                 <Printer size={13} /> Print Invoice
               </button>
@@ -3965,10 +3965,10 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
       {editingOrder && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-fade-in">
-            <div className="p-6 bg-eminence-surface border-b border-gray-100 flex justify-between items-center">
+            <div className="p-6 bg-jainil-surface border-b border-gray-100 flex justify-between items-center">
               <div>
                 <h4 className="font-serif text-xl text-gray-900">Edit Bill Details</h4>
-                <p className="text-xs text-eminence-muted">Bill ID: #{editingOrder.id.slice(0, 8)}</p>
+                <p className="text-xs text-jainil-muted">Bill ID: #{editingOrder.id.slice(0, 8)}</p>
               </div>
               <button onClick={() => setEditingOrder(null)} className="p-2 hover:bg-gray-100 rounded-full"><X size={18} /></button>
             </div>
@@ -3982,7 +3982,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                     required
                     value={editForm.full_name}
                     onChange={e => setEditForm({ ...editForm, full_name: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                   />
                 </div>
                 <div>
@@ -3992,7 +3992,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                     required
                     value={editForm.phone}
                     onChange={e => setEditForm({ ...editForm, phone: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                   />
                 </div>
               </div>
@@ -4006,7 +4006,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                     min="0"
                     value={editForm.total}
                     onChange={e => setEditForm({ ...editForm, total: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                   />
                 </div>
                 <div className="col-span-2">
@@ -4015,7 +4015,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                     rows={2}
                     value={editForm.notes}
                     onChange={e => setEditForm({ ...editForm, notes: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                    className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                   />
                 </div>
               </div>
@@ -4027,7 +4027,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                   <button
                     type="button"
                     onClick={handleAddItem}
-                    className="text-xs text-eminence-gold hover:text-black font-bold uppercase tracking-wider flex items-center gap-1"
+                    className="text-xs text-jainil-gold hover:text-black font-bold uppercase tracking-wider flex items-center gap-1"
                   >
                     <Plus size={12} /> Add Item
                   </button>
@@ -4045,7 +4045,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                           placeholder="Search & select item..."
                           value={it.name || ""}
                           onChange={e => handleItemChange(idx, "name", e.target.value)}
-                          className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-white"
+                          className="flex-1 border border-gray-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-white"
                         />
                         <datalist id={`edit-items-list-${idx}`}>
                           {catalogItems.map(i => (
@@ -4058,7 +4058,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                         <select
                           value={it.is_service ? "service" : "product"}
                           onChange={e => handleItemChange(idx, "is_service", e.target.value === "service")}
-                          className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-white"
+                          className="w-24 border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-white"
                         >
                           <option value="service">Service</option>
                           <option value="product">Product</option>
@@ -4075,7 +4075,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                             min="1"
                             value={it.quantity || 1}
                             onChange={e => handleItemChange(idx, "quantity", Number(e.target.value))}
-                            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-white text-right font-mono"
+                            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-white text-right font-mono"
                           />
                         </div>
                         {/* Price */}
@@ -4087,7 +4087,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                             min="0"
                             value={it.price || 0}
                             onChange={e => handleItemChange(idx, "price", Number(e.target.value))}
-                            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-white text-right font-mono"
+                            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-white text-right font-mono"
                           />
                         </div>
                         {/* Service Provider */}
@@ -4096,7 +4096,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                           <select
                             value={it.service_provider || ""}
                             onChange={e => handleItemChange(idx, "service_provider", e.target.value)}
-                            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-white"
+                            className="w-full border border-gray-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-white"
                           >
                             <option value="">-- None --</option>
                             {employees.filter(emp => emp.role === "service").map(emp => (
@@ -4131,7 +4131,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                       ...editForm,
                       split_payments: [...editForm.split_payments, { method: "Cash", amount: 0 }]
                     })}
-                    className="text-xs text-eminence-gold hover:text-black font-bold uppercase tracking-wider flex items-center gap-1"
+                    className="text-xs text-jainil-gold hover:text-black font-bold uppercase tracking-wider flex items-center gap-1"
                   >
                     <Plus size={12} /> Add Payment
                   </button>
@@ -4147,7 +4147,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                           updated[idx].method = e.target.value;
                           setEditForm({ ...editForm, split_payments: updated });
                         }}
-                        className="flex-1 border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-gray-50"
+                        className="flex-1 border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-gray-50"
                       >
                         {["Cash", "UPI", "Card", "Bank Transfer", "Cheque", "Credit"].map(m => (
                           <option key={m} value={m}>{m}</option>
@@ -4163,7 +4163,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                           updated[idx].amount = e.target.value;
                           setEditForm({ ...editForm, split_payments: updated });
                         }}
-                        className="w-32 border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-gray-50 font-mono text-right"
+                        className="w-32 border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-gray-50 font-mono text-right"
                       />
                       {editForm.split_payments.length > 1 && (
                         <button
@@ -4193,7 +4193,7 @@ function BillingReportsPanel({ orders, employees = [], products = [], services =
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2 bg-eminence-gold hover:bg-eminence-gold/95 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition disabled:opacity-50"
+                  className="px-6 py-2 bg-jainil-gold hover:bg-jainil-gold/95 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition disabled:opacity-50"
                 >
                   {saving ? "Saving..." : "Save Changes"}
                 </button>
@@ -4221,12 +4221,12 @@ function EnquiryReportsPanel({ consultations }) {
         <StatCard icon={User} label="Manual/Walk-In" value={manualLeads} />
       </div>
 
-      <div className="eminence-card p-6">
+      <div className="jainil-card p-6">
         <h3 className="font-serif text-xl mb-6">Recent Consultations & Enquiries</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-eminence-border py-2 text-left overline text-eminence-muted">
+              <tr className="border-b border-jainil-border py-2 text-left overline text-jainil-muted">
                 <th className="py-3">Date</th>
                 <th>Client</th>
                 <th>Phone</th>
@@ -4236,13 +4236,13 @@ function EnquiryReportsPanel({ consultations }) {
             </thead>
             <tbody>
               {consultations.slice(0, 10).map((c) => (
-                <tr key={c.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+                <tr key={c.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                   <td className="py-3">{c.created_at?.split("T")[0] || new Date(c.timestamp).toISOString().split("T")[0]}</td>
                   <td className="font-bold">{c.name}</td>
                   <td>{c.phone || "—"}</td>
-                  <td className="text-eminence-gold font-medium">{c.recommended_service || "Consultation"}</td>
+                  <td className="text-jainil-gold font-medium">{c.recommended_service || "Consultation"}</td>
                   <td>
-                    <span className="uppercase text-[9px] font-bold tracking-widest border border-eminence-border/50 px-2 py-0.5 rounded bg-eminence-surface">
+                    <span className="uppercase text-[9px] font-bold tracking-widest border border-jainil-border/50 px-2 py-0.5 rounded bg-jainil-surface">
                       {c.source || "Website"}
                     </span>
                   </td>
@@ -4250,7 +4250,7 @@ function EnquiryReportsPanel({ consultations }) {
               ))}
               {consultations.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="text-center py-10 text-eminence-muted italic">No enquiries logged yet.</td>
+                  <td colSpan="5" className="text-center py-10 text-jainil-muted italic">No enquiries logged yet.</td>
                 </tr>
               )}
             </tbody>
@@ -4383,11 +4383,11 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Service Provider Reports</h2>
-          <p className="text-xs text-eminence-muted">Detailed transaction log and stylist payouts.</p>
+          <p className="text-xs text-jainil-muted">Detailed transaction log and stylist payouts.</p>
         </div>
         <button
           onClick={handleExport}
-          className="bg-eminence-gold/10 text-eminence-gold hover:bg-eminence-gold hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
+          className="bg-jainil-gold/10 text-jainil-gold hover:bg-jainil-gold hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
         >
           <Download size={14} /> Export CSV
         </button>
@@ -4400,7 +4400,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
             type="date"
             value={dateFrom}
             onChange={e => { setDateFrom(e.target.value); setPage(1); }}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-eminence-gold bg-white"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jainil-gold bg-white"
           />
         </div>
         <div>
@@ -4409,7 +4409,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
             type="date"
             value={dateTo}
             onChange={e => { setDateTo(e.target.value); setPage(1); }}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-eminence-gold bg-white"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jainil-gold bg-white"
           />
         </div>
         <div className="flex-1 min-w-[200px]">
@@ -4417,7 +4417,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
           <select
             value={selectedProvider}
             onChange={e => { setSelectedProvider(e.target.value); setPage(1); }}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-eminence-gold bg-white"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jainil-gold bg-white"
           >
             <option value="">-- All Providers --</option>
             {serviceEmployees.map(emp => (
@@ -4430,7 +4430,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
           <select
             value={selectedType}
             onChange={e => { setSelectedType(e.target.value); setPage(1); }}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-eminence-gold bg-white"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-jainil-gold bg-white"
           >
             <option value="">-- All Types --</option>
             <option value="Service">Service</option>
@@ -4447,11 +4447,11 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
         </button>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm whitespace-nowrap">
             <thead>
-              <tr className="bg-gray-50 border-b border-eminence-border py-3 text-left overline text-eminence-muted">
+              <tr className="bg-gray-50 border-b border-jainil-border py-3 text-left overline text-jainil-muted">
                 <th className="px-6 py-4">Date</th>
                 <th>Service Provider</th>
                 <th>Contact</th>
@@ -4462,7 +4462,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
             </thead>
             <tbody>
               {paginatedTxs.map(tx => (
-                <tr key={tx.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+                <tr key={tx.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                   <td className="px-6 py-4 text-gray-500">{tx.date}</td>
                   <td className="font-bold text-gray-900">{tx.providerName}</td>
                   <td className="text-gray-600">{tx.contact}</td>
@@ -4473,7 +4473,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
               ))}
               {paginatedTxs.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center py-10 text-eminence-muted italic">No transactions found for the selected filters.</td>
+                  <td colSpan="6" className="text-center py-10 text-jainil-muted italic">No transactions found for the selected filters.</td>
                 </tr>
               )}
             </tbody>
@@ -4502,7 +4502,7 @@ function ServiceProviderReportsPanel({ reportsData, employees, orders = [] }) {
               >
                 Previous
               </button>
-              <span className="px-3 py-1 text-xs font-bold bg-eminence-gold/10 text-eminence-gold rounded">
+              <span className="px-3 py-1 text-xs font-bold bg-jainil-gold/10 text-jainil-gold rounded">
                 {page}
               </span>
               <button
@@ -4534,14 +4534,14 @@ function SalesEmployeeReportsPanel({ reportsData, employees }) {
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex justify-between items-center">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Sales Employee Performance Analysis</h2>
-          <p className="text-xs text-eminence-muted">Real-time analysis of leads, conversion rates, and sales targets for the sales team.</p>
+          <p className="text-xs text-jainil-muted">Real-time analysis of leads, conversion rates, and sales targets for the sales team.</p>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="glass-card p-6 rounded-2xl border border-gray-200 bg-white shadow-sm">
-          <p className="overline mb-1 text-eminence-gold font-bold text-[10px]">Total Assigned Leads</p>
+          <p className="overline mb-1 text-jainil-gold font-bold text-[10px]">Total Assigned Leads</p>
           <p className="text-3xl font-serif text-gray-950 mt-1">{totalLeads}</p>
         </div>
         <div className="glass-card p-6 rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -4558,11 +4558,11 @@ function SalesEmployeeReportsPanel({ reportsData, employees }) {
         </div>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-eminence-border py-3 text-left overline text-eminence-muted">
+              <tr className="bg-gray-50 border-b border-jainil-border py-3 text-left overline text-jainil-muted">
                 <th className="px-6 py-4">Employee Name</th>
                 <th>Branch / Section</th>
                 <th>Assigned Leads</th>
@@ -4583,14 +4583,14 @@ function SalesEmployeeReportsPanel({ reportsData, employees }) {
                 const visitedToConvRate = emp.visited_leads ? ((emp.converted_leads / emp.visited_leads) * 100).toFixed(1) : "0.0";
 
                 return (
-                  <tr key={emp.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+                  <tr key={emp.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                     <td className="px-6 py-4">
                       <div className="font-bold text-gray-950">{emp.name}</div>
-                      <div className="text-[10px] text-eminence-muted uppercase">{emp.email}</div>
+                      <div className="text-[10px] text-jainil-muted uppercase">{emp.email}</div>
                     </td>
                     <td>
                       <div className="text-xs font-semibold text-gray-700">{emp.branch}</div>
-                      <div className="text-[10px] text-eminence-muted">{emp.section}</div>
+                      <div className="text-[10px] text-jainil-muted">{emp.section}</div>
                     </td>
                     <td className="font-semibold text-gray-950">{emp.assigned_leads}</td>
                     <td className="text-gray-600">{emp.total_calls}</td>
@@ -4617,11 +4617,11 @@ function SalesEmployeeReportsPanel({ reportsData, employees }) {
                       <div className="space-y-1 py-1 pr-4 min-w-[140px]">
                         <div className="flex justify-between text-[10px] font-bold">
                           <span>₹{emp.monthly_sales.toLocaleString("en-IN")} / ₹{target.toLocaleString("en-IN")}</span>
-                          <span className={achievement >= 100 ? "text-emerald-600" : "text-eminence-gold"}>{achievement}%</span>
+                          <span className={achievement >= 100 ? "text-emerald-600" : "text-jainil-gold"}>{achievement}%</span>
                         </div>
                         <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
                           <div
-                            className={`h-full transition-all duration-500 ${achievement >= 100 ? "bg-emerald-600" : "bg-eminence-gold"}`}
+                            className={`h-full transition-all duration-500 ${achievement >= 100 ? "bg-emerald-600" : "bg-jainil-gold"}`}
                             style={{ width: `${progressWidth}%` }}
                           />
                         </div>
@@ -4632,7 +4632,7 @@ function SalesEmployeeReportsPanel({ reportsData, employees }) {
               })}
               {salesData.length === 0 && (
                 <tr>
-                  <td colSpan="8" className="text-center py-10 text-eminence-muted italic">No sales employee statistics computed yet.</td>
+                  <td colSpan="8" className="text-center py-10 text-jainil-muted italic">No sales employee statistics computed yet.</td>
                 </tr>
               )}
             </tbody>
@@ -4660,13 +4660,13 @@ function PendingPaymentsPanel({ orders, refresh }) {
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
         <h2 className="font-serif text-2xl text-gray-800">Unpaid / Pending Collections</h2>
-        <p className="text-xs text-eminence-muted">Track salon bookings and orders with outstanding balances.</p>
+        <p className="text-xs text-jainil-muted">Track salon bookings and orders with outstanding balances.</p>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-eminence-border text-left overline text-eminence-muted">
+            <tr className="border-b border-jainil-border text-left overline text-jainil-muted">
               <th className="px-6 py-4">Order ID</th>
               <th>Customer</th>
               <th>Contact</th>
@@ -4677,7 +4677,7 @@ function PendingPaymentsPanel({ orders, refresh }) {
           </thead>
           <tbody>
             {pendingOrders.map(o => (
-              <tr key={o.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+              <tr key={o.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                 <td className="px-6 py-4 font-mono text-xs">#{o.id.slice(0, 8)}</td>
                 <td className="font-bold">{o.full_name || o.user_name}</td>
                 <td>{o.phone || "—"}</td>
@@ -4692,7 +4692,7 @@ function PendingPaymentsPanel({ orders, refresh }) {
             ))}
             {pendingOrders.length === 0 && (
               <tr>
-                <td colSpan="6" className="text-center py-12 text-eminence-muted italic">All accounts are settled! No pending payments.</td>
+                <td colSpan="6" className="text-center py-12 text-jainil-muted italic">All accounts are settled! No pending payments.</td>
               </tr>
             )}
           </tbody>
@@ -4710,14 +4710,14 @@ function HistoryReportsPanel({ orders = [], expenses = [] }) {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="eminence-card p-6">
+      <div className="jainil-card p-6">
         <h3 className="font-serif text-2xl mb-4">Operations Chronology</h3>
-        <p className="text-xs text-eminence-muted mb-6">Audited historical ledger of revenue actions and expenses in chronological order.</p>
+        <p className="text-xs text-jainil-muted mb-6">Audited historical ledger of revenue actions and expenses in chronological order.</p>
 
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-eminence-border py-2 text-left overline text-eminence-muted">
+              <tr className="border-b border-jainil-border py-2 text-left overline text-jainil-muted">
                 <th className="py-3">Date</th>
                 <th>Type</th>
                 <th>Event Description</th>
@@ -4726,7 +4726,7 @@ function HistoryReportsPanel({ orders = [], expenses = [] }) {
             </thead>
             <tbody>
               {combined.slice(0, 50).map(item => (
-                <tr key={item.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+                <tr key={item.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                   <td className="py-3">{item.date}</td>
                   <td>
                     <span className={`text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded border ${item.type === "Bill" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-rose-50 text-rose-700 border-rose-100"
@@ -5016,7 +5016,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
     <button
       onClick={() => setFilterPeriod(type)}
       className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${filterPeriod === type
-        ? "bg-eminence-gold text-white shadow-md scale-105"
+        ? "bg-jainil-gold text-white shadow-md scale-105"
         : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-100"
         }`}
     >
@@ -5029,7 +5029,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
       {/* Header */}
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
         <h2 className="font-serif text-2xl text-gray-900">Financial Analytics</h2>
-        <p className="text-xs text-eminence-muted">Track salon revenue, operating expenses, cash flow trends, and transaction history.</p>
+        <p className="text-xs text-jainil-muted">Track salon revenue, operating expenses, cash flow trends, and transaction history.</p>
       </div>
 
       {/* Date Filtering Panel */}
@@ -5049,14 +5049,14 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               type="date"
               value={customFromDate}
               onChange={e => setCustomFromDate(e.target.value)}
-              className="bg-eminence-surface border border-eminence-border rounded-lg px-3 py-1.5 text-xs text-eminence-text focus:outline-none focus:border-eminence-gold"
+              className="bg-jainil-surface border border-jainil-border rounded-lg px-3 py-1.5 text-xs text-jainil-text focus:outline-none focus:border-jainil-gold"
             />
-            <span className="text-xs text-eminence-muted font-bold">TO</span>
+            <span className="text-xs text-jainil-muted font-bold">TO</span>
             <input
               type="date"
               value={customToDate}
               onChange={e => setCustomToDate(e.target.value)}
-              className="bg-eminence-surface border border-eminence-border rounded-lg px-3 py-1.5 text-xs text-eminence-text focus:outline-none focus:border-eminence-gold"
+              className="bg-jainil-surface border border-jainil-border rounded-lg px-3 py-1.5 text-xs text-jainil-text focus:outline-none focus:border-jainil-gold"
             />
           </div>
         )}
@@ -5064,12 +5064,12 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
 
       {/* KPI Stats Summary Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-card p-6 rounded-2xl border-l-4 border-l-eminence-gold flex flex-col justify-between bg-white shadow-sm border border-gray-100 relative overflow-hidden group">
+        <div className="glass-card p-6 rounded-2xl border-l-4 border-l-jainil-gold flex flex-col justify-between bg-white shadow-sm border border-gray-100 relative overflow-hidden group">
           <div>
-            <p className="overline text-[10px] text-eminence-gold font-bold mb-1">Gross Revenue</p>
+            <p className="overline text-[10px] text-jainil-gold font-bold mb-1">Gross Revenue</p>
             <h3 className="font-serif text-3xl text-gray-900">₹{totalRevenue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h3>
           </div>
-          <div className="mt-4 pt-4 border-t border-eminence-border/10 flex justify-between items-center text-xs text-eminence-muted">
+          <div className="mt-4 pt-4 border-t border-jainil-border/10 flex justify-between items-center text-xs text-jainil-muted">
             <span>Orders count: {filteredOrders.length}</span>
             <span>Avg: ₹{averageOrder.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
           </div>
@@ -5080,7 +5080,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
             <p className="overline text-[10px] text-rose-500 font-bold mb-1">Total Operating Expenses</p>
             <h3 className="font-serif text-3xl text-rose-700">₹{totalExpense.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h3>
           </div>
-          <div className="mt-4 pt-4 border-t border-eminence-border/10 flex justify-between items-center text-xs text-eminence-muted">
+          <div className="mt-4 pt-4 border-t border-jainil-border/10 flex justify-between items-center text-xs text-jainil-muted">
             <span>Vouchers count: {filteredExpenses.length}</span>
             <span>Avg: ₹{averageExpense.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
           </div>
@@ -5095,7 +5095,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               ₹{netProfit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </h3>
           </div>
-          <div className="mt-4 pt-4 border-t border-eminence-border/10 flex justify-between items-center text-xs text-eminence-muted">
+          <div className="mt-4 pt-4 border-t border-jainil-border/10 flex justify-between items-center text-xs text-jainil-muted">
             <span>Operating balance</span>
             <span className={`font-bold ${netProfit >= 0 ? "text-emerald-600" : "text-red-600"}`}>
               {netProfit >= 0 ? "PROFITABLE" : "OVER SPENT"}
@@ -5108,7 +5108,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
             <p className="overline text-[10px] text-indigo-500 font-bold mb-1">Profit Margin</p>
             <h3 className="font-serif text-3xl text-indigo-700">{profitMargin.toFixed(1)}%</h3>
           </div>
-          <div className="mt-4 pt-4 border-t border-eminence-border/10 flex justify-between items-center text-xs text-eminence-muted">
+          <div className="mt-4 pt-4 border-t border-jainil-border/10 flex justify-between items-center text-xs text-jainil-muted">
             <span>Net / Gross ratio</span>
             <div className="w-16 bg-gray-100 h-1.5 rounded-full overflow-hidden">
               <div
@@ -5121,20 +5121,20 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
       </div>
 
       {/* Monthly Cash Flow Trend Chart */}
-      <div className="eminence-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
-        <div className="flex justify-between items-center border-b border-eminence-border/10 pb-4">
+      <div className="jainil-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
+        <div className="flex justify-between items-center border-b border-jainil-border/10 pb-4">
           <div>
             <h3 className="font-serif text-2xl text-gray-800">Monthly Cash Flow Trend</h3>
-            <p className="text-xs text-eminence-muted">Comparative view of revenue vs operating expenses over the last 6 months</p>
+            <p className="text-xs text-jainil-muted">Comparative view of revenue vs operating expenses over the last 6 months</p>
           </div>
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 bg-emerald-500 rounded" />
-              <span className="text-eminence-muted">Revenue</span>
+              <span className="text-jainil-muted">Revenue</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 bg-rose-500 rounded" />
-              <span className="text-eminence-muted">Expenses</span>
+              <span className="text-jainil-muted">Expenses</span>
             </div>
           </div>
         </div>
@@ -5148,7 +5148,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
 
             return (
               <div key={month.yearMonth} className="flex-1 flex flex-col items-center min-w-[80px] group">
-                <div className="w-full flex items-end justify-center gap-1.5 h-[160px] relative pb-2 border-b border-eminence-border/15">
+                <div className="w-full flex items-end justify-center gap-1.5 h-[160px] relative pb-2 border-b border-jainil-border/15">
                   {/* Revenue Bar */}
                   <div
                     className="w-5 bg-emerald-500 hover:bg-emerald-600 rounded-t-sm transition-all duration-500 relative cursor-pointer"
@@ -5183,16 +5183,16 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
       {/* Visual Analytics Breakdowns */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Revenue Stream Analysis */}
-        <div className="eminence-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
-          <div className="flex justify-between items-center border-b border-eminence-border/10 pb-4">
+        <div className="jainil-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
+          <div className="flex justify-between items-center border-b border-jainil-border/10 pb-4">
             <h3 className="font-serif text-2xl text-gray-800">Revenue Streams</h3>
-            <span className="text-[10px] font-bold text-eminence-gold border border-eminence-gold/30 px-2 py-0.5 rounded-full uppercase">Inflow</span>
+            <span className="text-[10px] font-bold text-jainil-gold border border-jainil-gold/30 px-2 py-0.5 rounded-full uppercase">Inflow</span>
           </div>
 
           <div className="space-y-6 pt-2">
             {[
               { label: "Service Billing", amount: serviceRevenue, color: "bg-emerald-500" },
-              { label: "Salon Product Sales", amount: salesRevenue, color: "bg-eminence-gold" },
+              { label: "Salon Product Sales", amount: salesRevenue, color: "bg-jainil-gold" },
               { label: "E-commerce Orders", amount: websiteRevenue, color: "bg-indigo-500" }
             ].map(item => {
               const pct = totalRevenue > 0 ? (item.amount / totalRevenue) * 100 : 0;
@@ -5201,7 +5201,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
                   <div className="flex justify-between text-sm">
                     <span className="font-medium text-gray-700 text-xs">{item.label}</span>
                     <span className="font-serif text-gray-900 font-bold text-xs">
-                      ₹{item.amount.toLocaleString("en-IN")} <span className="text-[10px] text-eminence-muted font-sans font-normal">({pct.toFixed(1)}%)</span>
+                      ₹{item.amount.toLocaleString("en-IN")} <span className="text-[10px] text-jainil-muted font-sans font-normal">({pct.toFixed(1)}%)</span>
                     </span>
                   </div>
                   <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
@@ -5214,14 +5214,14 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               );
             })}
             {totalRevenue === 0 && (
-              <p className="text-xs italic text-eminence-muted text-center py-6">No revenue logs in this date range.</p>
+              <p className="text-xs italic text-jainil-muted text-center py-6">No revenue logs in this date range.</p>
             )}
           </div>
         </div>
 
         {/* Payment Method Distribution */}
-        <div className="eminence-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
-          <div className="flex justify-between items-center border-b border-eminence-border/10 pb-4">
+        <div className="jainil-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
+          <div className="flex justify-between items-center border-b border-jainil-border/10 pb-4">
             <h3 className="font-serif text-2xl text-gray-800">Payment Methods</h3>
             <span className="text-[10px] font-bold text-emerald-600 border border-emerald-200 px-2 py-0.5 rounded-full uppercase bg-emerald-50/50">Receipts</span>
           </div>
@@ -5230,9 +5230,9 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
             {sortedPaymentModes.map(item => (
               <div key={item.mode} className="space-y-1">
                 <div className="flex justify-between text-sm items-center">
-                  <span className="text-xs uppercase tracking-wider text-eminence-muted font-bold">{item.mode}</span>
+                  <span className="text-xs uppercase tracking-wider text-jainil-muted font-bold">{item.mode}</span>
                   <span className="font-serif text-gray-900 font-bold text-xs">
-                    ₹{item.amount.toLocaleString("en-IN")} <span className="text-[10px] text-eminence-muted font-sans font-normal">({item.percentage.toFixed(1)}%)</span>
+                    ₹{item.amount.toLocaleString("en-IN")} <span className="text-[10px] text-jainil-muted font-sans font-normal">({item.percentage.toFixed(1)}%)</span>
                   </span>
                 </div>
                 <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
@@ -5244,14 +5244,14 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               </div>
             ))}
             {sortedPaymentModes.length === 0 && (
-              <p className="text-xs italic text-eminence-muted text-center py-10">No payments registered in this range.</p>
+              <p className="text-xs italic text-jainil-muted text-center py-10">No payments registered in this range.</p>
             )}
           </div>
         </div>
 
         {/* Expense Category Analysis */}
-        <div className="eminence-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
-          <div className="flex justify-between items-center border-b border-eminence-border/10 pb-4">
+        <div className="jainil-card p-8 bg-white border border-gray-100 rounded-2xl shadow-sm space-y-6">
+          <div className="flex justify-between items-center border-b border-jainil-border/10 pb-4">
             <h3 className="font-serif text-2xl text-gray-800">Expenses</h3>
             <span className="text-[10px] font-bold text-red-500 border border-red-200 px-2 py-0.5 rounded-full uppercase bg-red-50/50">Outflow</span>
           </div>
@@ -5260,9 +5260,9 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
             {sortedExpensesByCat.map(item => (
               <div key={item.category} className="space-y-1">
                 <div className="flex justify-between text-sm items-center">
-                  <span className="text-xs uppercase tracking-wider text-eminence-muted font-bold">{item.category}</span>
+                  <span className="text-xs uppercase tracking-wider text-jainil-muted font-bold">{item.category}</span>
                   <span className="font-serif text-gray-900 font-bold text-xs">
-                    ₹{item.amount.toLocaleString("en-IN")} <span className="text-[10px] text-eminence-muted font-sans font-normal">({item.percentage.toFixed(1)}%)</span>
+                    ₹{item.amount.toLocaleString("en-IN")} <span className="text-[10px] text-jainil-muted font-sans font-normal">({item.percentage.toFixed(1)}%)</span>
                   </span>
                 </div>
                 <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
@@ -5274,19 +5274,19 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               </div>
             ))}
             {sortedExpensesByCat.length === 0 && (
-              <p className="text-xs italic text-eminence-muted text-center py-10">No expenses logged in this date range.</p>
+              <p className="text-xs italic text-jainil-muted text-center py-10">No expenses logged in this date range.</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Combined Transaction History Ledger */}
-      <div className="eminence-card bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
+      <div className="jainil-card bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden">
         {/* Ledger Toolbar */}
-        <div className="p-6 border-b border-eminence-border/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="p-6 border-b border-jainil-border/10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h3 className="font-serif text-2xl text-gray-800">Unified Transaction Ledger</h3>
-            <p className="text-xs text-eminence-muted">Chronological cash flow list showing all salon revenues and expense bills</p>
+            <p className="text-xs text-jainil-muted">Chronological cash flow list showing all salon revenues and expense bills</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -5298,7 +5298,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
                 placeholder="Search description, code..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="pl-9 pr-4 py-2 border border-eminence-border rounded-lg text-xs bg-eminence-surface focus:outline-none focus:border-eminence-gold min-w-[200px]"
+                className="pl-9 pr-4 py-2 border border-jainil-border rounded-lg text-xs bg-jainil-surface focus:outline-none focus:border-jainil-gold min-w-[200px]"
               />
               {searchQuery && (
                 <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>
@@ -5306,14 +5306,14 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
             </div>
 
             {/* Type Filters */}
-            <div className="flex bg-eminence-surface rounded-lg p-0.5 border border-eminence-border">
+            <div className="flex bg-jainil-surface rounded-lg p-0.5 border border-jainil-border">
               {["ALL", "REVENUE", "EXPENSE"].map(mode => (
                 <button
                   key={mode}
                   onClick={() => setLedgerTypeFilter(mode)}
                   className={`px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all ${ledgerTypeFilter === mode
                     ? "bg-white text-gray-900 shadow-sm"
-                    : "text-eminence-muted hover:text-gray-800"
+                    : "text-jainil-muted hover:text-gray-800"
                     }`}
                 >
                   {mode}
@@ -5324,7 +5324,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
             {/* Export CSV Button */}
             <button
               onClick={downloadCSV}
-              className="flex items-center gap-1.5 border border-eminence-border bg-white hover:bg-eminence-surface px-3 py-2 rounded-lg text-xs font-bold text-gray-700 transition-all"
+              className="flex items-center gap-1.5 border border-jainil-border bg-white hover:bg-jainil-surface px-3 py-2 rounded-lg text-xs font-bold text-gray-700 transition-all"
             >
               <Download size={13} /> Export
             </button>
@@ -5335,7 +5335,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
         <div className="overflow-x-auto max-h-[450px] overflow-y-auto">
           <table className="w-full text-sm text-left">
             <thead>
-              <tr className="text-[10px] text-eminence-muted uppercase tracking-wider bg-eminence-surface/30 border-b border-eminence-border/10">
+              <tr className="text-[10px] text-jainil-muted uppercase tracking-wider bg-jainil-surface/30 border-b border-jainil-border/10">
                 <th className="px-6 py-3.5">Date</th>
                 <th className="px-6 py-3.5">Type</th>
                 <th className="px-6 py-3.5">Category</th>
@@ -5348,7 +5348,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               {filteredLedger.map((item, index) => {
                 const isRevenue = item.type === "Revenue";
                 return (
-                  <tr key={`${item.id}-${index}`} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10 transition-colors">
+                  <tr key={`${item.id}-${index}`} className="border-b border-jainil-border/10 hover:bg-jainil-surface/10 transition-colors">
                     <td className="px-6 py-4 font-mono text-xs text-gray-600">{item.date}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-bold ${isRevenue ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-700 border border-red-100"}`}>
@@ -5372,7 +5372,7 @@ function FinanceReportsPanel({ orders = [], expenses = [], leads = [], stats = n
               })}
               {filteredLedger.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="text-center py-20 text-sm italic text-eminence-muted bg-eminence-surface/5">
+                  <td colSpan="6" className="text-center py-20 text-sm italic text-jainil-muted bg-jainil-surface/5">
                     No transactions match search criteria or selected date range.
                   </td>
                 </tr>
@@ -5394,7 +5394,7 @@ function BalanceReportsPanel({ orders, expenses }) {
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="glass-card p-8 rounded-2xl bg-white border border-gray-100">
-          <p className="overline mb-1 text-eminence-gold font-bold">Total Salon Revenue</p>
+          <p className="overline mb-1 text-jainil-gold font-bold">Total Salon Revenue</p>
           <p className="text-4xl font-serif text-gray-900">₹{totalRevenue.toLocaleString("en-IN")}</p>
         </div>
         <div className="glass-card p-8 rounded-2xl bg-white border border-gray-100">
@@ -5973,7 +5973,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
             <button
               key={t}
               onClick={() => setAdvanceTab(t)}
-              className={`px-3 py-1 hover:text-white transition-colors pb-0.5 ${advanceTab === t ? "text-eminence-gold" : "text-gray-300"}`}
+              className={`px-3 py-1 hover:text-white transition-colors pb-0.5 ${advanceTab === t ? "text-jainil-gold" : "text-gray-300"}`}
             >
               {t}
             </button>
@@ -5982,7 +5982,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
       </div>
 
       {/* Nested Tab Rendering */}
-      <div className="eminence-card p-6 bg-white border border-gray-200 rounded-xl">
+      <div className="jainil-card p-6 bg-white border border-gray-200 rounded-xl">
         {advanceTab === "REPORTS" && (() => {
           const totalRev = filteredOrders.reduce((sum, o) => sum + (o.total || 0), 0);
           const totalExp = filteredExpenses.reduce((sum, e) => sum + (e.amount || 0), 0);
@@ -6006,19 +6006,19 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               </div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <p className="text-[10px] text-eminence-muted uppercase font-bold block mb-1">Turnover</p>
-                  <p className="text-2xl font-serif text-eminence-gold">₹{totalRev.toLocaleString("en-IN")}</p>
+                  <p className="text-[10px] text-jainil-muted uppercase font-bold block mb-1">Turnover</p>
+                  <p className="text-2xl font-serif text-jainil-gold">₹{totalRev.toLocaleString("en-IN")}</p>
                 </div>
                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <p className="text-[10px] text-eminence-muted uppercase font-bold block mb-1">Gross Margin</p>
+                  <p className="text-[10px] text-jainil-muted uppercase font-bold block mb-1">Gross Margin</p>
                   <p className="text-2xl font-serif text-emerald-700">₹{(totalRev - totalExp).toLocaleString("en-IN")}</p>
                 </div>
                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <p className="text-[10px] text-eminence-muted uppercase font-bold block mb-1">Average Order Value</p>
+                  <p className="text-[10px] text-jainil-muted uppercase font-bold block mb-1">Average Order Value</p>
                   <p className="text-2xl font-serif text-gray-950">₹{aov.toFixed(0)}</p>
                 </div>
                 <div className="p-4 bg-gray-50 border border-gray-100 rounded-xl">
-                  <p className="text-[10px] text-eminence-muted uppercase font-bold block mb-1">GST Collected (18%)</p>
+                  <p className="text-[10px] text-jainil-muted uppercase font-bold block mb-1">GST Collected (18%)</p>
                   <p className="text-2xl font-serif text-indigo-700">₹{(totalRev * 0.18).toLocaleString("en-IN")}</p>
                 </div>
               </div>
@@ -6583,7 +6583,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
                 <table className="w-full text-sm text-left">
                   <thead>
-                    <tr className="border-b border-gray-100 text-eminence-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
+                    <tr className="border-b border-gray-100 text-jainil-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
                       <th className="px-4 py-3">Bill date</th>
                       <th>Invoice id</th>
                       <th>Client name</th>
@@ -6614,13 +6614,13 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                           <td>{o.payment_method || "—"}</td>
                           <td>{formatNumber(incTax)}</td>
                           <td>{formatNumber(excTax)}</td>
-                          <td className="capitalize text-xs text-eminence-muted">{o.status}</td>
+                          <td className="capitalize text-xs text-jainil-muted">{o.status}</td>
                         </tr>
                       );
                     })}
                     {filteredGstOrders.length === 0 && (
                       <tr>
-                        <td colSpan="9" className="text-center py-8 text-eminence-muted italic">No data found!</td>
+                        <td colSpan="9" className="text-center py-8 text-jainil-muted italic">No data found!</td>
                       </tr>
                     )}
                     <tr className="bg-gray-100 font-bold border-t border-gray-200 whitespace-nowrap">
@@ -6703,7 +6703,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
                 <table className="w-full text-sm text-left">
                   <thead>
-                    <tr className="border-b border-gray-100 text-eminence-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
+                    <tr className="border-b border-gray-100 text-jainil-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
                       <th className="px-4 py-3">Date</th>
                       <th>Service name</th>
                       <th>Category</th>
@@ -6736,7 +6736,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                     })}
                     {serviceSalesRecords.length === 0 && (
                       <tr>
-                        <td colSpan="8" className="text-center py-8 text-eminence-muted italic">No service sales in filter range.</td>
+                        <td colSpan="8" className="text-center py-8 text-jainil-muted italic">No service sales in filter range.</td>
                       </tr>
                     )}
                     <tr className="bg-gray-100 font-bold border-t border-gray-200 whitespace-nowrap">
@@ -6799,7 +6799,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
                 <table className="w-full text-sm text-left">
                   <thead>
-                    <tr className="border-b border-gray-100 text-eminence-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
+                    <tr className="border-b border-gray-100 text-jainil-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
                       <th className="px-4 py-3">Purchase date</th>
                       <th>Invoice</th>
                       <th>Vendor name</th>
@@ -6849,7 +6849,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                     })}
                     {filteredStockLogs.length === 0 && (
                       <tr>
-                        <td colSpan="16" className="text-center py-8 text-eminence-muted italic">No record found!!</td>
+                        <td colSpan="16" className="text-center py-8 text-jainil-muted italic">No record found!!</td>
                       </tr>
                     )}
                     <tr className="bg-gray-100 font-bold border-t border-gray-200">
@@ -6935,7 +6935,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
                 <table className="w-full text-sm text-left">
                   <thead>
-                    <tr className="border-b border-gray-100 text-eminence-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
+                    <tr className="border-b border-gray-100 text-jainil-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
                       <th className="px-4 py-3">Bill date</th>
                       <th>Invoice id</th>
                       <th>Client name</th>
@@ -6980,7 +6980,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                     })}
                     {productSalesRecords.length === 0 && (
                       <tr>
-                        <td colSpan="14" className="text-center py-8 text-eminence-muted italic">No retail product sales in filter range.</td>
+                        <td colSpan="14" className="text-center py-8 text-jainil-muted italic">No retail product sales in filter range.</td>
                       </tr>
                     )}
                     <tr className="bg-gray-100 font-bold border-t border-gray-200">
@@ -7084,7 +7084,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
                 <table className="w-full text-sm text-left">
                   <thead>
-                    <tr className="border-b border-gray-100 text-eminence-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
+                    <tr className="border-b border-gray-100 text-jainil-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50 whitespace-nowrap">
                       <th className="px-4 py-3">Bill date</th>
                       <th>Invoice id</th>
                       <th>Client name</th>
@@ -7115,13 +7115,13 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                           <td>Pcs</td>
                           <td className="font-mono text-xs">#{u.product_id?.slice(0, 8)}</td>
                           <td>{u.employee_name}</td>
-                          <td className="text-xs text-eminence-muted">{u.remarks || "Salon"}</td>
+                          <td className="text-xs text-jainil-muted">{u.remarks || "Salon"}</td>
                         </tr>
                       );
                     })}
                     {filteredUsages.length === 0 && (
                       <tr>
-                        <td colSpan="10" className="text-center py-8 text-eminence-muted italic">No record found!!</td>
+                        <td colSpan="10" className="text-center py-8 text-jainil-muted italic">No record found!!</td>
                       </tr>
                     )}
                   </tbody>
@@ -7134,7 +7134,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
         {advanceTab === "MEMBERSHIP" && (
           <div className="space-y-4">
             <h3 className="font-serif text-xl border-b pb-2">Membership Sales Log</h3>
-            <div className="text-center py-6 text-eminence-muted italic text-sm">No new membership enrollments in the selected filter range.</div>
+            <div className="text-center py-6 text-jainil-muted italic text-sm">No new membership enrollments in the selected filter range.</div>
           </div>
         )}
 
@@ -7196,7 +7196,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
               <div className="overflow-x-auto bg-white rounded-xl border border-gray-200">
                 <table className="w-full text-sm text-left">
                   <thead>
-                    <tr className="border-b border-gray-100 text-eminence-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50">
+                    <tr className="border-b border-gray-100 text-jainil-muted uppercase text-[10px] tracking-wider font-bold bg-gray-50">
                       <th className="px-4 py-3">Date</th>
                       <th>Invoice id</th>
                       <th>Client name</th>
@@ -7227,7 +7227,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                           <td>
                             <button
                               onClick={() => toast.success(`Viewing invoice: ${item.orderId}`)}
-                              className="text-eminence-gold hover:text-eminence-muted transition-colors text-xs font-bold"
+                              className="text-jainil-gold hover:text-jainil-muted transition-colors text-xs font-bold"
                             >
                               View
                             </button>
@@ -7237,7 +7237,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
                     })}
                     {filteredUpsellRecords.length === 0 && (
                       <tr>
-                        <td colSpan="8" className="text-center py-8 text-eminence-muted italic">No upsell records logged in the selected range.</td>
+                        <td colSpan="8" className="text-center py-8 text-jainil-muted italic">No upsell records logged in the selected range.</td>
                       </tr>
                     )}
                     <tr className="bg-gray-100 font-bold border-t border-gray-200 whitespace-nowrap">
@@ -7255,7 +7255,7 @@ function AdvanceReportsPanel({ stats, orders, employees, expenses, usages, repor
         {advanceTab === "WALLET RECHARGE" && (
           <div className="space-y-4">
             <h3 className="font-serif text-xl border-b pb-2">Client Wallet Transactions</h3>
-            <div className="text-center py-6 text-eminence-muted italic text-sm">No wallet credit additions registered during this period.</div>
+            <div className="text-center py-6 text-jainil-muted italic text-sm">No wallet credit additions registered during this period.</div>
           </div>
         )}
       </div>
@@ -7273,20 +7273,20 @@ function AttendanceReportPanel({ attendanceLogs, employees }) {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="eminence-card p-6 flex justify-between items-center bg-white border border-gray-200">
+      <div className="jainil-card p-6 flex justify-between items-center bg-white border border-gray-200">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Staff Attendance Report</h2>
-          <p className="text-xs text-eminence-muted">Detailed check-in logs, geolocations, and face checks.</p>
+          <p className="text-xs text-jainil-muted">Detailed check-in logs, geolocations, and face checks.</p>
         </div>
         <div>
-          <input type="text" placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)} className="bg-eminence-surface border border-eminence-border px-3 py-1.5 text-xs focus:outline-none" />
+          <input type="text" placeholder="Search employee..." value={search} onChange={e => setSearch(e.target.value)} className="bg-jainil-surface border border-jainil-border px-3 py-1.5 text-xs focus:outline-none" />
         </div>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-eminence-border text-left overline text-eminence-muted">
+            <tr className="border-b border-jainil-border text-left overline text-jainil-muted">
               <th className="px-6 py-4">Employee</th>
               <th>Date</th>
               <th>Check-In</th>
@@ -7297,11 +7297,11 @@ function AttendanceReportPanel({ attendanceLogs, employees }) {
           </thead>
           <tbody>
             {filtered.map(log => (
-              <tr key={log.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+              <tr key={log.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                 <td className="px-6 py-4 font-bold">{log.user_name}</td>
                 <td>{log.date}</td>
                 <td className="text-emerald-700 font-medium font-serif">{log.time}</td>
-                <td className="font-serif text-eminence-gold font-medium">{log.checkout_time || "Active"}</td>
+                <td className="font-serif text-jainil-gold font-medium">{log.checkout_time || "Active"}</td>
                 <td>
                   <span className={`text-[9px] uppercase tracking-wider border px-2 py-0.5 rounded font-bold ${log.is_manual ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-emerald-50 text-emerald-700 border-emerald-200"
                     }`}>
@@ -7310,18 +7310,18 @@ function AttendanceReportPanel({ attendanceLogs, employees }) {
                 </td>
                 <td>
                   {log.photo_url ? (
-                    <a href={`/api/files/${log.photo_url}`} target="_blank" rel="noreferrer" className="text-xs text-eminence-gold hover:underline">
+                    <a href={`/api/files/${log.photo_url}`} target="_blank" rel="noreferrer" className="text-xs text-jainil-gold hover:underline">
                       View photo
                     </a>
                   ) : (
-                    <span className="text-xs text-eminence-muted italic">No photo</span>
+                    <span className="text-xs text-jainil-muted italic">No photo</span>
                   )}
                 </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan="6" className="text-center py-10 text-eminence-muted italic">No attendance records found.</td>
+                <td colSpan="6" className="text-center py-10 text-jainil-muted italic">No attendance records found.</td>
               </tr>
             )}
           </tbody>
@@ -7336,13 +7336,13 @@ function SMSHistoryPanel({ smsLogs }) {
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
         <h2 className="font-serif text-2xl text-gray-800">SMS Reminders & Broadcast Logs</h2>
-        <p className="text-xs text-eminence-muted">Log of all system-sent text notifications, service reminders, and custom campaigns.</p>
+        <p className="text-xs text-jainil-muted">Log of all system-sent text notifications, service reminders, and custom campaigns.</p>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-eminence-border text-left overline text-eminence-muted">
+            <tr className="border-b border-jainil-border text-left overline text-jainil-muted">
               <th className="px-6 py-4">Recipient</th>
               <th>Message Content</th>
               <th>Status</th>
@@ -7351,15 +7351,15 @@ function SMSHistoryPanel({ smsLogs }) {
           </thead>
           <tbody>
             {smsLogs.map(log => (
-              <tr key={log.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+              <tr key={log.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                 <td className="px-6 py-4 font-semibold">{log.recipient}</td>
-                <td className="text-xs text-eminence-text">{log.text}</td>
+                <td className="text-xs text-jainil-text">{log.text}</td>
                 <td>
                   <span className="text-[9px] uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded font-bold">
                     {log.status}
                   </span>
                 </td>
-                <td className="text-xs text-eminence-muted font-mono">{log.date}</td>
+                <td className="text-xs text-jainil-muted font-mono">{log.date}</td>
               </tr>
             ))}
           </tbody>
@@ -7454,7 +7454,7 @@ const SearchableServiceCategorySelect = ({ value, onChange, placeholder = "Selec
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+      <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
         <input
           type="text"
           value={search}
@@ -7490,7 +7490,7 @@ const SearchableServiceCategorySelect = ({ value, onChange, placeholder = "Selec
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="px-3 bg-transparent border-l border-eminence-border/30 text-gray-500 hover:text-eminence-gold flex items-center focus:outline-none"
+          className="px-3 bg-transparent border-l border-jainil-border/30 text-gray-500 hover:text-jainil-gold flex items-center focus:outline-none"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -7499,7 +7499,7 @@ const SearchableServiceCategorySelect = ({ value, onChange, placeholder = "Selec
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-1 bg-white border border-eminence-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
+        <div className="absolute left-0 right-0 mt-1 bg-white border border-jainil-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
           {allowAdd && search.trim() && !categories.some(c => c.toLowerCase() === search.trim().toLowerCase()) && (
             <button
               type="button"
@@ -7515,7 +7515,7 @@ const SearchableServiceCategorySelect = ({ value, onChange, placeholder = "Selec
             <div
               key={cat}
               onMouseDown={() => handleSelect(cat)}
-              className="flex justify-between items-center px-4 py-2.5 hover:bg-eminence-gold/10 hover:text-eminence-gold cursor-pointer text-sm text-gray-700 transition-colors"
+              className="flex justify-between items-center px-4 py-2.5 hover:bg-jainil-gold/10 hover:text-jainil-gold cursor-pointer text-sm text-gray-700 transition-colors"
             >
               <span>{cat}</span>
               <button
@@ -7598,7 +7598,7 @@ const SearchableProductCategorySelect = ({ value, onChange, options, onAddCatego
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+      <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
         <input
           type="text"
           value={search}
@@ -7634,7 +7634,7 @@ const SearchableProductCategorySelect = ({ value, onChange, options, onAddCatego
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="px-3 bg-transparent border-l border-eminence-border/30 text-gray-500 hover:text-eminence-gold flex items-center focus:outline-none"
+          className="px-3 bg-transparent border-l border-jainil-border/30 text-gray-500 hover:text-jainil-gold flex items-center focus:outline-none"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -7643,7 +7643,7 @@ const SearchableProductCategorySelect = ({ value, onChange, options, onAddCatego
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-1 bg-white border border-eminence-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
+        <div className="absolute left-0 right-0 mt-1 bg-white border border-jainil-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
           {allowAdd && search.trim() && !categories.some(c => (c.name || "").toLowerCase() === search.trim().toLowerCase()) && (
             <button
               type="button"
@@ -7659,7 +7659,7 @@ const SearchableProductCategorySelect = ({ value, onChange, options, onAddCatego
             <div
               key={cat.id || cat.name}
               onMouseDown={() => handleSelect(cat.name)}
-              className="flex justify-between items-center px-4 py-2.5 hover:bg-eminence-gold/10 hover:text-eminence-gold cursor-pointer text-sm text-gray-700 transition-colors"
+              className="flex justify-between items-center px-4 py-2.5 hover:bg-jainil-gold/10 hover:text-jainil-gold cursor-pointer text-sm text-gray-700 transition-colors"
             >
               <span>{cat.name}</span>
               <button
@@ -7768,7 +7768,7 @@ const SearchableCategorySelect = ({ value, onChange, placeholder = "Enter Catego
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+      <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
         <input
           type="text"
           value={search}
@@ -7804,7 +7804,7 @@ const SearchableCategorySelect = ({ value, onChange, placeholder = "Enter Catego
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="px-3 bg-transparent border-l border-eminence-border/30 text-gray-500 hover:text-eminence-gold flex items-center focus:outline-none"
+          className="px-3 bg-transparent border-l border-jainil-border/30 text-gray-500 hover:text-jainil-gold flex items-center focus:outline-none"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -7813,7 +7813,7 @@ const SearchableCategorySelect = ({ value, onChange, placeholder = "Enter Catego
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 mt-1 bg-white border border-eminence-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
+        <div className="absolute left-0 right-0 mt-1 bg-white border border-jainil-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
           {allowAdd && search.trim() && !categories.some(c => c.toLowerCase() === search.trim().toLowerCase()) && (
             <button
               type="button"
@@ -7829,7 +7829,7 @@ const SearchableCategorySelect = ({ value, onChange, placeholder = "Enter Catego
             <div
               key={cat}
               onMouseDown={() => handleSelect(cat)}
-              className="flex justify-between items-center px-4 py-2.5 hover:bg-eminence-gold/10 hover:text-eminence-gold cursor-pointer text-sm text-gray-700 transition-colors"
+              className="flex justify-between items-center px-4 py-2.5 hover:bg-jainil-gold/10 hover:text-jainil-gold cursor-pointer text-sm text-gray-700 transition-colors"
             >
               <span>{cat}</span>
               <button
@@ -7891,7 +7891,7 @@ const SearchableRecipientSelect = ({ value, onChange, options, placeholder = "En
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+      <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
         <input
           type="text"
           value={search}
@@ -7927,7 +7927,7 @@ const SearchableRecipientSelect = ({ value, onChange, options, placeholder = "En
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="px-3 bg-transparent border-l border-eminence-border/30 text-gray-500 hover:text-eminence-gold flex items-center focus:outline-none"
+          className="px-3 bg-transparent border-l border-jainil-border/30 text-gray-500 hover:text-jainil-gold flex items-center focus:outline-none"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -7936,12 +7936,12 @@ const SearchableRecipientSelect = ({ value, onChange, options, placeholder = "En
       </div>
 
       {isOpen && filtered.length > 0 && (
-        <div className="absolute left-0 right-0 mt-1 bg-white border border-eminence-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
+        <div className="absolute left-0 right-0 mt-1 bg-white border border-jainil-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
           {filtered.map((rec) => (
             <div
               key={rec}
               onMouseDown={() => handleSelect(rec)}
-              className="flex justify-between items-center px-4 py-2.5 hover:bg-eminence-gold/10 hover:text-eminence-gold cursor-pointer text-sm text-gray-700 transition-colors"
+              className="flex justify-between items-center px-4 py-2.5 hover:bg-jainil-gold/10 hover:text-jainil-gold cursor-pointer text-sm text-gray-700 transition-colors"
             >
               <span>{rec}</span>
             </div>
@@ -8058,7 +8058,7 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* ── Add / Edit Expense Form ── */}
-      <div className="bg-white rounded-2xl border border-eminence-border shadow-sm overflow-visible">
+      <div className="bg-white rounded-2xl border border-jainil-border shadow-sm overflow-visible">
         <div className="bg-gray-800 text-white px-6 py-3 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-semibold text-sm">{editingId ? "Edit expense" : "Add new expense"}</h3>
           {editingId && <button onClick={cancelEdit} className="text-xs bg-gray-600 hover:bg-gray-500 px-3 py-1 rounded">Cancel Edit</button>}
@@ -8067,7 +8067,7 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
               <label className="text-[10px] uppercase font-bold text-gray-500 block mb-1">Date *</label>
-              <input type="date" required value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <input type="date" required value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
             <div>
               <label className="text-[10px] uppercase font-bold text-gray-500 block mb-1">Type of expense *</label>
@@ -8079,11 +8079,11 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
             </div>
             <div>
               <label className="text-[10px] uppercase font-bold text-gray-500 block mb-1">Amount paid *</label>
-              <input type="number" required placeholder="Enter Amount paid" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <input type="number" required placeholder="Enter Amount paid" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
             <div>
               <label className="text-[10px] uppercase font-bold text-gray-500 block mb-1">Mode of payment *</label>
-              <select required value={form.payment_mode} onChange={e => setForm({ ...form, payment_mode: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold">
+              <select required value={form.payment_mode} onChange={e => setForm({ ...form, payment_mode: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold">
                 <option value="">Select payment mode</option>
                 {PAYMENT_MODES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
@@ -8100,7 +8100,7 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
             </div>
             <div>
               <label className="text-[10px] uppercase font-bold text-gray-500 block mb-1">Description *</label>
-              <input type="text" required placeholder="Enter Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold" />
+              <input type="text" required placeholder="Enter Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold" />
             </div>
             <div className="flex justify-end">
               <button type="submit" className={`px-5 py-2 text-sm font-bold text-white rounded shadow-sm ${editingId ? 'bg-amber-600 hover:bg-amber-700' : 'bg-emerald-600 hover:bg-emerald-700'} transition-colors`}>
@@ -8112,7 +8112,7 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
       </div>
 
       {/* ── Manage Expenses Table ── */}
-      <div className="bg-white rounded-2xl border border-eminence-border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-jainil-border shadow-sm overflow-hidden">
         <div className="bg-gray-800 text-white px-6 py-3">
           <h3 className="font-semibold text-sm">Manage expense(s)</h3>
         </div>
@@ -8143,28 +8143,28 @@ function ExpensesPanel({ expenses, employees, refresh, isSuperAdmin }) {
             </button>
             <div className="relative">
               <Search size={13} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input type="text" placeholder="Search:" value={search} onChange={e => setSearch(e.target.value)} className="border border-gray-300 rounded pl-7 pr-3 py-1.5 text-xs bg-white focus:outline-none focus:border-eminence-gold w-40" />
+              <input type="text" placeholder="Search:" value={search} onChange={e => setSearch(e.target.value)} className="border border-gray-300 rounded pl-7 pr-3 py-1.5 text-xs bg-white focus:outline-none focus:border-jainil-gold w-40" />
             </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-gray-100">
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 font-medium">Type:</span>
-              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white focus:outline-none focus:border-eminence-gold min-w-[120px] text-gray-700">
+              <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white focus:outline-none focus:border-jainil-gold min-w-[120px] text-gray-700">
                 <option value="">All Categories</option>
                 {uniqueCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 font-medium">Payment Mode:</span>
-              <select value={filterPaymentMode} onChange={e => setFilterPaymentMode(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white focus:outline-none focus:border-eminence-gold min-w-[120px] text-gray-700">
+              <select value={filterPaymentMode} onChange={e => setFilterPaymentMode(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white focus:outline-none focus:border-jainil-gold min-w-[120px] text-gray-700">
                 <option value="">All Modes</option>
                 {uniquePaymentModes.map(mode => <option key={mode} value={mode}>{mode}</option>)}
               </select>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs text-gray-500 font-medium">Recipient:</span>
-              <select value={filterRecipient} onChange={e => setFilterRecipient(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white focus:outline-none focus:border-eminence-gold min-w-[120px] text-gray-700">
+              <select value={filterRecipient} onChange={e => setFilterRecipient(e.target.value)} className="border border-gray-300 rounded px-2 py-1 text-xs bg-white focus:outline-none focus:border-jainil-gold min-w-[120px] text-gray-700">
                 <option value="">All Recipients</option>
                 {uniqueRecipients.map(rec => <option key={rec} value={rec}>{rec}</option>)}
               </select>
@@ -8265,30 +8265,30 @@ function CouponsPanel({ coupons, refresh }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-      <form onSubmit={submit} className="eminence-card p-6 space-y-4 lg:col-span-1 h-fit sticky top-24">
-        <p className="overline text-eminence-gold">Add Salon Discount Coupon</p>
+      <form onSubmit={submit} className="jainil-card p-6 space-y-4 lg:col-span-1 h-fit sticky top-24">
+        <p className="overline text-jainil-gold">Add Salon Discount Coupon</p>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Coupon Code</label>
-          <input type="text" required placeholder="E.g. WELCOME10" value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Coupon Code</label>
+          <input type="text" required placeholder="E.g. WELCOME10" value={form.code} onChange={e => setForm({ ...form, code: e.target.value.toUpperCase() })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Discount Type</label>
-          <select value={form.discount_type} onChange={e => setForm({ ...form, discount_type: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none">
+          <label className="text-xs text-jainil-muted block mb-1">Discount Type</label>
+          <select value={form.discount_type} onChange={e => setForm({ ...form, discount_type: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none">
             <option value="percentage">Percentage (%)</option>
             <option value="flat">Flat Cash Discount (₹)</option>
           </select>
         </div>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Discount Value</label>
-          <input type="number" required placeholder="E.g. 10" value={form.discount_value} onChange={e => setForm({ ...form, discount_value: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Discount Value</label>
+          <input type="number" required placeholder="E.g. 10" value={form.discount_value} onChange={e => setForm({ ...form, discount_value: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Expiry Date</label>
-          <input type="date" required value={form.expiry_date} onChange={e => setForm({ ...form, expiry_date: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Expiry Date</label>
+          <input type="date" required value={form.expiry_date} onChange={e => setForm({ ...form, expiry_date: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <button type="submit" className="btn-gold w-full mt-4">Create Coupon</button>
@@ -8297,13 +8297,13 @@ function CouponsPanel({ coupons, refresh }) {
       <div className="lg:col-span-2 space-y-4">
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
           <h3 className="font-serif text-2xl text-gray-800">Coupon Configurations</h3>
-          <p className="text-xs text-eminence-muted">Active promotional and reward campaigns currently valid on checkout.</p>
+          <p className="text-xs text-jainil-muted">Active promotional and reward campaigns currently valid on checkout.</p>
         </div>
 
-        <div className="eminence-card overflow-hidden">
+        <div className="jainil-card overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-eminence-border text-left overline text-eminence-muted">
+              <tr className="border-b border-jainil-border text-left overline text-jainil-muted">
                 <th className="px-6 py-4">Coupon Code</th>
                 <th>Type</th>
                 <th>Value</th>
@@ -8313,19 +8313,19 @@ function CouponsPanel({ coupons, refresh }) {
             </thead>
             <tbody>
               {coupons.map(c => (
-                <tr key={c.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+                <tr key={c.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                   <td className="px-6 py-4 font-mono font-bold text-gray-900">{c.code}</td>
                   <td className="uppercase text-xs font-semibold text-indigo-700">{c.discount_type}</td>
                   <td className="font-bold text-emerald-600">{c.discount_type === "percentage" ? `${c.discount_value}%` : `₹${c.discount_value}`}</td>
                   <td className="text-xs font-mono">{c.expiry_date}</td>
                   <td className="text-right px-6">
-                    <button onClick={() => remove(c.id)} className="text-eminence-muted hover:text-red-500"><Trash2 size={14} /></button>
+                    <button onClick={() => remove(c.id)} className="text-jainil-muted hover:text-red-500"><Trash2 size={14} /></button>
                   </td>
                 </tr>
               ))}
               {coupons.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="text-center py-10 text-eminence-muted italic">No active coupons created.</td>
+                  <td colSpan="5" className="text-center py-10 text-jainil-muted italic">No active coupons created.</td>
                 </tr>
               )}
             </tbody>
@@ -8374,7 +8374,7 @@ const SearchableServiceSelect = ({ value, onChange, options, placeholder = "Sele
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+      <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
         <input
           type="text"
           value={search}
@@ -8410,7 +8410,7 @@ const SearchableServiceSelect = ({ value, onChange, options, placeholder = "Sele
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="px-3 bg-transparent border-l border-eminence-border/30 text-gray-500 hover:text-eminence-gold flex items-center focus:outline-none"
+          className="px-3 bg-transparent border-l border-jainil-border/30 text-gray-500 hover:text-jainil-gold flex items-center focus:outline-none"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
@@ -8419,14 +8419,14 @@ const SearchableServiceSelect = ({ value, onChange, options, placeholder = "Sele
       </div>
 
       {isOpen && filtered.length > 0 && (
-        <div className="absolute left-0 right-0 mt-1 bg-white border border-eminence-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
+        <div className="absolute left-0 right-0 mt-1 bg-white border border-jainil-border rounded-xl shadow-xl z-50 max-h-60 overflow-y-auto py-1">
           {filtered.map((s) => {
             const sName = s.name || "";
             return (
               <div
                 key={s.id || sName}
                 onMouseDown={() => handleSelect(sName)}
-                className="flex justify-between items-center px-4 py-2 hover:bg-eminence-gold/10 hover:text-eminence-gold cursor-pointer text-sm text-gray-700 transition-colors"
+                className="flex justify-between items-center px-4 py-2 hover:bg-jainil-gold/10 hover:text-jainil-gold cursor-pointer text-sm text-gray-700 transition-colors"
               >
                 <span>{sName}</span>
               </div>
@@ -8528,7 +8528,7 @@ function ReminderSettingsPanel({ services }) {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* ── Form Card ── */}
-      <div className="bg-white rounded-2xl border border-eminence-border shadow-sm overflow-visible">
+      <div className="bg-white rounded-2xl border border-jainil-border shadow-sm overflow-visible">
         <div className="bg-gray-800 text-white px-6 py-3 flex items-center justify-between rounded-t-2xl">
           <h3 className="font-semibold text-sm">{editingId ? "Edit automatic service reminder" : "Manage automatic service reminder"}</h3>
           {editingId && (
@@ -8556,7 +8556,7 @@ function ReminderSettingsPanel({ services }) {
                 placeholder="0"
                 value={form.interval_days}
                 onChange={(e) => setForm({ ...form, interval_days: e.target.value })}
-                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold text-gray-800"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold text-gray-800"
               />
             </div>
             <div>
@@ -8567,7 +8567,7 @@ function ReminderSettingsPanel({ services }) {
                 placeholder="Enter reminder template message..."
                 value={form.message}
                 onChange={(e) => setForm({ ...form, message: e.target.value })}
-                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold text-gray-800"
+                className="w-full bg-white border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold text-gray-800"
               />
               <p className="text-[10px] text-gray-400 mt-1">
                 Client name : <span className="font-mono">{`{name}`}</span> , Salon name : <span className="font-mono">{`{salon_name}`}</span>
@@ -8587,7 +8587,7 @@ function ReminderSettingsPanel({ services }) {
       </div>
 
       {/* ── Table Card ── */}
-      <div className="bg-white rounded-2xl border border-eminence-border shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-jainil-border shadow-sm overflow-hidden">
         <div className="bg-gray-800 text-white px-6 py-3">
           <h3 className="font-semibold text-sm">Active service reminder's</h3>
         </div>
@@ -8615,7 +8615,7 @@ function ReminderSettingsPanel({ services }) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold bg-white w-48 text-gray-800"
+              className="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-jainil-gold bg-white w-48 text-gray-800"
             />
           </div>
         </div>
@@ -8718,11 +8718,11 @@ function BranchesPanel({ branches, setBranches }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-      <form onSubmit={add} className="eminence-card p-6 space-y-4 lg:col-span-1 h-fit">
-        <p className="overline text-eminence-gold">Add Salon Branch</p>
+      <form onSubmit={add} className="jainil-card p-6 space-y-4 lg:col-span-1 h-fit">
+        <p className="overline text-jainil-gold">Add Salon Branch</p>
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Branch City/Name</label>
-          <input type="text" required placeholder="E.g. Ahmedabad" value={newBranch} onChange={e => setNewBranch(e.target.value)} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Branch City/Name</label>
+          <input type="text" required placeholder="E.g. Ahmedabad" value={newBranch} onChange={e => setNewBranch(e.target.value)} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
         <button type="submit" className="btn-gold w-full mt-4">Save Branch</button>
       </form>
@@ -8730,7 +8730,7 @@ function BranchesPanel({ branches, setBranches }) {
       <div className="lg:col-span-2 space-y-4">
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
           <h3 className="font-serif text-2xl text-gray-800">Salon Outlets</h3>
-          <p className="text-xs text-eminence-muted">Active branches managed across Gujarat regional network.</p>
+          <p className="text-xs text-jainil-muted">Active branches managed across Gujarat regional network.</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -8775,27 +8775,27 @@ function OffersPanel({ offers, setOffers }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-      <form onSubmit={add} className="eminence-card p-6 space-y-4 lg:col-span-1 h-fit">
-        <p className="overline text-eminence-gold">Publish Promotional Offer</p>
+      <form onSubmit={add} className="jainil-card p-6 space-y-4 lg:col-span-1 h-fit">
+        <p className="overline text-jainil-gold">Publish Promotional Offer</p>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Offer Title</label>
-          <input type="text" required placeholder="E.g. Monsoon Hair Care Promo" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Offer Title</label>
+          <input type="text" required placeholder="E.g. Monsoon Hair Care Promo" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Discount Tag</label>
-          <input type="text" required placeholder="E.g. 15% OFF" value={form.discount} onChange={e => setForm({ ...form, discount: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Discount Tag</label>
+          <input type="text" required placeholder="E.g. 15% OFF" value={form.discount} onChange={e => setForm({ ...form, discount: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Offer Summary description</label>
-          <input type="text" required placeholder="E.g. Valid on all styling sessions" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Offer Summary description</label>
+          <input type="text" required placeholder="E.g. Valid on all styling sessions" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <div>
-          <label className="text-xs text-eminence-muted block mb-1">Validity Expires</label>
-          <input type="date" required value={form.expires} onChange={e => setForm({ ...form, expires: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none" />
+          <label className="text-xs text-jainil-muted block mb-1">Validity Expires</label>
+          <input type="date" required value={form.expires} onChange={e => setForm({ ...form, expires: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none" />
         </div>
 
         <button type="submit" className="btn-gold w-full mt-4">Publish Banner</button>
@@ -8804,21 +8804,21 @@ function OffersPanel({ offers, setOffers }) {
       <div className="lg:col-span-2 space-y-4">
         <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
           <h3 className="font-serif text-2xl text-gray-800">Seasonal Offers</h3>
-          <p className="text-xs text-eminence-muted">Promotional banners displayed to clients visiting user website.</p>
+          <p className="text-xs text-jainil-muted">Promotional banners displayed to clients visiting user website.</p>
         </div>
 
         <div className="space-y-4">
           {offers.map(o => (
-            <div key={o.id} className="eminence-card p-6 flex justify-between items-center">
+            <div key={o.id} className="jainil-card p-6 flex justify-between items-center">
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mb-2 inline-block">
                   {o.discount}
                 </span>
                 <h4 className="font-serif text-xl">{o.title}</h4>
-                <p className="text-xs text-eminence-muted">{o.description}</p>
-                <p className="text-[10px] font-mono text-eminence-muted mt-2">Expires: {o.expires}</p>
+                <p className="text-xs text-jainil-muted">{o.description}</p>
+                <p className="text-[10px] font-mono text-jainil-muted mt-2">Expires: {o.expires}</p>
               </div>
-              <button onClick={() => remove(o.id)} className="text-eminence-muted hover:text-red-500"><Trash2 size={16} /></button>
+              <button onClick={() => remove(o.id)} className="text-jainil-muted hover:text-red-500"><Trash2 size={16} /></button>
             </div>
           ))}
         </div>
@@ -8908,15 +8908,15 @@ function GalleryPanel() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Upload Card */}
-      <div className="eminence-card p-6">
-        <p className="overline text-eminence-gold mb-4">Upload Photo to Consultation Gallery</p>
+      <div className="jainil-card p-6">
+        <p className="overline text-jainil-gold mb-4">Upload Photo to Consultation Gallery</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-xs font-bold text-eminence-muted uppercase tracking-widest mb-1.5">Image Type</label>
+            <label className="block text-xs font-bold text-jainil-muted uppercase tracking-widest mb-1.5">Image Type</label>
             <select
               value={uploadType}
               onChange={e => setUploadType(e.target.value)}
-              className="w-full border border-eminence-border bg-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-eminence-gold"
+              className="w-full border border-jainil-border bg-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-jainil-gold"
             >
               <option value="before">Before Image</option>
               <option value="after">After Image</option>
@@ -8924,11 +8924,11 @@ function GalleryPanel() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-bold text-eminence-muted uppercase tracking-widest mb-1.5">Gender</label>
+            <label className="block text-xs font-bold text-jainil-muted uppercase tracking-widest mb-1.5">Gender</label>
             <select
               value={uploadGender}
               onChange={e => setUploadGender(e.target.value)}
-              className="w-full border border-eminence-border bg-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-eminence-gold"
+              className="w-full border border-jainil-border bg-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-jainil-gold"
             >
               <option value="men">Men</option>
               <option value="women">Women</option>
@@ -8936,14 +8936,14 @@ function GalleryPanel() {
             </select>
           </div>
         </div>
-        <div className="bg-gray-50 border border-dashed border-eminence-border/60 rounded-xl p-4">
-          <p className="text-[10px] text-eminence-muted uppercase font-bold mb-2">
+        <div className="bg-gray-50 border border-dashed border-jainil-border/60 rounded-xl p-4">
+          <p className="text-[10px] text-jainil-muted uppercase font-bold mb-2">
             Adding as: <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold mr-1 ${TYPE_COLORS[uploadType]}`}>{TYPE_LABELS[uploadType]}</span>
             <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${GENDER_COLORS[uploadGender]}`}>{GENDER_LABELS[uploadGender]}</span>
           </p>
           <ImageUpload value="" onChange={addPhoto} testId="gallery-uploader" />
         </div>
-        {saving && <p className="text-xs text-eminence-gold mt-2 animate-pulse">Saving...</p>}
+        {saving && <p className="text-xs text-jainil-gold mt-2 animate-pulse">Saving...</p>}
       </div>
 
       {/* Filter Tabs */}
@@ -8951,9 +8951,9 @@ function GalleryPanel() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-serif text-xl text-gray-800">Consultation Photo Gallery</h3>
-            <p className="text-xs text-eminence-muted">Photos shown to clients in the consultation form, organized by category.</p>
+            <p className="text-xs text-jainil-muted">Photos shown to clients in the consultation form, organized by category.</p>
           </div>
-          <span className="text-xs font-bold text-eminence-muted bg-gray-100 px-3 py-1 rounded-full">{gallery.length} photos</span>
+          <span className="text-xs font-bold text-jainil-muted bg-gray-100 px-3 py-1 rounded-full">{gallery.length} photos</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {CATEGORIES.map(cat => (
@@ -8962,7 +8962,7 @@ function GalleryPanel() {
               onClick={() => setActiveFilter(cat.key)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wide transition-all ${
                 activeFilter === cat.key
-                  ? "bg-eminence-gold text-white shadow"
+                  ? "bg-jainil-gold text-white shadow"
                   : "bg-gray-100 text-gray-500 hover:bg-gray-200"
               }`}
             >
@@ -8982,14 +8982,14 @@ function GalleryPanel() {
 
       {/* Gallery Grid */}
       {loading ? (
-        <div className="text-center py-12 text-eminence-muted text-sm">Loading gallery...</div>
+        <div className="text-center py-12 text-jainil-muted text-sm">Loading gallery...</div>
       ) : filteredGallery.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
-          <div className="w-14 h-14 rounded-2xl bg-eminence-gold/10 flex items-center justify-center text-eminence-gold mx-auto mb-4">
+          <div className="w-14 h-14 rounded-2xl bg-jainil-gold/10 flex items-center justify-center text-jainil-gold mx-auto mb-4">
             <Camera size={24} />
           </div>
           <p className="text-sm font-bold text-gray-700 mb-1">No photos in this category</p>
-          <p className="text-xs text-eminence-muted">Upload a photo above and assign it to this category.</p>
+          <p className="text-xs text-jainil-muted">Upload a photo above and assign it to this category.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -9037,13 +9037,13 @@ function AssessmentPanel({ consultations }) {
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
         <h2 className="font-serif text-2xl text-gray-800">Self Assessment Records</h2>
-        <p className="text-xs text-eminence-muted">Online hair quality and scalp concern checklists submitted by clients.</p>
+        <p className="text-xs text-jainil-muted">Online hair quality and scalp concern checklists submitted by clients.</p>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-eminence-border text-left overline text-eminence-muted">
+            <tr className="border-b border-jainil-border text-left overline text-jainil-muted">
               <th className="px-6 py-4">Client Name</th>
               <th>Phone</th>
               <th>Concerns</th>
@@ -9053,11 +9053,11 @@ function AssessmentPanel({ consultations }) {
           </thead>
           <tbody>
             {consultations.map(c => (
-              <tr key={c.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+              <tr key={c.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                 <td className="px-6 py-4 font-bold">{c.name}</td>
                 <td>{c.phone || "—"}</td>
                 <td>
-                  <span className="text-xs font-semibold text-eminence-gold truncate max-w-[200px] block">
+                  <span className="text-xs font-semibold text-jainil-gold truncate max-w-[200px] block">
                     {c.scalp_type ? `${c.scalp_type} scalp · ${c.hair_quality || "standard"}` : "General Assessment"}
                   </span>
                 </td>
@@ -9077,10 +9077,10 @@ function AssessmentPanel({ consultations }) {
       {selectedAssessment && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-xl overflow-hidden max-h-[85vh] overflow-y-auto">
-            <div className="p-6 bg-eminence-surface border-b border-gray-100 flex justify-between items-center">
+            <div className="p-6 bg-jainil-surface border-b border-gray-100 flex justify-between items-center">
               <div>
                 <h4 className="font-serif text-2xl text-gray-900">Self Assessment Report</h4>
-                <p className="text-xs text-eminence-muted">{selectedAssessment.name} · {selectedAssessment.phone}</p>
+                <p className="text-xs text-jainil-muted">{selectedAssessment.name} · {selectedAssessment.phone}</p>
               </div>
               <button onClick={() => setSelectedAssessment(null)} className="p-2 hover:bg-gray-100 rounded-full"><X size={18} /></button>
             </div>
@@ -9088,24 +9088,24 @@ function AssessmentPanel({ consultations }) {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <span className="text-[9px] uppercase tracking-wider font-bold text-eminence-muted block">Scalp Type</span>
+                  <span className="text-[9px] uppercase tracking-wider font-bold text-jainil-muted block">Scalp Type</span>
                   <span className="font-semibold text-sm">{selectedAssessment.scalp_type || "Oily"}</span>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg">
-                  <span className="text-[9px] uppercase tracking-wider font-bold text-eminence-muted block">Hair Quality</span>
+                  <span className="text-[9px] uppercase tracking-wider font-bold text-jainil-muted block">Hair Quality</span>
                   <span className="font-semibold text-sm">{selectedAssessment.hair_quality || "Dry"}</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-[9px] uppercase tracking-wider font-bold text-eminence-muted block mb-1">Key Concerns</span>
+                <span className="text-[9px] uppercase tracking-wider font-bold text-jainil-muted block mb-1">Key Concerns</span>
                 <p className="text-sm bg-gray-50 p-3 rounded-lg leading-relaxed text-gray-800">
                   {selectedAssessment.concerns || "Hair fall, thinning at crown region, dryness."}
                 </p>
               </div>
 
               <div>
-                <span className="text-[9px] uppercase tracking-wider font-bold text-eminence-muted block mb-1">Customer Notes</span>
+                <span className="text-[9px] uppercase tracking-wider font-bold text-jainil-muted block mb-1">Customer Notes</span>
                 <p className="text-sm bg-gray-50 p-3 rounded-lg leading-relaxed text-gray-800 italic">
                   "{selectedAssessment.notes || "Looking for premium natural human hair toppers."}"
                 </p>
@@ -9128,8 +9128,8 @@ function StatCard({ icon: Icon, label, value }) {
     <div className="glass-card p-6 rounded-2xl group hover:premium-gradient transition-all duration-500" data-testid={`stat-${label.toLowerCase()}`}>
       <div className="flex items-center justify-between mb-4">
         <p className="overline group-hover:text-gray-400 transition-colors">{label}</p>
-        <div className="p-2 rounded-lg bg-eminence-surface group-hover:bg-gray-800 transition-colors">
-          <Icon size={18} className="text-eminence-gold" />
+        <div className="p-2 rounded-lg bg-jainil-surface group-hover:bg-gray-800 transition-colors">
+          <Icon size={18} className="text-jainil-gold" />
         </div>
       </div>
       <p className="font-serif text-2xl sm:text-3xl lg:text-4xl group-hover:text-white transition-colors break-all">{value}</p>
@@ -9217,7 +9217,7 @@ function Analysis({ stats, products, orders, t, selectedBranch, setSelectedBranc
     <button
       onClick={() => setFilterPeriod(type)}
       className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${filterPeriod === type
-        ? "bg-eminence-gold text-white shadow-md scale-105"
+        ? "bg-jainil-gold text-white shadow-md scale-105"
         : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-100"
         }`}
     >
@@ -9231,11 +9231,11 @@ function Analysis({ stats, products, orders, t, selectedBranch, setSelectedBranc
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Business Analytics</h2>
-          <p className="text-xs text-eminence-muted">Analyze inventory values, stock levels, category distribution, and service popularity.</p>
+          <p className="text-xs text-jainil-muted">Analyze inventory values, stock levels, category distribution, and service popularity.</p>
         </div>
         {isSuperAdmin && (
           <div className="flex items-center gap-2 bg-white/80 border border-gray-200 rounded-xl px-3 py-1.5 shadow-sm">
-            <span className="text-[10px] font-bold text-eminence-gold uppercase tracking-wider">Branch Filter:</span>
+            <span className="text-[10px] font-bold text-jainil-gold uppercase tracking-wider">Branch Filter:</span>
             <select
               value={selectedBranch}
               onChange={(e) => setSelectedBranch(e.target.value)}
@@ -9266,24 +9266,24 @@ function Analysis({ stats, products, orders, t, selectedBranch, setSelectedBranc
               type="date"
               value={customFromDate}
               onChange={e => setCustomFromDate(e.target.value)}
-              className="bg-eminence-surface border border-eminence-border rounded-lg px-3 py-1.5 text-xs text-eminence-text focus:outline-none focus:border-eminence-gold"
+              className="bg-jainil-surface border border-jainil-border rounded-lg px-3 py-1.5 text-xs text-jainil-text focus:outline-none focus:border-jainil-gold"
             />
-            <span className="text-xs text-eminence-muted font-bold">TO</span>
+            <span className="text-xs text-jainil-muted font-bold">TO</span>
             <input
               type="date"
               value={customToDate}
               onChange={e => setCustomToDate(e.target.value)}
-              className="bg-eminence-surface border border-eminence-border rounded-lg px-3 py-1.5 text-xs text-eminence-text focus:outline-none focus:border-eminence-gold"
+              className="bg-jainil-surface border border-jainil-border rounded-lg px-3 py-1.5 text-xs text-jainil-text focus:outline-none focus:border-jainil-gold"
             />
           </div>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-card p-8 rounded-2xl border-l-4 border-l-eminence-gold">
+        <div className="glass-card p-8 rounded-2xl border-l-4 border-l-jainil-gold">
           <p className="overline mb-2">Inventory Valuation</p>
-          <p className="text-4xl font-serif text-eminence-gold">₹{totalStockValue.toLocaleString("en-IN")}</p>
-          <p className="text-xs text-eminence-muted mt-3">Total value of all stock items in current inventory</p>
+          <p className="text-4xl font-serif text-jainil-gold">₹{totalStockValue.toLocaleString("en-IN")}</p>
+          <p className="text-xs text-jainil-muted mt-3">Total value of all stock items in current inventory</p>
         </div>
         <div className="glass-card p-8 rounded-2xl border-l-4 border-l-red-500">
           <p className="overline mb-2 text-red-600 font-bold">Stock Health</p>
@@ -9301,70 +9301,70 @@ function Analysis({ stats, products, orders, t, selectedBranch, setSelectedBranc
         <div className="glass-card p-8 rounded-2xl border-l-4 border-l-gray-900">
           <p className="overline mb-2">Total Units</p>
           <p className="text-4xl font-serif text-gray-900">{products.reduce((acc, p) => acc + (p.stock || 0), 0)}</p>
-          <p className="text-xs text-eminence-muted mt-3">Total pieces currently across all categories</p>
+          <p className="text-xs text-jainil-muted mt-3">Total pieces currently across all categories</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* TOP PRODUCTS */}
-        <div className="eminence-card p-8">
+        <div className="jainil-card p-8">
           <h3 className="font-serif text-2xl mb-8">Best Selling Products</h3>
           <div className="space-y-6">
             {topProducts.map(([name, qty], idx) => (
               <div key={idx} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-eminence-surface flex items-center justify-center font-serif text-eminence-gold border border-eminence-gold/20">
+                <div className="w-8 h-8 rounded-full bg-jainil-surface flex items-center justify-center font-serif text-jainil-gold border border-jainil-gold/20">
                   {idx + 1}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium line-clamp-1">{name}</p>
-                  <div className="w-full bg-eminence-border/30 h-1.5 mt-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-jainil-border/30 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-eminence-gold h-full transition-all duration-1000"
+                      className="bg-jainil-gold h-full transition-all duration-1000"
                       style={{ width: topProducts[0] ? `${(qty / topProducts[0][1]) * 100}%` : "0%" }}
                     />
                   </div>
                 </div>
-                <p className="text-sm font-bold text-eminence-muted">{qty} Sold</p>
+                <p className="text-sm font-bold text-jainil-muted">{qty} Sold</p>
               </div>
             ))}
-            {topProducts.length === 0 && <p className="text-eminence-muted italic text-sm">No sales data yet.</p>}
+            {topProducts.length === 0 && <p className="text-jainil-muted italic text-sm">No sales data yet.</p>}
           </div>
         </div>
 
         {/* TOP SERVICES */}
-        <div className="eminence-card p-8">
+        <div className="jainil-card p-8">
           <h3 className="font-serif text-2xl mb-8">Most Given Services</h3>
           <div className="space-y-6">
             {topServices.map(([name, qty], idx) => (
               <div key={idx} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-full bg-eminence-surface flex items-center justify-center font-serif text-eminence-gold border border-eminence-gold/20">
+                <div className="w-8 h-8 rounded-full bg-jainil-surface flex items-center justify-center font-serif text-jainil-gold border border-jainil-gold/20">
                   {idx + 1}
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium line-clamp-1">{name}</p>
-                  <div className="w-full bg-eminence-border/30 h-1.5 mt-2 rounded-full overflow-hidden">
+                  <div className="w-full bg-jainil-border/30 h-1.5 mt-2 rounded-full overflow-hidden">
                     <div
-                      className="bg-eminence-gold h-full transition-all duration-1000"
+                      className="bg-jainil-gold h-full transition-all duration-1000"
                       style={{ width: topServices[0] ? `${(qty / topServices[0][1]) * 100}%` : "0%" }}
                     />
                   </div>
                 </div>
-                <p className="text-sm font-bold text-eminence-muted">{qty} Sessions</p>
+                <p className="text-sm font-bold text-jainil-muted">{qty} Sessions</p>
               </div>
             ))}
-            {topServices.length === 0 && <p className="text-eminence-muted italic text-sm">No service data yet.</p>}
+            {topServices.length === 0 && <p className="text-jainil-muted italic text-sm">No service data yet.</p>}
           </div>
         </div>
       </div>
 
       {/* CATEGORY ANALYSIS */}
-      <div className="eminence-card p-8">
+      <div className="jainil-card p-8">
         <h3 className="font-serif text-2xl mb-8">Stock by Category</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(catDist).map(([cat, count]) => (
-            <div key={cat} className="flex justify-between items-center py-3 border-b border-eminence-border/50">
-              <span className="text-xs uppercase tracking-widest text-eminence-muted">{cat}</span>
-              <span className="font-serif text-lg">{count} <span className="text-[10px] text-eminence-muted uppercase font-sans">SKUs</span></span>
+            <div key={cat} className="flex justify-between items-center py-3 border-b border-jainil-border/50">
+              <span className="text-xs uppercase tracking-widest text-jainil-muted">{cat}</span>
+              <span className="font-serif text-lg">{count} <span className="text-[10px] text-jainil-muted uppercase font-sans">SKUs</span></span>
             </div>
           ))}
         </div>
@@ -9447,6 +9447,25 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
   const todayLeads = React.useMemo(() => leads.filter(l => l.created_at?.slice(0, 10) === todayDateStr), [leads, todayDateStr]);
   const dailyLeadsCount = todayLeads.length;
 
+  const exportClientsData = async () => {
+    try {
+      const loadingToastId = toast.loading("Exporting clients data...");
+      const response = await api.get(`/admin/export/clients?t=${Date.now()}`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'clients_data.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      toast.dismiss(loadingToastId);
+      toast.success("Export downloaded successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to export clients data");
+    }
+  };
+
   return (
     <div className="space-y-10">
 
@@ -9456,11 +9475,11 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
           <div className="flex flex-wrap items-center gap-4">
             <div>
               <h3 className="font-serif text-2xl text-gray-800">Today's Operations Tracker</h3>
-              <p className="text-xs text-eminence-muted">Real-time overview of salon traffic, sales, and lead generation for today ({todayDateStr})</p>
+              <p className="text-xs text-jainil-muted">Real-time overview of salon traffic, sales, and lead generation for today ({todayDateStr})</p>
             </div>
             {isSuperAdmin && (
               <div className="flex items-center gap-2 bg-white/80 border border-gray-200 rounded-xl px-3 py-1.5 shadow-sm">
-                <span className="text-[10px] font-bold text-eminence-gold uppercase tracking-wider">Branch Filter:</span>
+                <span className="text-[10px] font-bold text-jainil-gold uppercase tracking-wider">Branch Filter:</span>
                 <select
                   value={selectedBranch}
                   onChange={(e) => setSelectedBranch(e.target.value)}
@@ -9475,9 +9494,18 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
               </div>
             )}
           </div>
-          <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 animate-pulse bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 w-fit">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" /> LIVE MONITOR
-          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={exportClientsData}
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-sm hover:shadow active:scale-95"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              EXPORT CLIENTS
+            </button>
+            <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 animate-pulse bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 w-fit">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" /> LIVE MONITOR
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -9485,20 +9513,20 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
           <div
             onClick={() => setSelectedDailyDetail(selectedDailyDetail === "SALES" ? null : "SALES")}
             className={`glass-card p-6 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col justify-between hover:translate-y-[-2px] ${selectedDailyDetail === "SALES"
-              ? "border-eminence-gold bg-eminence-gold/5 shadow-[0_4px_20px_rgba(212,175,55,0.15)] scale-102"
-              : "border-gray-100 bg-white hover:border-eminence-gold/40 shadow-sm"
+              ? "border-jainil-gold bg-jainil-gold/5 shadow-[0_4px_20px_rgba(212,175,55,0.15)] scale-102"
+              : "border-gray-100 bg-white hover:border-jainil-gold/40 shadow-sm"
               }`}
           >
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="overline text-[10px] text-eminence-gold font-bold">Daily CRM & Lead Sales</span>
-                <span className="text-[9px] font-bold text-eminence-muted uppercase">Today</span>
+                <span className="overline text-[10px] text-jainil-gold font-bold">Daily CRM & Lead Sales</span>
+                <span className="text-[9px] font-bold text-jainil-muted uppercase">Today</span>
               </div>
               <h4 className="font-serif text-2xl text-gray-900">₹{(stats?.daily_sales || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h4>
             </div>
-            <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
+            <div className="mt-4 pt-3 border-t border-jainil-border/10 flex justify-between items-center text-[10px] text-jainil-muted font-bold">
               <span>{stats?.daily_sales_details?.length || 0} Transactions</span>
-              <span className="text-eminence-gold uppercase tracking-wider">View Details</span>
+              <span className="text-jainil-gold uppercase tracking-wider">View Details</span>
             </div>
           </div>
 
@@ -9513,11 +9541,11 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
             <div>
               <div className="flex justify-between items-center mb-1">
                 <span className="overline text-[10px] text-emerald-600 font-bold">Daily Service Revenue</span>
-                <span className="text-[9px] font-bold text-eminence-muted uppercase">Today</span>
+                <span className="text-[9px] font-bold text-jainil-muted uppercase">Today</span>
               </div>
               <h4 className="font-serif text-2xl text-emerald-700">₹{(stats?.daily_services || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h4>
             </div>
-            <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
+            <div className="mt-4 pt-3 border-t border-jainil-border/10 flex justify-between items-center text-[10px] text-jainil-muted font-bold">
               <span>{stats?.daily_services_details?.length || 0} Bills</span>
               <span className="text-emerald-600 uppercase tracking-wider">View Details</span>
             </div>
@@ -9534,11 +9562,11 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
             <div>
               <div className="flex justify-between items-center mb-1">
                 <span className="overline text-[10px] text-purple-600 font-bold">CRM Token & Closures</span>
-                <span className="text-[9px] font-bold text-eminence-muted uppercase">Today</span>
+                <span className="text-[9px] font-bold text-jainil-muted uppercase">Today</span>
               </div>
               <h4 className="font-serif text-2xl text-purple-700">₹{(stats?.daily_crm_revenue || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</h4>
             </div>
-            <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
+            <div className="mt-4 pt-3 border-t border-jainil-border/10 flex justify-between items-center text-[10px] text-jainil-muted font-bold">
               <span>{stats?.daily_crm_details?.length || 0} Invoices</span>
               <span className="text-purple-600 uppercase tracking-wider">View Details</span>
             </div>
@@ -9557,13 +9585,13 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                 <span className="overline text-[10px] text-teal-600 font-bold">
                   {leadsPeriod === "today" ? "Daily" : leadsPeriod === "weekly" ? "Weekly" : leadsPeriod === "monthly" ? "Monthly" : leadsPeriod === "quarterly" ? "Quarterly" : leadsPeriod === "yearly" ? "Yearly" : "All"} Leads Count
                 </span>
-                <span className="text-[9px] font-bold text-eminence-muted uppercase">
+                <span className="text-[9px] font-bold text-jainil-muted uppercase">
                   {leadsPeriod === "today" ? "Today" : leadsPeriod === "weekly" ? "7 Days" : leadsPeriod === "monthly" ? "30 Days" : leadsPeriod === "quarterly" ? "90 Days" : leadsPeriod === "yearly" ? "365 Days" : "All Time"}
                 </span>
               </div>
               <h4 className="font-serif text-2xl text-teal-700">{filteredLeads.length} Leads</h4>
             </div>
-            <div className="mt-4 pt-3 border-t border-eminence-border/10 flex justify-between items-center text-[10px] text-eminence-muted font-bold">
+            <div className="mt-4 pt-3 border-t border-jainil-border/10 flex justify-between items-center text-[10px] text-jainil-muted font-bold">
               <span>{leadsPeriod === "today" ? "Fresh inquiries" : `Filtered (${leadsPeriod})`}</span>
               <span className="text-teal-600 uppercase tracking-wider">View Details</span>
             </div>
@@ -9572,7 +9600,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
 
         {/* Selected Details Expansion Area */}
         {selectedDailyDetail && (
-          <div className="eminence-card p-6 bg-white border border-gray-200 rounded-2xl shadow-md animate-in fade-in slide-in-from-top-2 duration-300 relative">
+          <div className="jainil-card p-6 bg-white border border-gray-200 rounded-2xl shadow-md animate-in fade-in slide-in-from-top-2 duration-300 relative">
             <button
               onClick={() => setSelectedDailyDetail(null)}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 bg-gray-50 hover:bg-gray-100 p-1.5 rounded-full transition-colors"
@@ -9585,12 +9613,12 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
               <div className="space-y-4">
                 <div>
                   <h4 className="font-serif text-lg text-gray-800">Daily CRM Lead Sales & Manual Sales Records</h4>
-                  <p className="text-xs text-eminence-muted">Detailed transactions logged today via CRM conversion or manual entry</p>
+                  <p className="text-xs text-jainil-muted">Detailed transactions logged today via CRM conversion or manual entry</p>
                 </div>
                 <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
                   <table className="w-full text-xs text-left">
                     <thead>
-                      <tr className="text-[10px] uppercase text-eminence-muted tracking-wider bg-eminence-surface/50 border-b border-eminence-border/10">
+                      <tr className="text-[10px] uppercase text-jainil-muted tracking-wider bg-jainil-surface/50 border-b border-jainil-border/10">
                         <th className="px-4 py-2.5">Date/Time</th>
                         <th className="px-4 py-2.5">Type</th>
                         <th className="px-4 py-2.5">Client / Lead Name</th>
@@ -9600,7 +9628,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                     </thead>
                     <tbody>
                       {stats?.daily_sales_details?.map((item, idx) => (
-                        <tr key={idx} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10">
+                        <tr key={idx} className="border-b border-jainil-border/10 hover:bg-jainil-surface/10">
                           <td className="px-4 py-3 font-mono text-[10px] text-gray-500">
                             {item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : "N/A"}
                           </td>
@@ -9616,7 +9644,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       ))}
                       {(!stats?.daily_sales_details || stats?.daily_sales_details?.length === 0) && (
                         <tr>
-                          <td colSpan="5" className="text-center py-8 text-eminence-muted italic">No sales transactions logged today.</td>
+                          <td colSpan="5" className="text-center py-8 text-jainil-muted italic">No sales transactions logged today.</td>
                         </tr>
                       )}
                     </tbody>
@@ -9630,12 +9658,12 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
               <div className="space-y-4">
                 <div>
                   <h4 className="font-serif text-lg text-gray-800">Daily Service Billing Records</h4>
-                  <p className="text-xs text-eminence-muted">Service checkout invoices generated in the salon today</p>
+                  <p className="text-xs text-jainil-muted">Service checkout invoices generated in the salon today</p>
                 </div>
                 <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
                   <table className="w-full text-xs text-left">
                     <thead>
-                      <tr className="text-[10px] uppercase text-eminence-muted tracking-wider bg-eminence-surface/50 border-b border-eminence-border/10">
+                      <tr className="text-[10px] uppercase text-jainil-muted tracking-wider bg-jainil-surface/50 border-b border-jainil-border/10">
                         <th className="px-4 py-2.5">Billing Time</th>
                         <th className="px-4 py-2.5">Invoice ID</th>
                         <th className="px-4 py-2.5">Client Name</th>
@@ -9662,7 +9690,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                         const paymentMode = getPaymentMode(item.notes);
 
                         return (
-                          <tr key={idx} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10">
+                          <tr key={idx} className="border-b border-jainil-border/10 hover:bg-jainil-surface/10">
                             <td className="px-4 py-3 font-mono text-[10px] text-gray-500">
                               {item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : "N/A"}
                             </td>
@@ -9681,7 +9709,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       })}
                       {(!stats?.daily_services_details || stats?.daily_services_details?.length === 0) && (
                         <tr>
-                          <td colSpan="7" className="text-center py-8 text-eminence-muted italic">No service bills generated today.</td>
+                          <td colSpan="7" className="text-center py-8 text-jainil-muted italic">No service bills generated today.</td>
                         </tr>
                       )}
                     </tbody>
@@ -9695,12 +9723,12 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
               <div className="space-y-4">
                 <div>
                   <h4 className="font-serif text-lg text-gray-800">CRM Token & Closure Invoices Today</h4>
-                  <p className="text-xs text-eminence-muted">Lead conversions (Token Received / Converted) with payment receipts</p>
+                  <p className="text-xs text-jainil-muted">Lead conversions (Token Received / Converted) with payment receipts</p>
                 </div>
                 <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
                   <table className="w-full text-xs text-left">
                     <thead>
-                      <tr className="text-[10px] uppercase text-eminence-muted tracking-wider bg-eminence-surface/50 border-b border-eminence-border/10">
+                      <tr className="text-[10px] uppercase text-jainil-muted tracking-wider bg-jainil-surface/50 border-b border-jainil-border/10">
                         <th className="px-4 py-2.5">Time</th>
                         <th className="px-4 py-2.5">Client</th>
                         <th className="px-4 py-2.5">Phone</th>
@@ -9714,7 +9742,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       {stats?.daily_crm_details?.map((item, idx) => {
                         const isClosure = item.details?.toLowerCase().includes("closure") || item.details?.toLowerCase().includes("converted");
                         return (
-                          <tr key={idx} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10">
+                          <tr key={idx} className="border-b border-jainil-border/10 hover:bg-jainil-surface/10">
                             <td className="px-4 py-3 font-mono text-[10px] text-gray-500">
                               {item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : "N/A"}
                             </td>
@@ -9740,7 +9768,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       })}
                       {(!stats?.daily_crm_details || stats?.daily_crm_details?.length === 0) && (
                         <tr>
-                          <td colSpan="7" className="text-center py-8 text-eminence-muted italic">No CRM invoices generated today.</td>
+                          <td colSpan="7" className="text-center py-8 text-jainil-muted italic">No CRM invoices generated today.</td>
                         </tr>
                       )}
                     </tbody>
@@ -9752,28 +9780,28 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
             {/* Details for Leads */}
             {selectedDailyDetail === "LEADS" && (
               <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-eminence-border/10 pb-3">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-jainil-border/10 pb-3">
                   <div>
                     <h4 className="font-serif text-lg text-gray-800">Leads Count Details ({leadsPeriod === "all" ? "All" : leadsPeriod.toUpperCase()})</h4>
-                    <p className="text-xs text-eminence-muted">Client lead inquiries registered in the selected period</p>
+                    <p className="text-xs text-jainil-muted">Client lead inquiries registered in the selected period</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-eminence-muted">Search:</span>
+                      <span className="text-xs font-medium text-jainil-muted">Search:</span>
                       <input
                         type="text"
                         placeholder="Search name or mobile..."
                         value={leadsSearchQuery}
                         onChange={(e) => setLeadsSearchQuery(e.target.value)}
-                        className="bg-eminence-surface border border-eminence-border px-3 py-1.5 text-xs rounded-lg focus:outline-none focus:border-eminence-gold transition-colors w-44"
+                        className="bg-jainil-surface border border-jainil-border px-3 py-1.5 text-xs rounded-lg focus:outline-none focus:border-jainil-gold transition-colors w-44"
                       />
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-eminence-muted">Sales Person:</span>
+                      <span className="text-xs font-medium text-jainil-muted">Sales Person:</span>
                       <select
                         value={leadsSalesPerson}
                         onChange={(e) => setLeadsSalesPerson(e.target.value)}
-                        className="bg-eminence-surface border border-eminence-border px-3 py-1.5 text-xs rounded-lg focus:outline-none focus:border-eminence-gold transition-colors"
+                        className="bg-jainil-surface border border-jainil-border px-3 py-1.5 text-xs rounded-lg focus:outline-none focus:border-jainil-gold transition-colors"
                       >
                         <option value="all">All</option>
                         {uniqueSalesPersons.map(name => (
@@ -9783,11 +9811,11 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       </select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-medium text-eminence-muted">Period:</span>
+                      <span className="text-xs font-medium text-jainil-muted">Period:</span>
                       <select
                         value={leadsPeriod}
                         onChange={(e) => setLeadsPeriod(e.target.value)}
-                        className="bg-eminence-surface border border-eminence-border px-3 py-1.5 text-xs rounded-lg focus:outline-none focus:border-eminence-gold transition-colors"
+                        className="bg-jainil-surface border border-jainil-border px-3 py-1.5 text-xs rounded-lg focus:outline-none focus:border-jainil-gold transition-colors"
                       >
                         <option value="today">Today</option>
                         <option value="weekly">Weekly (Last 7 Days)</option>
@@ -9802,7 +9830,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                 <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
                   <table className="w-full text-xs text-left">
                     <thead>
-                      <tr className="text-[10px] uppercase text-eminence-muted tracking-wider bg-eminence-surface/50 border-b border-eminence-border/10">
+                      <tr className="text-[10px] uppercase text-jainil-muted tracking-wider bg-jainil-surface/50 border-b border-jainil-border/10">
                         <th className="px-4 py-2.5">Date/Time</th>
                         <th className="px-4 py-2.5">Name</th>
                         <th className="px-4 py-2.5">Phone Number</th>
@@ -9815,7 +9843,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                     </thead>
                     <tbody>
                       {filteredLeads.map((item, idx) => (
-                        <tr key={idx} className="border-b border-eminence-border/10 hover:bg-eminence-surface/10">
+                        <tr key={idx} className="border-b border-jainil-border/10 hover:bg-jainil-surface/10">
                           <td className="px-4 py-3 font-mono text-[10px] text-gray-500 font-bold">
                             {item.created_at ? new Date(item.created_at).toLocaleString() : "N/A"}
                           </td>
@@ -9842,7 +9870,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                       ))}
                       {filteredLeads.length === 0 && (
                         <tr>
-                          <td colSpan="8" className="text-center py-8 text-eminence-muted italic">No leads found in this period.</td>
+                          <td colSpan="8" className="text-center py-8 text-jainil-muted italic">No leads found in this period.</td>
                         </tr>
                       )}
                     </tbody>
@@ -9860,7 +9888,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="eminence-card p-6 border-l-4 border-red-500 flex flex-col justify-between">
+        <div className="jainil-card p-6 border-l-4 border-red-500 flex flex-col justify-between">
           <div>
             <p className="overline mb-4 text-red-500">{t("stock")} Alerts</p>
             <div className="space-y-3">
@@ -9876,31 +9904,31 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
                   </div>
                 </div>
               ))}
-              {products.filter(p => p.stock <= 5).length === 0 && <p className="text-eminence-muted text-sm italic">All items are sufficiently stocked.</p>}
+              {products.filter(p => p.stock <= 5).length === 0 && <p className="text-jainil-muted text-sm italic">All items are sufficiently stocked.</p>}
             </div>
           </div>
         </div>
 
-        <div className="eminence-card p-6 flex flex-col justify-between">
+        <div className="jainil-card p-6 flex flex-col justify-between">
           <div>
             <p className="overline mb-4">{t("recentOrders")}</p>
             <div className="space-y-2">
               {stats.recent_orders.map((o) => (
-                <div key={o.id} className="flex justify-between text-sm border-b border-eminence-border py-2">
-                  <span>{o.full_name || o.user_name} · <span className="text-eminence-muted">#{o.id.slice(0, 8)}</span></span>
-                  <span className="text-eminence-gold">₹{(o.total || o.total_amount || 0).toLocaleString("en-IN")}</span>
+                <div key={o.id} className="flex justify-between text-sm border-b border-jainil-border py-2">
+                  <span>{o.full_name || o.user_name} · <span className="text-jainil-muted">#{o.id.slice(0, 8)}</span></span>
+                  <span className="text-jainil-gold">₹{(o.total || o.total_amount || 0).toLocaleString("en-IN")}</span>
                 </div>
               ))}
-              {stats.recent_orders.length === 0 && <p className="text-eminence-muted text-sm">{t("noOrders")}</p>}
+              {stats.recent_orders.length === 0 && <p className="text-jainil-muted text-sm">{t("noOrders")}</p>}
             </div>
           </div>
         </div>
 
-        <div className="eminence-card p-6 border-l-4 border-eminence-gold flex flex-col justify-between">
+        <div className="jainil-card p-6 border-l-4 border-jainil-gold flex flex-col justify-between">
           <div>
-            <p className="overline mb-4 text-eminence-gold">Atelier Status</p>
+            <p className="overline mb-4 text-jainil-gold">Atelier Status</p>
             <h3 className="text-lg font-bold mb-2">Maintenance Mode</h3>
-            <p className="text-xs text-eminence-muted leading-relaxed">
+            <p className="text-xs text-jainil-muted leading-relaxed">
               When enabled, regular customers visiting the site will see a premium "Under Maintenance" page. Staff can still bypass this to manage orders, bookings, and test changes.
             </p>
           </div>
@@ -9909,7 +9937,7 @@ function Overview({ stats, products, leads = [], employees = [], t, maintenanceE
               onClick={onToggleMaintenance}
               className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${maintenanceEnabled
                 ? "bg-rose-600 text-white hover:bg-rose-700 shadow-md font-semibold"
-                : "bg-eminence-gold text-black hover:bg-[#c5a030] shadow-md font-semibold"
+                : "bg-jainil-gold text-black hover:bg-[#c5a030] shadow-md font-semibold"
                 }`}
             >
               {maintenanceEnabled ? "Disable Maintenance Mode" : "Enable Maintenance Mode"}
@@ -9994,9 +10022,9 @@ function SalesTeamOverview({ leads = [], employees = [], todayDateStr, selectedB
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-serif text-2xl text-gray-800">Sales Team Overview</h3>
-          <p className="text-xs text-eminence-muted mt-1">Click on a salesperson to expand their detailed panel</p>
+          <p className="text-xs text-jainil-muted mt-1">Click on a salesperson to expand their detailed panel</p>
         </div>
-        <span className="text-xs font-bold text-eminence-gold bg-eminence-gold/10 px-3 py-1 rounded-full border border-eminence-gold/20">
+        <span className="text-xs font-bold text-jainil-gold bg-jainil-gold/10 px-3 py-1 rounded-full border border-jainil-gold/20">
           {salesPersons.length} Sales Members
         </span>
       </div>
@@ -10013,7 +10041,7 @@ function SalesTeamOverview({ leads = [], employees = [], todayDateStr, selectedB
                 className="w-full flex items-center justify-between md:grid md:grid-cols-12 px-6 py-4 hover:bg-gray-50/70 transition-colors"
               >
                 <div className="flex items-center gap-4 md:col-span-4 text-left">
-                  <div className="w-10 h-10 rounded-full bg-eminence-gold/10 text-eminence-gold flex items-center justify-center font-bold text-lg border border-eminence-gold/20 flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-jainil-gold/10 text-jainil-gold flex items-center justify-center font-bold text-lg border border-jainil-gold/20 flex-shrink-0">
                     {person.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left">
@@ -10045,7 +10073,7 @@ function SalesTeamOverview({ leads = [], employees = [], todayDateStr, selectedB
                     <p className="text-[9px] text-gray-400 uppercase tracking-wider">Conv. Rate</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-xs font-bold text-eminence-gold">₹{person.total_sale_amount.toLocaleString("en-IN")}</p>
+                    <p className="text-xs font-bold text-jainil-gold">₹{person.total_sale_amount.toLocaleString("en-IN")}</p>
                     <p className="text-[9px] text-gray-400 uppercase tracking-wider">Sales</p>
                   </div>
                 </div>
@@ -10141,13 +10169,13 @@ function SalesTeamOverview({ leads = [], employees = [], todayDateStr, selectedB
                           <p className="text-[9px] font-bold text-gray-500 uppercase tracking-wider">Recycled</p>
                           <p className="text-xl font-bold text-gray-700">{person.recycled}</p>
                         </div>
-                        <div className="p-3 bg-eminence-gold/10 rounded-lg border border-eminence-gold/20">
-                          <p className="text-[9px] font-bold text-eminence-gold uppercase tracking-wider">Conv. Rate</p>
+                        <div className="p-3 bg-jainil-gold/10 rounded-lg border border-jainil-gold/20">
+                          <p className="text-[9px] font-bold text-jainil-gold uppercase tracking-wider">Conv. Rate</p>
                           <p className="text-xl font-bold text-gray-900">{convRate}%</p>
                         </div>
                         <div className="col-span-2 p-3 bg-gray-900 rounded-lg">
                           <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">Total Sales</p>
-                          <p className="text-lg font-bold text-eminence-gold">₹{person.total_sale_amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</p>
+                          <p className="text-lg font-bold text-jainil-gold">₹{person.total_sale_amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</p>
                         </div>
                       </div>
                     </div>
@@ -11348,8 +11376,8 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 gap-4">
-        <div className="w-12 h-12 border-4 border-eminence-gold border-t-transparent rounded-full animate-spin" />
-        <p className="text-eminence-muted font-medium text-sm">Aggregating checkout metrics & segmenting customer ledger...</p>
+        <div className="w-12 h-12 border-4 border-jainil-gold border-t-transparent rounded-full animate-spin" />
+        <p className="text-jainil-muted font-medium text-sm">Aggregating checkout metrics & segmenting customer ledger...</p>
       </div>
     );
   }
@@ -11422,7 +11450,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
       </div>
 
       {/* SEGMENTS TAB PILLS AND OPERATIONAL ACTIONS BAR */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white/60 p-4 rounded-2xl border border-eminence-border/30 shadow-sm">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white/60 p-4 rounded-2xl border border-jainil-border/30 shadow-sm">
         <div className="flex flex-wrap gap-1.5">
           {[
             { k: "all", label: "All", count: segments.all?.length || 0 },
@@ -11453,7 +11481,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
           <label className="bg-white border border-gray-200 text-gray-700 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider hover:bg-gray-50 transition-colors flex items-center gap-2 cursor-pointer flex-1 lg:flex-initial justify-center">
             {isImporting ? (
               <>
-                <div className="w-3.5 h-3.5 border-2 border-eminence-gold border-t-transparent rounded-full animate-spin" />
+                <div className="w-3.5 h-3.5 border-2 border-jainil-gold border-t-transparent rounded-full animate-spin" />
                 <span>Uploading...</span>
               </>
             ) : (
@@ -11474,7 +11502,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-eminence-gold text-black font-semibold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#c5a030] transition-colors flex items-center gap-2 flex-1 lg:flex-initial justify-center shadow-sm"
+            className="bg-jainil-gold text-black font-semibold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider hover:bg-[#c5a030] transition-colors flex items-center gap-2 flex-1 lg:flex-initial justify-center shadow-sm"
           >
             <Plus size={14} /> Add Client
           </button>
@@ -11482,10 +11510,10 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
       </div>
 
       {/* MANAGE CLIENTS FILTERS CARD */}
-      <div className="eminence-card p-6 bg-white rounded-3xl border border-eminence-border/40 shadow-sm space-y-4">
-        <div className="border-b border-eminence-border/30 pb-3 flex items-center gap-2">
-          <Filter size={16} className="text-eminence-gold" />
-          <h3 className="font-serif text-lg text-eminence-text">Manage clients</h3>
+      <div className="jainil-card p-6 bg-white rounded-3xl border border-jainil-border/40 shadow-sm space-y-4">
+        <div className="border-b border-jainil-border/30 pb-3 flex items-center gap-2">
+          <Filter size={16} className="text-jainil-gold" />
+          <h3 className="font-serif text-lg text-jainil-text">Manage clients</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
@@ -11592,7 +11620,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
               source: "All",
               salesperson: "All"
             })}
-            className="text-xs text-eminence-gold hover:text-[#c5a030] font-bold uppercase tracking-wider"
+            className="text-xs text-jainil-gold hover:text-[#c5a030] font-bold uppercase tracking-wider"
           >
             Clear Filters
           </button>
@@ -11600,7 +11628,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
       </div>
 
       {/* MAIN DATA TABLE */}
-      <div className="eminence-card rounded-3xl overflow-hidden border border-eminence-border/30 shadow-sm bg-white">
+      <div className="jainil-card rounded-3xl overflow-hidden border border-jainil-border/30 shadow-sm bg-white">
         {selectedClientIds.size > 0 && (
           <div className="bg-gray-950 text-white px-6 py-4 flex justify-between items-center animate-fade-in">
             <span className="text-xs font-bold tracking-widest">{selectedClientIds.size} Selected Clients</span>
@@ -11618,7 +11646,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
-              <tr className="border-b border-eminence-border bg-gray-50/50 text-gray-500 text-[10px] uppercase font-bold tracking-wider">
+              <tr className="border-b border-jainil-border bg-gray-50/50 text-gray-500 text-[10px] uppercase font-bold tracking-wider">
                 <th className="px-4 py-4 w-10 text-center">
                   <input
                     type="checkbox"
@@ -11663,7 +11691,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                 return (
                   <tr
                     key={client.id}
-                    className={`hover:bg-eminence-surface/30 transition-colors ${isSelected ? 'bg-indigo-50/30' : ''}`}
+                    className={`hover:bg-jainil-surface/30 transition-colors ${isSelected ? 'bg-indigo-50/30' : ''}`}
                   >
                     <td className="px-4 py-3.5 text-center">
                       <input
@@ -11673,7 +11701,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                         className="w-4 h-4 accent-gray-950 rounded cursor-pointer"
                       />
                     </td>
-                    <td className="px-4 py-3.5 font-mono text-[11px] text-eminence-muted">
+                    <td className="px-4 py-3.5 font-mono text-[11px] text-jainil-muted">
                       {client.id?.slice(0, 8) || "—"}
                     </td>
                     <td className="px-4 py-3.5 font-bold text-gray-900 whitespace-nowrap">
@@ -11682,7 +11710,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                     <td className="px-4 py-3.5 font-medium whitespace-nowrap">
                       {client.phone || "—"}
                     </td>
-                    <td className="px-4 py-3.5 font-mono text-xs font-semibold text-eminence-gold whitespace-nowrap">
+                    <td className="px-4 py-3.5 font-mono text-xs font-semibold text-jainil-gold whitespace-nowrap">
                       {inviteCode}
                     </td>
                     <td className="px-4 py-3.5 text-xs whitespace-nowrap">
@@ -11703,7 +11731,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                     <td className="px-4 py-3.5 text-xs">
                       {client.gender || "—"}
                     </td>
-                    <td className="px-4 py-3.5 font-bold text-eminence-gold text-xs">
+                    <td className="px-4 py-3.5 font-bold text-jainil-gold text-xs">
                       {client.points || 0}
                     </td>
                     <td className="px-4 py-3.5 text-center whitespace-nowrap">
@@ -11730,7 +11758,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
               })}
               {sortedClients.length === 0 && (
                 <tr>
-                  <td colSpan="13" className="text-center py-12 text-eminence-muted italic">
+                  <td colSpan="13" className="text-center py-12 text-jainil-muted italic">
                     No clients found matching the filters or active segment.
                   </td>
                 </tr>
@@ -11887,7 +11915,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
           <div className="bg-white w-full max-w-5xl rounded-3xl shadow-2xl overflow-hidden border border-white/20 flex flex-col my-4">
             <div className="bg-gray-950 px-8 py-6 flex justify-between items-center text-white">
               <div>
-                <span className="text-[11px] uppercase tracking-wider bg-eminence-gold/15 text-eminence-gold px-2 py-0.5 rounded font-bold">Client Ledger Profile</span>
+                <span className="text-[11px] uppercase tracking-wider bg-jainil-gold/15 text-jainil-gold px-2 py-0.5 rounded font-bold">Client Ledger Profile</span>
                 <h3 className="text-2xl font-serif font-bold mt-1 text-white">{selectedProfileClient?.name || "Loading..."}</h3>
               </div>
               <button
@@ -11900,8 +11928,8 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
 
             {isLoadingProfile ? (
               <div className="p-20 flex flex-col items-center justify-center gap-4">
-                <div className="w-10 h-10 border-4 border-eminence-gold border-t-transparent rounded-full animate-spin" />
-                <p className="text-eminence-muted font-medium text-xs">Retrieving database aggregates for {selectedProfileClient?.name || "client"}...</p>
+                <div className="w-10 h-10 border-4 border-jainil-gold border-t-transparent rounded-full animate-spin" />
+                <p className="text-jainil-muted font-medium text-xs">Retrieving database aggregates for {selectedProfileClient?.name || "client"}...</p>
               </div>
             ) : selectedProfileClient && (
               <div className="grid grid-cols-1 md:grid-cols-4 min-h-[480px]">
@@ -11927,7 +11955,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                   <div className="pt-8 px-4 text-center">
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Ledger Balance</p>
                     <p className="text-2xl font-serif font-bold text-gray-900 mt-1">₹{(selectedProfileClient.wallet || 0).toLocaleString("en-IN")}</p>
-                    <p className="text-[11px] text-eminence-gold font-semibold uppercase mt-0.5">{selectedProfileClient.points || 0} Reward Points</p>
+                    <p className="text-[11px] text-jainil-gold font-semibold uppercase mt-0.5">{selectedProfileClient.points || 0} Reward Points</p>
                   </div>
                 </div>
 
@@ -12088,7 +12116,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                     <div className="space-y-6">
                       <h4 className="font-serif text-lg text-gray-900 border-b border-gray-100 pb-3">Active Purchased Packages</h4>
                       {!selectedProfileClient.packages || selectedProfileClient.packages.length === 0 ? (
-                        <div className="text-center py-10 text-eminence-muted italic text-sm">
+                        <div className="text-center py-10 text-jainil-muted italic text-sm">
                           No active package purchases registered on this client profile.
                         </div>
                       ) : (
@@ -12097,7 +12125,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                             <div key={idx} className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100 space-y-4">
                               <div className="flex justify-between items-center">
                                 <h5 className="font-bold text-gray-900 text-sm flex items-center gap-1.5">
-                                  <span className="w-2.5 h-2.5 rounded-full bg-eminence-gold" />
+                                  <span className="w-2.5 h-2.5 rounded-full bg-jainil-gold" />
                                   {pkg.name}
                                 </h5>
                                 <span className="text-[10px] font-mono text-gray-400 bg-white border px-2 py-0.5 rounded">ID: {pkg.id || "—"}</span>
@@ -12138,7 +12166,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                       <h4 className="font-serif text-lg text-gray-900 border-b border-gray-100 pb-3">Checkout Visit Log</h4>
                       <div className="max-h-[360px] overflow-y-auto pr-2 space-y-3">
                         {(!selectedProfileClient.orders || selectedProfileClient.orders.length === 0) ? (
-                          <p className="text-center py-10 text-eminence-muted italic text-sm">No billing records found under client contact phone.</p>
+                          <p className="text-center py-10 text-jainil-muted italic text-sm">No billing records found under client contact phone.</p>
                         ) : selectedProfileClient.orders.map((o) => (
                           <div key={o.id} className="p-4 bg-gray-50 border border-gray-100 rounded-2xl flex justify-between items-center">
                             <div>
@@ -12154,7 +12182,7 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-bold text-gray-900">₹{(o.total || 0).toLocaleString("en-IN")}</p>
-                              <p className="text-[9px] uppercase tracking-wider text-eminence-gold font-bold mt-1 bg-eminence-gold/10 px-2 py-0.5 rounded">{o.payment_method || "Paid"}</p>
+                              <p className="text-[9px] uppercase tracking-wider text-jainil-gold font-bold mt-1 bg-jainil-gold/10 px-2 py-0.5 rounded">{o.payment_method || "Paid"}</p>
                             </div>
                           </div>
                         ))}
@@ -12186,10 +12214,10 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
 
                       <div className="max-h-[260px] overflow-y-auto pr-2 space-y-4 pt-2">
                         {(!selectedProfileClient.notes || selectedProfileClient.notes.length === 0) ? (
-                          <p className="text-center py-6 text-eminence-muted italic text-xs">No notes recorded on this client profile.</p>
+                          <p className="text-center py-6 text-jainil-muted italic text-xs">No notes recorded on this client profile.</p>
                         ) : [...selectedProfileClient.notes].reverse().map((n, idx) => (
                           <div key={idx} className="relative pl-6 border-l border-gray-200 py-1 space-y-1">
-                            <div className="absolute -left-1.5 top-2 w-3 h-3 rounded-full bg-eminence-gold border-2 border-white" />
+                            <div className="absolute -left-1.5 top-2 w-3 h-3 rounded-full bg-jainil-gold border-2 border-white" />
                             <div className="flex items-center gap-2 text-[10px] text-gray-400">
                               <span className="font-bold text-gray-600">{n.author || "System"}</span>
                               <span>·</span>
@@ -12213,22 +12241,22 @@ function ClientsSegmentationPanel({ employees = [], appointments = [], refreshAl
 
 function Table({ rows, cols, testid, t }) {
   return (
-    <div className="eminence-card overflow-x-auto" data-testid={testid}>
+    <div className="jainil-card overflow-x-auto" data-testid={testid}>
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-eminence-border">
+          <tr className="border-b border-jainil-border">
             {cols.map((c) => <th key={c.h} className="text-left px-4 py-3 overline">{c.h}</th>)}
           </tr>
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} className="border-b border-eminence-border/50 hover:bg-eminence-surface/50">
+            <tr key={r.id} className="border-b border-jainil-border/50 hover:bg-jainil-surface/50">
               {cols.map((c, i) => <td key={i} className="px-4 py-3">{c.k(r)}</td>)}
             </tr>
           ))}
         </tbody>
       </table>
-      {rows.length === 0 && <p className="text-eminence-muted text-center py-10">{t("noRecords")}</p>}
+      {rows.length === 0 && <p className="text-jainil-muted text-center py-10">{t("noRecords")}</p>}
     </div>
   );
 }
@@ -12345,7 +12373,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
         <h2 className="font-serif text-2xl text-gray-800">
           {testid === "products" ? "Product Catalog" : "Product Vendors"}
         </h2>
-        <p className="text-xs text-eminence-muted">
+        <p className="text-xs text-jainil-muted">
           {testid === "products"
             ? "Manage and edit physical products, pricing, stock levels, and digital assets."
             : "Manage external suppliers, contact details, and procurement histories."}
@@ -12353,13 +12381,13 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
       </div>
 
       <div className={testid === "products" ? "flex flex-col gap-6" : "grid grid-cols-1 lg:grid-cols-3 gap-6"} data-testid={`crud-${testid}`}>
-        <form onSubmit={submit} className={testid === "products" ? "w-full eminence-card p-6" : "eminence-card p-6 space-y-4 lg:col-span-1 h-fit sticky top-24"}>
+        <form onSubmit={submit} className={testid === "products" ? "w-full jainil-card p-6" : "jainil-card p-6 space-y-4 lg:col-span-1 h-fit sticky top-24"}>
           <p className="overline mb-4">{editId ? `${t("edit")} ${title}` : `${t("add")} ${title}`}</p>
 
           <div className={testid === "products" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" : "space-y-4"}>
             {fields.map((f) => (
               <div key={f.k} className={getColSpan(f)}>
-                <label className="text-xs text-eminence-muted block mb-1">{f.label}</label>
+                <label className="text-xs text-jainil-muted block mb-1">{f.label}</label>
                 {f.type === "media_upload" ? (
                   <ImageUpload value={form[f.k]} onChange={(v) => set(f.k, v)} testId={`crud-${f.k}`} />
                 ) : f.type === "category_manager" ? (
@@ -12373,22 +12401,22 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                   />
                 ) : f.type === "select" ? (
                   <select value={form[f.k]} onChange={(e) => set(f.k, e.target.value)} data-testid={`crud-${f.k}`}
-                    className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 focus:outline-none focus:border-eminence-gold text-sm">
+                    className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 focus:outline-none focus:border-jainil-gold text-sm">
                     <option value="">{t("explore")} {f.label}</option>
                     {f.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                   </select>
                 ) : f.type === "textarea" ? (
                   <textarea rows={testid === "products" ? 2 : 4} value={form[f.k]} onChange={(e) => set(f.k, e.target.value)} data-testid={`crud-${f.k}`}
-                    className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 focus:outline-none focus:border-eminence-gold text-sm" />
+                    className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 focus:outline-none focus:border-jainil-gold text-sm" />
                 ) : f.type === "checkbox" ? (
                   <div className="flex items-center gap-2 py-1">
                     <input type="checkbox" checked={!!form[f.k]} onChange={(e) => set(f.k, e.target.checked)} data-testid={`crud-${f.k}`}
-                      className="w-4 h-4 rounded border-gray-300 text-eminence-gold focus:ring-eminence-gold accent-eminence-gold" />
-                    <span className="text-xs text-eminence-muted">{f.label === "Show in Online Shop" ? "Yes, list in online shop" : f.label}</span>
+                      className="w-4 h-4 rounded border-gray-300 text-jainil-gold focus:ring-jainil-gold accent-jainil-gold" />
+                    <span className="text-xs text-jainil-muted">{f.label === "Show in Online Shop" ? "Yes, list in online shop" : f.label}</span>
                   </div>
                 ) : (
                   <input type={f.type} value={form[f.k]} onChange={(e) => set(f.k, e.target.value)} data-testid={`crud-${f.k}`}
-                    className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 focus:outline-none focus:border-eminence-gold text-sm" />
+                    className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 focus:outline-none focus:border-jainil-gold text-sm" />
                 )}
               </div>
             ))}
@@ -12403,19 +12431,19 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
         <div className={testid === "products" ? "w-full space-y-4" : "lg:col-span-2 space-y-4"}>
           {/* Real-time search bar */}
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-gold" />
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-gold" />
             <input
               type="text"
               placeholder={testid === "products" ? "Search products by name, SKU, or category..." : "Search vendors..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-eminence-surface border border-eminence-border pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:border-eminence-gold rounded-xl"
+              className="w-full bg-jainil-surface border border-jainil-border pl-9 pr-4 py-2.5 text-sm focus:outline-none focus:border-jainil-gold rounded-xl"
             />
           </div>
 
           <div className="space-y-2">
             {filteredItems.map((it) => (
-              <div key={it.id} className="eminence-card p-4 flex flex-col gap-3" data-testid={`crud-row-${it.id}`}>
+              <div key={it.id} className="jainil-card p-4 flex flex-col gap-3" data-testid={`crud-row-${it.id}`}>
                 <div className="flex items-center gap-4">
                   {it.video_url ? (
                     <video src={it.video_url} className="w-16 h-16 object-cover rounded-lg" autoPlay muted loop playsInline />
@@ -12423,7 +12451,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                     <img src={it.image_url} alt="" className="w-16 h-16 object-cover rounded-lg" />
                   ) : (
                     // Do not render empty box for vendors
-                    !(it.contact_person || it.phone || it.email || it.address) && <div className="w-16 h-16 bg-eminence-surface rounded-lg" />
+                    !(it.contact_person || it.phone || it.email || it.address) && <div className="w-16 h-16 bg-jainil-surface rounded-lg" />
                   )}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -12436,15 +12464,15 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                     </div>
                     <h4 className="font-serif text-lg">{it.name}</h4>
                     {(it.volume || it.measurement_unit) && (
-                      <p className="text-xs text-eminence-gold font-bold uppercase tracking-wider mt-0.5">
+                      <p className="text-xs text-jainil-gold font-bold uppercase tracking-wider mt-0.5">
                         {it.volume ? `${it.volume} ` : ""}{it.measurement_unit || ""}
                       </p>
                     )}
-                    {it.description && <p className="text-xs text-eminence-muted line-clamp-1">{it.description}</p>}
+                    {it.description && <p className="text-xs text-jainil-muted line-clamp-1">{it.description}</p>}
 
                     {/* Vendor details */}
                     {(it.contact_person || it.phone || it.email || it.gst_no || it.address) && (
-                      <div className="text-xs text-eminence-muted space-y-1 mt-2 bg-eminence-surface/30 p-2.5 rounded-lg border border-eminence-border/10">
+                      <div className="text-xs text-jainil-muted space-y-1 mt-2 bg-jainil-surface/30 p-2.5 rounded-lg border border-jainil-border/10">
                         {it.contact_person && <p><span className="font-bold text-gray-500 uppercase text-[9px] tracking-wider block">Contact Person</span> {it.contact_person}</p>}
                         {it.phone && <p><span className="font-bold text-gray-500 uppercase text-[9px] tracking-wider block">Phone Number</span> {it.phone}</p>}
                         {it.email && <p><span className="font-bold text-gray-500 uppercase text-[9px] tracking-wider block">Email Address</span> {it.email}</p>}
@@ -12455,10 +12483,10 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                   </div>
                   <div className="text-right">
                     {it.price !== undefined && (
-                      <p className="text-eminence-gold font-serif text-xl">₹{it.price.toLocaleString("en-IN")}</p>
+                      <p className="text-jainil-gold font-serif text-xl">₹{it.price.toLocaleString("en-IN")}</p>
                     )}
                     {it.stock !== undefined && (
-                      <p className={`text-[10px] font-bold uppercase mt-1 ${it.stock <= 5 ? "text-red-500" : "text-eminence-muted"}`}>
+                      <p className={`text-[10px] font-bold uppercase mt-1 ${it.stock <= 5 ? "text-red-500" : "text-jainil-muted"}`}>
                         {it.stock} {t("units")} {it.stock <= 5 ? "· Low Stock" : ""}
                       </p>
                     )}
@@ -12474,7 +12502,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                         <button
                           type="button"
                           onClick={() => toggleVendorHistory(it.id)}
-                          className="text-xs uppercase tracking-wider text-eminence-muted hover:text-eminence-gold flex items-center gap-1"
+                          className="text-xs uppercase tracking-wider text-jainil-muted hover:text-jainil-gold flex items-center gap-1"
                         >
                           <Clock size={12} /> History
                         </button>
@@ -12482,30 +12510,30 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                       {onViewHistory && (
                         <button
                           onClick={() => onViewHistory(it)}
-                          className="text-xs uppercase tracking-wider text-eminence-muted hover:text-eminence-gold flex items-center gap-1"
+                          className="text-xs uppercase tracking-wider text-jainil-muted hover:text-jainil-gold flex items-center gap-1"
                         >
                           <Clock size={12} /> History
                         </button>
                       )}
-                      <button onClick={() => startEdit(it)} className="text-xs uppercase tracking-wider text-eminence-muted hover:text-eminence-gold" data-testid={`edit-${it.id}`}>{t("edit")}</button>
-                      <button onClick={() => del(it.id)} className="text-eminence-muted hover:text-red-400" data-testid={`delete-${it.id}`}><Trash2 size={14} /></button>
+                      <button onClick={() => startEdit(it)} className="text-xs uppercase tracking-wider text-jainil-muted hover:text-jainil-gold" data-testid={`edit-${it.id}`}>{t("edit")}</button>
+                      <button onClick={() => del(it.id)} className="text-jainil-muted hover:text-red-400" data-testid={`delete-${it.id}`}><Trash2 size={14} /></button>
                     </div>
                   </div>
                 </div>
 
                 {/* Collapsible Vendor Purchase History Section */}
                 {testid === "vendors" && expandedVendorId === it.id && (
-                  <div className="mt-2 bg-eminence-surface/30 p-4 rounded-xl border border-eminence-border/10 space-y-3 text-left">
+                  <div className="mt-2 bg-jainil-surface/30 p-4 rounded-xl border border-jainil-border/10 space-y-3 text-left">
                     {loadingVendorHistory ? (
-                      <div className="flex items-center justify-center py-6 gap-2 text-xs text-eminence-muted">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-eminence-gold" />
+                      <div className="flex items-center justify-center py-6 gap-2 text-xs text-jainil-muted">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-jainil-gold" />
                         <span>Fetching purchase logs...</span>
                       </div>
                     ) : !vendorHistory || vendorHistory.history.length === 0 ? (
-                      <p className="text-xs text-eminence-muted italic text-center py-4">No purchase logs found for this vendor.</p>
+                      <p className="text-xs text-jainil-muted italic text-center py-4">No purchase logs found for this vendor.</p>
                     ) : (
                       <div className="space-y-3">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs bg-white p-3 rounded-lg border border-eminence-border/10 font-bold uppercase tracking-wider text-eminence-muted">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs bg-white p-3 rounded-lg border border-jainil-border/10 font-bold uppercase tracking-wider text-jainil-muted">
                           <div>
                             <span className="text-[10px] text-gray-400 block font-normal">Purchased Qty</span>
                             <span>{vendorHistory.total_purchased_quantity} units</span>
@@ -12523,10 +12551,10 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                             <span className="text-red-500">₹{(vendorHistory.total_pending_amount || 0).toLocaleString("en-IN")}</span>
                           </div>
                         </div>
-                        <div className="max-h-60 overflow-y-auto border border-eminence-border/10 rounded-lg bg-white">
+                        <div className="max-h-60 overflow-y-auto border border-jainil-border/10 rounded-lg bg-white">
                           <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                              <tr className="bg-eminence-surface/60 border-b border-eminence-border/10 text-eminence-muted uppercase font-bold text-[9px] tracking-wider">
+                              <tr className="bg-jainil-surface/60 border-b border-jainil-border/10 text-jainil-muted uppercase font-bold text-[9px] tracking-wider">
                                 <th className="px-3 py-2.5">Date</th>
                                 <th className="px-3 py-2.5">Invoice No</th>
                                 <th className="px-3 py-2.5">Product Name</th>
@@ -12582,7 +12610,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                                               payment_status: status
                                             });
                                           }}
-                                          className="w-20 border border-gray-300 rounded px-1.5 py-0.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-eminence-gold bg-white font-mono"
+                                          className="w-20 border border-gray-300 rounded px-1.5 py-0.5 text-xs text-right focus:outline-none focus:ring-1 focus:ring-jainil-gold bg-white font-mono"
                                         />
                                       ) : (
                                         <span className="font-bold text-blue-600 whitespace-nowrap">
@@ -12610,7 +12638,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                                         <select
                                           value={editStockLogForm.payment_mode}
                                           onChange={(e) => setEditStockLogForm({ ...editStockLogForm, payment_mode: e.target.value })}
-                                          className="border border-gray-300 rounded px-1 py-0.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-eminence-gold"
+                                          className="border border-gray-300 rounded px-1 py-0.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-jainil-gold"
                                         >
                                           <option>Cash</option>
                                           <option>UPI</option>
@@ -12632,7 +12660,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                                         <select
                                           value={editStockLogForm.payment_status}
                                           onChange={(e) => setEditStockLogForm({ ...editStockLogForm, payment_status: e.target.value })}
-                                          className="border border-gray-300 rounded px-1 py-0.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-eminence-gold"
+                                          className="border border-gray-300 rounded px-1 py-0.5 text-xs bg-white focus:outline-none focus:ring-1 focus:ring-jainil-gold"
                                         >
                                           <option>Pending</option>
                                           <option>Partial</option>
@@ -12677,7 +12705,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
                                               payment_status: hLog.payment_status || "Pending"
                                             });
                                           }}
-                                          className="px-2 py-0.5 bg-eminence-gold hover:bg-eminence-gold/90 text-white rounded text-[10px] uppercase font-bold transition-all"
+                                          className="px-2 py-0.5 bg-jainil-gold hover:bg-jainil-gold/90 text-white rounded text-[10px] uppercase font-bold transition-all"
                                         >
                                           Edit
                                         </button>
@@ -12696,7 +12724,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
               </div>
             ))}
             {filteredItems.length === 0 && (
-              <p className="text-eminence-muted text-center py-10">{t("noRecords")}</p>
+              <p className="text-jainil-muted text-center py-10">{t("noRecords")}</p>
             )}
           </div>
         </div>
@@ -12707,7 +12735,7 @@ function CrudPanel({ title, items, fields, create, update, remove, onChange, onV
 
 function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refresh, t, isSuperAdmin, branches = [] }) {
   const [subTab, setSubTab] = useState(defaultSubTab);
-  const [form, setForm] = useState({ name: "", email: "", phones: [""], password: "", branch: "Surat", section: "Men", role: "sales", pancard: "", adhaar_card: "", bank_details: "", commission_rate: 5, base_salary: "", pancard_image: "", adhaar_card_image: "" });
+  const [form, setForm] = useState({ name: "", email: "", phones: [""], password: "", branch: "Sama Savli", section: "Men", role: "sales", pancard: "", adhaar_card: "", bank_details: "", commission_rate: 5, base_salary: "", pancard_image: "", adhaar_card_image: "" });
   const [editingEmpId, setEditingEmpId] = useState(null);
   const [attendanceData, setAttendanceData] = useState([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
@@ -12849,7 +12877,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
       email: emp.email || "",
       phones: phones,
       password: "",
-      branch: emp.branch || "Surat",
+      branch: emp.branch || "Sama Savli",
       section: emp.section || "Men",
       role: emp.role || "sales",
       pancard: emp.pancard || "",
@@ -12858,14 +12886,21 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
       commission_rate: emp.commission_rate !== undefined ? Math.round(emp.commission_rate * 100) : 5,
       base_salary: emp.base_salary || "",
       pancard_image: emp.pancard_image || "",
-      adhaar_card_image: emp.adhaar_card_image || ""
+      adhaar_card_image: emp.adhaar_card_image || "",
+      product_commission_rate: emp.product_commission_rate !== undefined ? Math.round(emp.product_commission_rate * 100) : 0,
+      working_hours_from: emp.working_hours_from || "",
+      working_hours_to: emp.working_hours_to || "",
+      gender: emp.gender || "",
+      monthly_target: emp.monthly_target || "",
+      sales_staff_type: emp.sales_staff_type || "Senior",
+      service_provider_type: emp.service_provider_type || "HairStylist"
     });
     setEditingEmpId(emp.id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const resetForm = () => {
-    setForm({ name: "", email: "", phones: [""], password: "", branch: "Surat", section: "Men", role: "sales", pancard: "", adhaar_card: "", bank_details: "", commission_rate: 5, base_salary: "", pancard_image: "", adhaar_card_image: "" });
+    setForm({ name: "", email: "", phones: [""], password: "", branch: "Sama Savli", section: "Men", role: "sales", pancard: "", adhaar_card: "", bank_details: "", commission_rate: 5, base_salary: "", pancard_image: "", adhaar_card_image: "", product_commission_rate: 0, working_hours_from: "", working_hours_to: "", gender: "", monthly_target: "", sales_staff_type: "Senior", service_provider_type: "HairStylist" });
     setEditingEmpId(null);
   };
 
@@ -12879,7 +12914,9 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
         phone: activePhones[0] || "",
         phone_numbers: activePhones,
         commission_rate: Number(form.commission_rate) / 100,
-        base_salary: Number(form.base_salary) || 0
+        product_commission_rate: Number(form.product_commission_rate) / 100,
+        base_salary: Number(form.base_salary) || 0,
+        monthly_target: form.monthly_target ? Number(form.monthly_target) : null,
       };
 
       if (editingEmpId) {
@@ -12894,7 +12931,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
         toast.success("Employee account created");
       }
 
-      setForm({ name: "", email: "", phones: [""], password: "", branch: "Surat", section: "Men", role: "sales", pancard: "", adhaar_card: "", bank_details: "", commission_rate: 5, base_salary: "", pancard_image: "", adhaar_card_image: "" });
+      resetForm();
       refresh();
     } catch (err) {
       toast.error(err.response?.data?.detail || `Failed to ${editingEmpId ? "update" : "create"} employee`);
@@ -12911,7 +12948,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
               <button
                 key={t}
                 onClick={() => setSubTab(t)}
-                className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-colors ${subTab === t ? "bg-eminence-gold text-white" : "bg-white text-gray-500 hover:bg-gray-100"}`}
+                className={`px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-colors ${subTab === t ? "bg-jainil-gold text-white" : "bg-white text-gray-500 hover:bg-gray-100"}`}
               >
                 {t === "kiosk" ? "Check-in Kiosk" : t}
               </button>
@@ -12934,8 +12971,8 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
-                  <h3 className="font-serif text-2xl text-eminence-gold">Staff Attendance Directory</h3>
-                  <p className="text-xs text-eminence-muted">Select a team member to view their interactive monthly attendance calendar</p>
+                  <h3 className="font-serif text-2xl text-jainil-gold">Staff Attendance Directory</h3>
+                  <p className="text-xs text-jainil-muted">Select a team member to view their interactive monthly attendance calendar</p>
                 </div>
               </div>
 
@@ -12954,23 +12991,23 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                         // Default selected day in details view to today
                         setSelectedDateStr(new Date().toISOString().split('T')[0]);
                       }}
-                      className="glass-card p-6 rounded-2xl border border-eminence-border/35 hover:border-eminence-gold/60 transition-all duration-300 cursor-pointer group hover:translate-y-[-4px] hover:shadow-[0_8px_30px_rgb(212,175,55,0.08)] bg-white/70 backdrop-blur-md"
+                      className="glass-card p-6 rounded-2xl border border-jainil-border/35 hover:border-jainil-gold/60 transition-all duration-300 cursor-pointer group hover:translate-y-[-4px] hover:shadow-[0_8px_30px_rgb(212,175,55,0.08)] bg-white/70 backdrop-blur-md"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 rounded-full bg-eminence-surface border border-eminence-border flex items-center justify-center font-bold text-eminence-gold group-hover:bg-eminence-gold group-hover:text-white transition-colors duration-300">
+                        <div className="w-12 h-12 rounded-full bg-jainil-surface border border-jainil-border flex items-center justify-center font-bold text-jainil-gold group-hover:bg-jainil-gold group-hover:text-white transition-colors duration-300">
                           {initials}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-serif text-lg truncate group-hover:text-eminence-gold transition-colors">{emp.name}</h4>
-                          <p className="text-xs text-eminence-muted truncate">{emp.role === "sales" ? "Sales Team" : emp.role === "receptionist" ? "Receptionist" : "Service Team"}</p>
-                          <p className="text-[10px] text-eminence-muted truncate mt-0.5">{emp.email}</p>
+                          <h4 className="font-serif text-lg truncate group-hover:text-jainil-gold transition-colors">{emp.name}</h4>
+                          <p className="text-xs text-jainil-muted truncate">{emp.role === "sales" ? "Sales Team" : emp.role === "receptionist" ? "Receptionist" : "Service Team"}</p>
+                          <p className="text-[10px] text-jainil-muted truncate mt-0.5">{emp.email}</p>
                         </div>
                       </div>
-                      <div className="mt-6 pt-4 border-t border-eminence-border/20 flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-eminence-gold border border-eminence-gold/40 px-2.5 py-0.5 rounded-full bg-eminence-gold/5">
+                      <div className="mt-6 pt-4 border-t border-jainil-border/20 flex items-center justify-between">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-jainil-gold border border-jainil-gold/40 px-2.5 py-0.5 rounded-full bg-jainil-gold/5">
                           {emp.role === "sales" ? "Sales" : emp.role === "receptionist" ? "Reception" : "Service"}
                         </span>
-                        <span className="text-xs font-medium text-eminence-muted">
+                        <span className="text-xs font-medium text-jainil-muted">
                           {logsCount} {logsCount === 1 ? "log" : "logs"} recorded
                         </span>
                       </div>
@@ -12978,7 +13015,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                   );
                 })}
                 {employees.length === 0 && (
-                  <div className="col-span-full eminence-card p-12 text-center text-eminence-muted">
+                  <div className="col-span-full jainil-card p-12 text-center text-jainil-muted">
                     No employees registered. Go to "Add Employee" in the Staff tab to add one.
                   </div>
                 )}
@@ -13029,19 +13066,19 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setSelectedEmployeeId(null)}
-                  className="px-4 py-2 border border-eminence-border rounded-xl text-xs uppercase tracking-wider hover:bg-eminence-surface hover:text-eminence-gold transition-all bg-white"
+                  className="px-4 py-2 border border-jainil-border rounded-xl text-xs uppercase tracking-wider hover:bg-jainil-surface hover:text-jainil-gold transition-all bg-white"
                 >
                   ← Back to Staff List
                 </button>
                 <div>
-                  <h3 className="font-serif text-2xl text-eminence-gold">{emp?.name}'s Attendance</h3>
-                  <p className="text-xs text-eminence-muted">{emp?.role === "sales" ? "Sales Team" : "Service Team"} · {emp?.email}</p>
+                  <h3 className="font-serif text-2xl text-jainil-gold">{emp?.name}'s Attendance</h3>
+                  <p className="text-xs text-jainil-muted">{emp?.role === "sales" ? "Sales Team" : "Service Team"} · {emp?.email}</p>
                 </div>
               </div>
 
               {/* Quick Switcher dropdown */}
               <div className="flex items-center gap-2">
-                <span className="text-xs text-eminence-muted">Select Staff:</span>
+                <span className="text-xs text-jainil-muted">Select Staff:</span>
                 <select
                   value={selectedEmployeeId}
                   onChange={(e) => {
@@ -13049,7 +13086,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                     setCurrentMonth(new Date());
                     setSelectedDateStr(new Date().toISOString().split('T')[0]);
                   }}
-                  className="bg-white border border-eminence-border px-3 py-1.5 focus:outline-none focus:border-eminence-gold rounded-xl text-xs uppercase tracking-wider"
+                  className="bg-white border border-jainil-border px-3 py-1.5 focus:outline-none focus:border-jainil-gold rounded-xl text-xs uppercase tracking-wider"
                 >
                   {employees.map(e => (
                     <option key={e.id} value={e.id}>{e.name}</option>
@@ -13060,21 +13097,21 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               {/* Calendar Card */}
-              <div className="lg:col-span-2 eminence-card overflow-hidden">
-                <div className="p-6 border-b border-eminence-border/40 bg-eminence-surface/30 flex items-center justify-between">
-                  <h4 className="font-serif text-lg text-eminence-gold">
+              <div className="lg:col-span-2 jainil-card overflow-hidden">
+                <div className="p-6 border-b border-jainil-border/40 bg-jainil-surface/30 flex items-center justify-between">
+                  <h4 className="font-serif text-lg text-jainil-gold">
                     {monthNames[month]} {year}
                   </h4>
                   <div className="flex gap-2">
                     <button
                       onClick={prevMonth}
-                      className="w-8 h-8 rounded-full border border-eminence-border flex items-center justify-center hover:bg-eminence-surface text-sm font-semibold hover:text-eminence-gold transition-all bg-white"
+                      className="w-8 h-8 rounded-full border border-jainil-border flex items-center justify-center hover:bg-jainil-surface text-sm font-semibold hover:text-jainil-gold transition-all bg-white"
                     >
                       ‹
                     </button>
                     <button
                       onClick={nextMonth}
-                      className="w-8 h-8 rounded-full border border-eminence-border flex items-center justify-center hover:bg-eminence-surface text-sm font-semibold hover:text-eminence-gold transition-all bg-white"
+                      className="w-8 h-8 rounded-full border border-jainil-border flex items-center justify-center hover:bg-jainil-surface text-sm font-semibold hover:text-jainil-gold transition-all bg-white"
                     >
                       ›
                     </button>
@@ -13085,7 +13122,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                   {/* Days of week */}
                   <div className="grid grid-cols-7 gap-2 mb-2 text-center">
                     {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-                      <div key={day} className="text-[10px] font-bold uppercase tracking-wider text-eminence-muted py-2">
+                      <div key={day} className="text-[10px] font-bold uppercase tracking-wider text-jainil-muted py-2">
                         {day}
                       </div>
                     ))}
@@ -13105,7 +13142,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                       const isToday = cell.dateStr === todayStr;
                       const isPast = cell.dateStr < todayStr;
 
-                      let statusClass = "bg-eminence-surface/20 border-eminence-border/45 text-gray-500 hover:bg-eminence-surface/40";
+                      let statusClass = "bg-jainil-surface/20 border-jainil-border/45 text-gray-500 hover:bg-jainil-surface/40";
                       let indicatorColor = "";
                       let isAbsent = false;
                       let forgotCheckout = false;
@@ -13143,17 +13180,17 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                             setSelectedDateStr(cell.dateStr);
                             setIsEditingAttendance(false); // Reset edit state
                           }}
-                          className={`aspect-square p-2 border rounded-xl flex flex-col justify-between transition-all text-left bg-white ${statusClass} ${isSelected ? "ring-2 ring-eminence-gold border-eminence-gold/60" : ""
-                            } ${isToday && !isSelected ? "border-dashed border-eminence-gold/80" : ""}`}
+                          className={`aspect-square p-2 border rounded-xl flex flex-col justify-between transition-all text-left bg-white ${statusClass} ${isSelected ? "ring-2 ring-jainil-gold border-jainil-gold/60" : ""
+                            } ${isToday && !isSelected ? "border-dashed border-jainil-gold/80" : ""}`}
                         >
                           <div className="flex justify-between items-start w-full">
-                            <span className={`text-xs font-bold ${isToday ? "text-eminence-gold" : ""}`}>{cell.day}</span>
+                            <span className={`text-xs font-bold ${isToday ? "text-jainil-gold" : ""}`}>{cell.day}</span>
                             {indicatorColor && <span className={`w-1.5 h-1.5 rounded-full ${indicatorColor}`}></span>}
                           </div>
 
                           {/* Mini info for larger screens */}
                           {dayLog && !isAbsent && (
-                            <div className="hidden md:block text-[8px] leading-tight font-medium mt-1 uppercase tracking-tighter truncate w-full text-eminence-muted">
+                            <div className="hidden md:block text-[8px] leading-tight font-medium mt-1 uppercase tracking-tighter truncate w-full text-jainil-muted">
                               <div>IN: {dayLog.time.split(":")[0] + ":" + dayLog.time.split(":")[1]}</div>
                               {dayLog.checkout_time && (
                                 <div>OUT: {dayLog.checkout_time.split(":")[0] + ":" + dayLog.checkout_time.split(":")[1]}</div>
@@ -13171,7 +13208,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                   </div>
                 </div>
 
-                <div className="p-4 bg-eminence-surface/10 border-t border-eminence-border/30 flex items-center justify-between text-xs text-eminence-muted">
+                <div className="p-4 bg-jainil-surface/10 border-t border-jainil-border/30 flex items-center justify-between text-xs text-jainil-muted">
                   <div className="flex gap-4 flex-wrap">
                     <span className="flex items-center gap-1.5">
                       <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Present
@@ -13183,18 +13220,18 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                       <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Absent / Forgot Out
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded border border-dashed border-eminence-gold/80"></span> Today
+                      <span className="w-2.5 h-2.5 rounded border border-dashed border-jainil-gold/80"></span> Today
                     </span>
                   </div>
                 </div>
               </div>
 
               {/* Day Details Card */}
-              <div className="lg:col-span-1 eminence-card overflow-hidden sticky top-24">
-                <div className="p-6 border-b border-eminence-border/40 bg-eminence-surface/30 flex justify-between items-center">
+              <div className="lg:col-span-1 jainil-card overflow-hidden sticky top-24">
+                <div className="p-6 border-b border-jainil-border/40 bg-jainil-surface/30 flex justify-between items-center">
                   <div>
-                    <h4 className="font-serif text-lg text-eminence-gold">Verification Details</h4>
-                    <p className="text-xs text-eminence-muted">
+                    <h4 className="font-serif text-lg text-jainil-gold">Verification Details</h4>
+                    <p className="text-xs text-jainil-muted">
                       {(() => {
                         try {
                           const parts = selectedDateStr.split('-');
@@ -13218,7 +13255,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                           status: selectedDayLog?.status || "present"
                         });
                       }}
-                      className="text-[10px] uppercase font-bold tracking-wider text-eminence-gold border border-eminence-gold/40 px-3 py-1.5 rounded-lg hover:bg-eminence-gold hover:text-white transition-colors"
+                      className="text-[10px] uppercase font-bold tracking-wider text-jainil-gold border border-jainil-gold/40 px-3 py-1.5 rounded-lg hover:bg-jainil-gold hover:text-white transition-colors"
                     >
                       {selectedDayLog ? "Edit Log" : "Log Manual"}
                     </button>
@@ -13227,14 +13264,14 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
 
                 {isEditingAttendance ? (
                   <div className="p-6 space-y-4">
-                    <p className="text-xs font-bold text-eminence-gold uppercase tracking-widest">Edit Attendance Log</p>
+                    <p className="text-xs font-bold text-jainil-gold uppercase tracking-widest">Edit Attendance Log</p>
 
                     <div>
-                      <label className="text-xs text-eminence-muted block mb-1">Status</label>
+                      <label className="text-xs text-jainil-muted block mb-1">Status</label>
                       <select
                         value={editAttendanceForm.status}
                         onChange={(e) => setEditAttendanceForm({ ...editAttendanceForm, status: e.target.value })}
-                        className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 focus:outline-none focus:border-eminence-gold text-sm rounded-lg text-gray-900"
+                        className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 focus:outline-none focus:border-jainil-gold text-sm rounded-lg text-gray-900"
                       >
                         <option value="present">Present</option>
                         <option value="absent">Absent</option>
@@ -13244,21 +13281,21 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                     {editAttendanceForm.status === "present" && (
                       <>
                         <div>
-                          <label className="text-xs text-eminence-muted block mb-1">Check-In Time</label>
+                          <label className="text-xs text-jainil-muted block mb-1">Check-In Time</label>
                           <input
                             type="time"
                             value={editAttendanceForm.time}
                             onChange={(e) => setEditAttendanceForm({ ...editAttendanceForm, time: e.target.value })}
-                            className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 focus:outline-none focus:border-eminence-gold text-sm rounded-lg text-gray-900"
+                            className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 focus:outline-none focus:border-jainil-gold text-sm rounded-lg text-gray-900"
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-eminence-muted block mb-1">Check-Out Time (Optional)</label>
+                          <label className="text-xs text-jainil-muted block mb-1">Check-Out Time (Optional)</label>
                           <input
                             type="time"
                             value={editAttendanceForm.checkout_time}
                             onChange={(e) => setEditAttendanceForm({ ...editAttendanceForm, checkout_time: e.target.value })}
-                            className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 focus:outline-none focus:border-eminence-gold text-sm rounded-lg text-gray-900"
+                            className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 focus:outline-none focus:border-jainil-gold text-sm rounded-lg text-gray-900"
                           />
                         </div>
                       </>
@@ -13267,13 +13304,13 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                     <div className="flex gap-2 pt-2">
                       <button
                         onClick={handleSaveAttendance}
-                        className="flex-1 bg-eminence-gold text-white text-xs font-bold py-2 rounded-lg uppercase tracking-wider hover:bg-black transition-colors"
+                        className="flex-1 bg-jainil-gold text-white text-xs font-bold py-2 rounded-lg uppercase tracking-wider hover:bg-black transition-colors"
                       >
                         Save
                       </button>
                       <button
                         onClick={() => setIsEditingAttendance(false)}
-                        className="flex-1 border border-eminence-border text-xs font-bold py-2 rounded-lg uppercase tracking-wider hover:bg-eminence-surface transition-colors"
+                        className="flex-1 border border-jainil-border text-xs font-bold py-2 rounded-lg uppercase tracking-wider hover:bg-jainil-surface transition-colors"
                       >
                         Cancel
                       </button>
@@ -13287,10 +13324,10 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                         <p className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider">Check-In</p>
                         <p className="font-serif text-lg font-bold mt-1 text-emerald-800">{selectedDayLog.time}</p>
                       </div>
-                      <div className="p-3 bg-eminence-surface border border-eminence-border/50 rounded-xl">
-                        <p className="text-[10px] text-eminence-muted font-bold uppercase tracking-wider">Check-Out</p>
+                      <div className="p-3 bg-jainil-surface border border-jainil-border/50 rounded-xl">
+                        <p className="text-[10px] text-jainil-muted font-bold uppercase tracking-wider">Check-Out</p>
                         {selectedDayLog.checkout_time ? (
-                          <p className="font-serif text-lg font-bold mt-1 text-eminence-gold">{selectedDayLog.checkout_time}</p>
+                          <p className="font-serif text-lg font-bold mt-1 text-jainil-gold">{selectedDayLog.checkout_time}</p>
                         ) : (
                           <span className="inline-block mt-2 px-2 py-0.5 bg-amber-50 text-amber-700 text-[9px] uppercase font-bold tracking-wider rounded border border-amber-200 animate-pulse">
                             Active
@@ -13301,7 +13338,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
 
                     {/* Photos */}
                     <div>
-                      <p className="text-[10px] text-eminence-muted font-bold uppercase tracking-wider mb-2">Verification Photos</p>
+                      <p className="text-[10px] text-jainil-muted font-bold uppercase tracking-wider mb-2">Verification Photos</p>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col items-center">
                           {selectedDayLog.photo_url ? (
@@ -13309,14 +13346,14 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                               <img
                                 src={`/api/files/${selectedDayLog.photo_url}`}
                                 alt="Check-In"
-                                className="w-full h-32 object-cover rounded-xl border border-eminence-border/80 shadow-sm cursor-zoom-in hover:scale-105 transition-all duration-300"
+                                className="w-full h-32 object-cover rounded-xl border border-jainil-border/80 shadow-sm cursor-zoom-in hover:scale-105 transition-all duration-300"
                               />
                               <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[9px] uppercase font-bold tracking-wider">
                                 Check-In
                               </div>
                             </div>
                           ) : (
-                            <div className="w-full h-32 bg-eminence-surface border border-dashed border-eminence-border/60 rounded-xl flex items-center justify-center text-xs text-eminence-muted">
+                            <div className="w-full h-32 bg-jainil-surface border border-dashed border-jainil-border/60 rounded-xl flex items-center justify-center text-xs text-jainil-muted">
                               No Check-In photo
                             </div>
                           )}
@@ -13328,14 +13365,14 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                               <img
                                 src={`/api/files/${selectedDayLog.checkout_photo_url}`}
                                 alt="Check-Out"
-                                className="w-full h-32 object-cover rounded-xl border border-eminence-border/80 shadow-sm cursor-zoom-in hover:scale-105 transition-all duration-300"
+                                className="w-full h-32 object-cover rounded-xl border border-jainil-border/80 shadow-sm cursor-zoom-in hover:scale-105 transition-all duration-300"
                               />
                               <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-sm text-white px-2 py-0.5 rounded text-[9px] uppercase font-bold tracking-wider">
                                 Check-Out
                               </div>
                             </div>
                           ) : (
-                            <div className="w-full h-32 bg-eminence-surface/40 border border-dashed border-eminence-border/40 rounded-xl flex flex-col items-center justify-center text-xs text-eminence-muted">
+                            <div className="w-full h-32 bg-jainil-surface/40 border border-dashed border-jainil-border/40 rounded-xl flex flex-col items-center justify-center text-xs text-jainil-muted">
                               <span className="text-[20px] font-light">-</span>
                               <span className="text-[9px] uppercase tracking-wider">Active Shift</span>
                             </div>
@@ -13345,8 +13382,8 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                     </div>
 
                     {/* Geolocation Links */}
-                    <div className="pt-2 border-t border-eminence-border/20 space-y-3">
-                      <p className="text-[10px] text-eminence-muted font-bold uppercase tracking-wider">Verification Locations</p>
+                    <div className="pt-2 border-t border-jainil-border/20 space-y-3">
+                      <p className="text-[10px] text-jainil-muted font-bold uppercase tracking-wider">Verification Locations</p>
 
                       <div className="flex flex-col gap-2">
                         {selectedDayLog.latitude && selectedDayLog.longitude ? (
@@ -13354,16 +13391,16 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                             href={`https://www.google.com/maps?q=${selectedDayLog.latitude},${selectedDayLog.longitude}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-3 bg-eminence-surface/50 hover:bg-eminence-surface border border-eminence-border/40 rounded-xl flex items-center justify-between text-xs text-eminence-muted hover:text-eminence-gold transition-colors duration-200"
+                            className="p-3 bg-jainil-surface/50 hover:bg-jainil-surface border border-jainil-border/40 rounded-xl flex items-center justify-between text-xs text-jainil-muted hover:text-jainil-gold transition-colors duration-200"
                           >
                             <span className="flex items-center gap-2">
                               <span className="px-1.5 py-0.5 bg-emerald-500/10 text-emerald-700 text-[9px] font-bold border border-emerald-500/25 rounded">IN</span>
                               <span>Map Pin Location</span>
                             </span>
-                            <MapPin size={14} className="text-eminence-gold" />
+                            <MapPin size={14} className="text-jainil-gold" />
                           </a>
                         ) : (
-                          <div className="p-3 bg-eminence-surface/30 border border-dashed border-eminence-border/30 rounded-xl text-xs text-eminence-muted">
+                          <div className="p-3 bg-jainil-surface/30 border border-dashed border-jainil-border/30 rounded-xl text-xs text-jainil-muted">
                             In Location: N/A
                           </div>
                         )}
@@ -13373,16 +13410,16 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                             href={`https://www.google.com/maps?q=${selectedDayLog.checkout_latitude},${selectedDayLog.checkout_longitude}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="p-3 bg-eminence-surface/50 hover:bg-eminence-surface border border-eminence-border/40 rounded-xl flex items-center justify-between text-xs text-eminence-muted hover:text-eminence-gold transition-colors duration-200"
+                            className="p-3 bg-jainil-surface/50 hover:bg-jainil-surface border border-jainil-border/40 rounded-xl flex items-center justify-between text-xs text-jainil-muted hover:text-jainil-gold transition-colors duration-200"
                           >
                             <span className="flex items-center gap-2">
-                              <span className="px-1.5 py-0.5 bg-eminence-gold/10 text-eminence-gold text-[9px] font-bold border border-eminence-gold/25 rounded">OUT</span>
+                              <span className="px-1.5 py-0.5 bg-jainil-gold/10 text-jainil-gold text-[9px] font-bold border border-jainil-gold/25 rounded">OUT</span>
                               <span>Map Pin Location</span>
                             </span>
-                            <MapPin size={14} className="text-eminence-gold" />
+                            <MapPin size={14} className="text-jainil-gold" />
                           </a>
                         ) : selectedDayLog.checkout_time ? (
-                          <div className="p-3 bg-eminence-surface/30 border border-dashed border-eminence-border/30 rounded-xl text-xs text-eminence-muted">
+                          <div className="p-3 bg-jainil-surface/30 border border-dashed border-jainil-border/30 rounded-xl text-xs text-jainil-muted">
                             Out Location: N/A
                           </div>
                         ) : null}
@@ -13390,8 +13427,8 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                     </div>
                   </div>
                 ) : (
-                  <div className="p-8 text-center text-eminence-muted space-y-3">
-                    <div className="w-12 h-12 rounded-full border border-dashed border-eminence-border/60 flex items-center justify-center mx-auto text-lg text-eminence-muted font-serif">
+                  <div className="p-8 text-center text-jainil-muted space-y-3">
+                    <div className="w-12 h-12 rounded-full border border-dashed border-jainil-border/60 flex items-center justify-center mx-auto text-lg text-jainil-muted font-serif">
                       {selectedDayLog?.status === "absent" ? "A" : "?"}
                     </div>
                     <p className="text-sm italic">
@@ -13420,17 +13457,17 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
               type="month"
               value={payrollFilterMonth}
               onChange={(e) => setPayrollFilterMonth(e.target.value)}
-              className="bg-white border border-eminence-border px-4 py-2 text-sm rounded-lg focus:outline-none focus:border-eminence-gold shadow-xs self-start sm:self-auto"
+              className="bg-white border border-jainil-border px-4 py-2 text-sm rounded-lg focus:outline-none focus:border-jainil-gold shadow-xs self-start sm:self-auto"
             />
           </div>
-          <div className="eminence-card overflow-hidden">
+          <div className="jainil-card overflow-hidden">
             {loading ? (
-              <div className="p-20 text-center animate-pulse text-eminence-muted uppercase tracking-[0.3em] text-xs">Loading Payroll...</div>
+              <div className="p-20 text-center animate-pulse text-jainil-muted uppercase tracking-[0.3em] text-xs">Loading Payroll...</div>
             ) : (
               <div className="overflow-x-auto w-full">
                 <table className="w-full text-sm min-w-[950px]">
                   <thead>
-                    <tr className="border-b border-eminence-border bg-eminence-surface/50">
+                    <tr className="border-b border-jainil-border bg-jainil-surface/50">
                       <th className="text-left px-6 py-4 overline">Employee</th>
                       <th className="text-left px-6 py-4 overline">Base Salary</th>
                       <th className="text-left px-6 py-4 overline">Monthly Sales</th>
@@ -13439,11 +13476,11 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                       <th className="text-left px-6 py-4 overline">Package Comm</th>
                       <th className="text-left px-6 py-4 overline">Member Comm</th>
                       <th className="text-left px-6 py-4 overline">Attendance & Leaves</th>
-                      <th className="text-left px-6 py-4 overline text-eminence-gold">Total Payout</th>
+                      <th className="text-left px-6 py-4 overline text-jainil-gold">Total Payout</th>
                       <th className="text-left px-6 py-4 overline">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-eminence-border/50">
+                  <tbody className="divide-y divide-jainil-border/50">
                   {payrollData.map((emp) => {
                     const isService = emp.role === "service";
                     const isSales = emp.role === "sales";
@@ -13454,7 +13491,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
 
                     return (
                       <React.Fragment key={emp.id}>
-                        <tr className={isExpanded ? "bg-emerald-50/40" : "hover:bg-eminence-surface/30 transition-colors"}>
+                        <tr className={isExpanded ? "bg-emerald-50/40" : "hover:bg-jainil-surface/30 transition-colors"}>
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-2">
                               {canExpand && (
@@ -13469,7 +13506,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                               )}
                               <div>
                                 <div className="font-bold font-serif text-lg text-gray-900">{emp.name}</div>
-                                <div className="text-[10px] text-eminence-muted uppercase flex items-center gap-1.5">
+                                <div className="text-[10px] text-jainil-muted uppercase flex items-center gap-1.5">
                                   <span>{emp.role} • {emp.branch}</span>
                                   {isService ? (
                                     <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-100/80 text-emerald-800 font-bold border border-emerald-300">
@@ -13490,7 +13527,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                 type="number"
                                 value={payrollForm.base_salary}
                                 onChange={(e) => setPayrollForm({ ...payrollForm, base_salary: e.target.value })}
-                                className="w-24 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
+                                className="w-24 bg-white border border-jainil-border px-2 py-1 text-sm focus:outline-none"
                               />
                             ) : (
                               "₹" + (emp.base_salary || 0).toLocaleString("en-IN")
@@ -13507,7 +13544,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                   step="0.1"
                                   value={payrollForm.commission_rate}
                                   onChange={(e) => setPayrollForm({ ...payrollForm, commission_rate: e.target.value })}
-                                  className="w-16 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
+                                  className="w-16 bg-white border border-jainil-border px-2 py-1 text-sm focus:outline-none"
                                 />
                                 <span>%</span>
                               </div>
@@ -13525,7 +13562,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                     </button>
                                   )}
                                 </div>
-                                <span className="text-[10px] text-eminence-muted block mt-0.5">
+                                <span className="text-[10px] text-jainil-muted block mt-0.5">
                                   {isService ? "Paid separately (not in salary)" : "Sales Commission"}
                                 </span>
                               </div>
@@ -13535,19 +13572,19 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                           {/* Product Comm */}
                           <td className="px-6 py-4 text-emerald-600 font-serif">
                             ₹{(emp.product_commission || 0).toLocaleString("en-IN")}
-                            <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.product_commission_rate || 0) * 100).toFixed(0)}%)</span>
+                            <span className="text-[10px] ml-1.5 text-jainil-muted font-sans">({((emp.product_commission_rate || 0) * 100).toFixed(0)}%)</span>
                           </td>
 
                           {/* Package Comm */}
                           <td className="px-6 py-4 text-emerald-600 font-serif">
                             ₹{(emp.package_commission || 0).toLocaleString("en-IN")}
-                            <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.package_commission_rate || 0) * 100).toFixed(0)}%)</span>
+                            <span className="text-[10px] ml-1.5 text-jainil-muted font-sans">({((emp.package_commission_rate || 0) * 100).toFixed(0)}%)</span>
                           </td>
 
                           {/* Member Comm */}
                           <td className="px-6 py-4 text-emerald-600 font-serif">
                             ₹{(emp.membership_commission || 0).toLocaleString("en-IN")}
-                            <span className="text-[10px] ml-1.5 text-eminence-muted font-sans">({((emp.membership_commission_rate || 0) * 100).toFixed(0)}%)</span>
+                            <span className="text-[10px] ml-1.5 text-jainil-muted font-sans">({((emp.membership_commission_rate || 0) * 100).toFixed(0)}%)</span>
                           </td>
 
                           <td className="px-6 py-4">
@@ -13558,9 +13595,9 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                     type="number" min="0" max="31"
                                     value={payrollForm.allowed_weekoffs}
                                     onChange={(e) => setPayrollForm({ ...payrollForm, allowed_weekoffs: e.target.value })}
-                                    className="w-16 bg-white border border-eminence-border px-2 py-1 text-sm focus:outline-none"
+                                    className="w-16 bg-white border border-jainil-border px-2 py-1 text-sm focus:outline-none"
                                   />
-                                  <span className="text-[11px] uppercase tracking-widest text-eminence-muted">Weekoffs allowed</span>
+                                  <span className="text-[11px] uppercase tracking-widest text-jainil-muted">Weekoffs allowed</span>
                                 </div>
                               </div>
                             ) : emp.attendance_details ? (
@@ -13586,7 +13623,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                           </td>
 
                           <td className="px-6 py-4 font-serif">
-                            <div className="text-xl text-eminence-gold">₹{emp.total_payout ? Math.round(emp.total_payout).toLocaleString("en-IN") : 0}</div>
+                            <div className="text-xl text-jainil-gold">₹{emp.total_payout ? Math.round(emp.total_payout).toLocaleString("en-IN") : 0}</div>
                             {(emp.attendance_deduction > 0 || emp.late_penalty > 0) && (
                               <div className="text-red-500 text-xs font-bold mt-1">
                                 -₹{Math.round((emp.attendance_deduction || 0) + (emp.late_penalty || 0)).toLocaleString("en-IN")} deduction
@@ -13599,13 +13636,13 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => handleUpdatePayroll(emp.id)}
-                                  className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 bg-eminence-gold text-white hover:bg-black transition-colors"
+                                  className="text-[10px] uppercase tracking-widest border border-jainil-border px-3 py-1 bg-jainil-gold text-white hover:bg-black transition-colors"
                                 >
                                   Save
                                 </button>
                                 <button
                                   onClick={() => setEditingPayroll(null)}
-                                  className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 hover:bg-gray-100 transition-colors"
+                                  className="text-[10px] uppercase tracking-widest border border-jainil-border px-3 py-1 hover:bg-gray-100 transition-colors"
                                 >
                                   Cancel
                                 </button>
@@ -13621,13 +13658,13 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                       allowed_weekoffs: emp.allowed_weekoffs !== undefined ? emp.allowed_weekoffs : 2
                                     });
                                   }}
-                                  className="text-[10px] uppercase tracking-widest text-eminence-muted hover:text-eminence-gold transition-colors"
+                                  className="text-[10px] uppercase tracking-widest text-jainil-muted hover:text-jainil-gold transition-colors"
                                 >
                                   Edit
                                 </button>
                                 <button
                                   onClick={() => toast.success()}
-                                  className="text-[10px] uppercase tracking-widest border border-eminence-border px-3 py-1 hover:bg-eminence-gold hover:text-white transition-colors"
+                                  className="text-[10px] uppercase tracking-widest border border-jainil-border px-3 py-1 hover:bg-jainil-gold hover:text-white transition-colors"
                                 >
                                   Slip
                                 </button>
@@ -13654,7 +13691,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                       <span className={"w-2.5 h-2.5 rounded-full " + (isSales ? "bg-blue-500" : "bg-emerald-500")} />
                                       Daily Sales & Commission Log — {emp.name} ({payrollFilterMonth})
                                     </h4>
-                                    <p className="text-xs text-eminence-muted mt-0.5">
+                                    <p className="text-xs text-jainil-muted mt-0.5">
                                       {isSales
                                         ? "Daily breakdown of sales and performance. Commission is credited and added directly into monthly salary payout."
                                         : "Breakdown of services performed each day. Commission is distributed on a daily basis and excluded from monthly salary payout."}
@@ -13683,7 +13720,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                     </div>
 
                                     <div className="text-right">
-                                      <span className="text-[10px] uppercase font-bold text-eminence-muted block">
+                                      <span className="text-[10px] uppercase font-bold text-jainil-muted block">
                                         {specificDate ? `Commission for ${specificDate}` : "Total Daily Commission Earned"}
                                       </span>
                                       <span className="text-xl font-bold font-serif text-emerald-700">₹{(filteredTotalComm).toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
@@ -13717,7 +13754,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                             </td>
                                             <td className="px-4 py-3 text-gray-700">
                                               <div className="flex flex-wrap gap-2">
-                                                {(dayItem.items || []).map((it, itIdx) => (
+                                                {(dayItem.items || []).filter(it => it.commission > 0).map((it, itIdx) => (
                                                   <span key={itIdx} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100/90 border border-gray-200 text-xs shadow-xs">
                                                     {it.client_name && (
                                                       <span className="font-bold text-gray-900 bg-white px-1.5 py-0.5 rounded border border-gray-200">
@@ -13743,6 +13780,9 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
                                                     )}
                                                   </span>
                                                 ))}
+                                                {(dayItem.items || []).filter(it => it.commission > 0).length === 0 && (
+                                                  <span className="text-gray-400 italic text-[10px] my-auto">No commission items</span>
+                                                )}
                                               </div>
                                             </td>
                                             <td className="px-4 py-3 text-center font-bold text-gray-800">
@@ -13772,7 +13812,7 @@ function EmployeeManager({ defaultSubTab = "sales staff", employees = [], refres
               </table>
               </div>
             )}
-            {!loading && payrollData.length === 0 && <p className="text-center py-20 text-eminence-muted italic text-sm">No payroll records found.</p>}
+            {!loading && payrollData.length === 0 && <p className="text-center py-20 text-jainil-muted italic text-sm">No payroll records found.</p>}
           </div>
         </div>
       )}
@@ -13794,7 +13834,7 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
   const [showEntries, setShowEntries] = useState(10);
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
-  const inputCls = "w-full bg-eminence-surface border border-eminence-border px-3 py-2.5 focus:outline-none focus:border-eminence-gold text-sm rounded-lg transition-colors";
+  const inputCls = "w-full bg-jainil-surface border border-jainil-border px-3 py-2.5 focus:outline-none focus:border-jainil-gold text-sm rounded-lg transition-colors";
 
   const startEdit = (m) => {
     setForm({
@@ -13852,10 +13892,10 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
 
   const DiscountField = ({ label, valueKey, typeKey }) => (
     <div>
-      <label className="text-xs text-eminence-muted block mb-1">{label} <span className="text-rose-500">*</span></label>
+      <label className="text-xs text-jainil-muted block mb-1">{label} <span className="text-rose-500">*</span></label>
       <div className="flex gap-1">
         <input type="number" min={0} value={form[valueKey]} onChange={e => set(valueKey, e.target.value)} className={`${inputCls} flex-1`} placeholder="0" />
-        <select value={form[typeKey]} onChange={e => set(typeKey, e.target.value)} className="bg-eminence-surface border border-eminence-border px-2 py-2 text-xs rounded-lg focus:outline-none focus:border-eminence-gold w-16">
+        <select value={form[typeKey]} onChange={e => set(typeKey, e.target.value)} className="bg-jainil-surface border border-jainil-border px-2 py-2 text-xs rounded-lg focus:outline-none focus:border-jainil-gold w-16">
           <option value="%">%</option>
           <option value="₹">₹</option>
         </select>
@@ -13865,33 +13905,33 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <form onSubmit={submit} className="eminence-card p-8 space-y-6">
+      <form onSubmit={submit} className="jainil-card p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="overline text-eminence-gold">{editingId ? "Edit Membership" : "Create Membership"}</p>
-            {editingId && <p className="text-[10px] text-eminence-muted mt-1">Editing existing membership. Cancel to discard.</p>}
+            <p className="overline text-jainil-gold">{editingId ? "Edit Membership" : "Create Membership"}</p>
+            {editingId && <p className="text-[10px] text-jainil-muted mt-1">Editing existing membership. Cancel to discard.</p>}
           </div>
           {editingId && (
-            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-eminence-muted border border-eminence-border px-4 py-2 rounded-xl hover:bg-eminence-surface transition-colors">Cancel</button>
+            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-jainil-muted border border-jainil-border px-4 py-2 rounded-xl hover:bg-jainil-surface transition-colors">Cancel</button>
           )}
         </div>
 
         {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Membership Type Name <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Membership Type Name <span className="text-rose-500">*</span></label>
             <input type="text" required value={form.name} onChange={e => set("name", e.target.value)} className={inputCls} placeholder="Membership name" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Membership Price <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Membership Price <span className="text-rose-500">*</span></label>
             <input type="number" required min={0} value={form.price} onChange={e => set("price", e.target.value)} className={inputCls} placeholder="Membership price" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Duration (days from purchase) <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Duration (days from purchase) <span className="text-rose-500">*</span></label>
             <input type="number" required min={1} value={form.duration_days} onChange={e => set("duration_days", e.target.value)} className={inputCls} placeholder="0" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Reward Points on Purchase <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Reward Points on Purchase <span className="text-rose-500">*</span></label>
             <input type="number" min={0} value={form.reward_points_on_purchase} onChange={e => set("reward_points_on_purchase", e.target.value)} className={inputCls} placeholder="0" />
           </div>
         </div>
@@ -13902,7 +13942,7 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
           <DiscountField label="Discount on Products" valueKey="discount_on_products" typeKey="discount_on_products_type" />
           <DiscountField label="Discount on Packages" valueKey="discount_on_packages" typeKey="discount_on_packages_type" />
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Reward Points Boost <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Reward Points Boost <span className="text-rose-500">*</span></label>
             <select value={form.reward_points_boost} onChange={e => set("reward_points_boost", e.target.value)} className={inputCls}>
               <option value="1X">1X</option>
               <option value="1.5X">1.5X</option>
@@ -13916,18 +13956,18 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
         {/* Row 3 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Min. Reward Points Earned <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Min. Reward Points Earned <span className="text-rose-500">*</span></label>
             <input type="number" min={0} value={form.min_reward_points_earned} onChange={e => set("min_reward_points_earned", e.target.value)} className={inputCls} placeholder="0" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Condition</label>
+            <label className="text-xs text-jainil-muted block mb-1">Condition</label>
             <select value={form.condition} onChange={e => set("condition", e.target.value)} className={inputCls}>
               <option value="AND">AND</option>
               <option value="OR">OR</option>
             </select>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Min. Billed Amount <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Min. Billed Amount <span className="text-rose-500">*</span></label>
             <input type="number" min={0} value={form.min_billed_amount} onChange={e => set("min_billed_amount", e.target.value)} className={inputCls} placeholder="0" />
           </div>
           <div className="flex justify-end">
@@ -13939,41 +13979,41 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
       </form>
 
       {/* Manage Table */}
-      <div className="eminence-card overflow-hidden">
-        <div className="px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-eminence-border/20">
+      <div className="jainil-card overflow-hidden">
+        <div className="px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-jainil-border/20">
           <p className="overline">Manage Membership ({filtered.length})</p>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-eminence-muted">
+            <div className="flex items-center gap-2 text-xs text-jainil-muted">
               Show
-              <select value={showEntries} onChange={e => setShowEntries(Number(e.target.value))} className="bg-eminence-surface border border-eminence-border px-2 py-1 text-xs rounded">
+              <select value={showEntries} onChange={e => setShowEntries(Number(e.target.value))} className="bg-jainil-surface border border-jainil-border px-2 py-1 text-xs rounded">
                 {[10, 25, 50].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
               entries
             </div>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-muted" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-muted" />
               <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-2 bg-eminence-surface border border-eminence-border text-xs rounded-lg w-48 focus:outline-none focus:border-eminence-gold"
+                className="pl-8 pr-3 py-2 bg-jainil-surface border border-jainil-border text-xs rounded-lg w-48 focus:outline-none focus:border-jainil-gold"
                 placeholder="Search..." />
             </div>
           </div>
         </div>
 
         {displayed.length === 0 ? (
-          <p className="text-center py-16 text-eminence-muted italic text-sm">No data available in table</p>
+          <p className="text-center py-16 text-jainil-muted italic text-sm">No data available in table</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-eminence-border/20 text-left">
+                <tr className="border-b border-jainil-border/20 text-left">
                   {["Membership Name", "Price", "Min. Reward Pts", "Min. Billed", "Disc. Services", "Disc. Products", "Disc. Packages", "Pts Boost", "Pts on Purchase", "Validity", "Action"].map(h => (
-                    <th key={h} className="px-4 py-3 text-[9px] text-eminence-muted uppercase tracking-wider font-bold whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-3 text-[9px] text-jainil-muted uppercase tracking-wider font-bold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {displayed.map(m => (
-                  <tr key={m.id} className="border-b border-eminence-border/10 hover:bg-eminence-surface/30 transition-colors">
+                  <tr key={m.id} className="border-b border-jainil-border/10 hover:bg-jainil-surface/30 transition-colors">
                     <td className="px-4 py-3 font-medium">{m.name}</td>
                     <td className="px-4 py-3 font-serif">₹{Number(m.price || 0).toLocaleString("en-IN")}</td>
                     <td className="px-4 py-3 text-xs">{m.min_reward_points_earned || 0}</td>
@@ -13981,13 +14021,13 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
                     <td className="px-4 py-3 text-xs">{m.discount_on_services || 0}{m.discount_on_services_type || "%"}</td>
                     <td className="px-4 py-3 text-xs">{m.discount_on_products || 0}{m.discount_on_products_type || "%"}</td>
                     <td className="px-4 py-3 text-xs">{m.discount_on_packages || 0}{m.discount_on_packages_type || "%"}</td>
-                    <td className="px-4 py-3 text-xs font-bold text-eminence-gold">{m.reward_points_boost || "1X"}</td>
+                    <td className="px-4 py-3 text-xs font-bold text-jainil-gold">{m.reward_points_boost || "1X"}</td>
                     <td className="px-4 py-3 text-xs">{m.reward_points_on_purchase || 0}</td>
                     <td className="px-4 py-3 text-xs">{m.duration_days || 0} days</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <button type="button" onClick={() => startEdit(m)}
-                          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${editingId === m.id ? "bg-eminence-gold text-white border-eminence-gold" : "border-eminence-gold/40 text-eminence-gold hover:bg-eminence-gold hover:text-white"}`}>
+                          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${editingId === m.id ? "bg-jainil-gold text-white border-jainil-gold" : "border-jainil-gold/40 text-jainil-gold hover:bg-jainil-gold hover:text-white"}`}>
                           {editingId === m.id ? "Editing..." : "Edit"}
                         </button>
                         <button type="button" onClick={() => handleDelete(m.id)}
@@ -14004,9 +14044,9 @@ function AdminMembershipPanel({ memberships, refresh, t }) {
         )}
 
         {filtered.length > showEntries && (
-          <p className="text-center py-4 text-xs text-eminence-muted">
+          <p className="text-center py-4 text-xs text-jainil-muted">
             Showing {displayed.length} of {filtered.length} entries.{" "}
-            <button type="button" onClick={() => setShowEntries(prev => prev + 10)} className="text-eminence-gold hover:underline font-bold">Show more</button>
+            <button type="button" onClick={() => setShowEntries(prev => prev + 10)} className="text-jainil-gold hover:underline font-bold">Show more</button>
           </p>
         )}
       </div>
@@ -14149,64 +14189,64 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
   });
   const displayed = filtered.slice(0, showEntries);
 
-  const inputCls = "w-full bg-eminence-surface border border-eminence-border px-3 py-2.5 focus:outline-none focus:border-eminence-gold text-sm rounded-lg transition-colors";
+  const inputCls = "w-full bg-jainil-surface border border-jainil-border px-3 py-2.5 focus:outline-none focus:border-jainil-gold text-sm rounded-lg transition-colors";
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <form onSubmit={submit} className="eminence-card p-8 space-y-6">
+      <form onSubmit={submit} className="jainil-card p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="overline text-eminence-gold">{editingId ? "Edit Package" : "Create Package"}</p>
-            {editingId && <p className="text-[10px] text-eminence-muted mt-1">Editing existing package. Cancel to discard.</p>}
+            <p className="overline text-jainil-gold">{editingId ? "Edit Package" : "Create Package"}</p>
+            {editingId && <p className="text-[10px] text-jainil-muted mt-1">Editing existing package. Cancel to discard.</p>}
           </div>
           {editingId && (
-            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-eminence-muted border border-eminence-border px-4 py-2 rounded-xl hover:bg-eminence-surface transition-colors">Cancel</button>
+            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-jainil-muted border border-jainil-border px-4 py-2 rounded-xl hover:bg-jainil-surface transition-colors">Cancel</button>
           )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Name of Package <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Name of Package <span className="text-rose-500">*</span></label>
             <input type="text" required value={form.name} onChange={e => set("name", e.target.value)} className={inputCls} placeholder="e.g. Bridal Bliss" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Duration (in days) <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Duration (in days) <span className="text-rose-500">*</span></label>
             <input type="number" required min={1} value={form.duration_days} onChange={e => set("duration_days", e.target.value)} className={inputCls} placeholder="e.g. 30" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Package validity till <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Package validity till <span className="text-rose-500">*</span></label>
             <input type="date" required value={form.valid_till} onChange={e => set("valid_till", e.target.value)} className={inputCls} />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Package price (₹) <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Package price (₹) <span className="text-rose-500">*</span></label>
             <input type="number" required min={0} value={form.price} onChange={e => set("price", e.target.value)} className={inputCls} placeholder="e.g. 5000" />
           </div>
         </div>
 
         <div className="space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-wider text-eminence-gold">Services included in package</p>
-          <div className="overflow-x-auto border border-eminence-border/10 rounded-lg">
+          <p className="text-sm font-semibold uppercase tracking-wider text-jainil-gold">Services included in package</p>
+          <div className="overflow-x-auto border border-jainil-border/10 rounded-lg">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-eminence-surface/50 border-b border-eminence-border/20 text-left">
-                  <th className="px-4 py-3 text-[10px] text-eminence-muted uppercase font-bold">Category</th>
-                  <th className="px-4 py-3 text-[10px] text-eminence-muted uppercase font-bold">Service</th>
-                  <th className="px-4 py-3 text-[10px] text-eminence-muted uppercase font-bold w-24">Quantity</th>
-                  <th className="px-4 py-3 text-[10px] text-eminence-muted uppercase font-bold w-32">Price (Single)</th>
-                  <th className="px-4 py-3 text-[10px] text-eminence-muted uppercase font-bold w-16">Action</th>
+                <tr className="bg-jainil-surface/50 border-b border-jainil-border/20 text-left">
+                  <th className="px-4 py-3 text-[10px] text-jainil-muted uppercase font-bold">Category</th>
+                  <th className="px-4 py-3 text-[10px] text-jainil-muted uppercase font-bold">Service</th>
+                  <th className="px-4 py-3 text-[10px] text-jainil-muted uppercase font-bold w-24">Quantity</th>
+                  <th className="px-4 py-3 text-[10px] text-jainil-muted uppercase font-bold w-32">Price (Single)</th>
+                  <th className="px-4 py-3 text-[10px] text-jainil-muted uppercase font-bold w-16">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-eminence-border/10">
+              <tbody className="divide-y divide-jainil-border/10">
                 {form.services.map((item, index) => {
                   const availableServices = services.filter(s => s.category === item.category);
                   return (
-                    <tr key={index} className="hover:bg-eminence-surface/10 transition-colors">
+                    <tr key={index} className="hover:bg-jainil-surface/10 transition-colors">
                       <td className="px-3 py-2">
                         <select
                           required
                           value={item.category}
                           onChange={e => updateServiceRow(index, "category", e.target.value)}
-                          className="w-full bg-eminence-surface border border-eminence-border/60 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                          className="w-full bg-jainil-surface border border-jainil-border/60 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                         >
                           <option value="">Select Category</option>
                           {categories.map(c => <option key={c} value={c}>{c}</option>)}
@@ -14218,7 +14258,7 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
                           disabled={!item.category}
                           value={item.service_name}
                           onChange={e => updateServiceRow(index, "service_name", e.target.value)}
-                          className="w-full bg-eminence-surface border border-eminence-border/60 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold disabled:opacity-50"
+                          className="w-full bg-jainil-surface border border-jainil-border/60 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold disabled:opacity-50"
                         >
                           <option value="">Select Service</option>
                           {availableServices.map(s => <option key={s.id} value={s.name}>{s.name} (₹{s.price})</option>)}
@@ -14231,7 +14271,7 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
                           min={1}
                           value={item.quantity}
                           onChange={e => updateServiceRow(index, "quantity", e.target.value)}
-                          className="w-full bg-eminence-surface border border-eminence-border/60 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                          className="w-full bg-jainil-surface border border-jainil-border/60 rounded px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                         />
                       </td>
                       <td className="px-3 py-2">
@@ -14239,7 +14279,7 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
                           type="number"
                           readOnly
                           value={item.price}
-                          className="w-full bg-eminence-surface border border-eminence-border/40 rounded px-2 py-1.5 text-xs text-eminence-muted"
+                          className="w-full bg-jainil-surface border border-jainil-border/40 rounded px-2 py-1.5 text-xs text-jainil-muted"
                         />
                       </td>
                       <td className="px-3 py-2 text-center">
@@ -14261,23 +14301,23 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
           <button
             type="button"
             onClick={addServiceRow}
-            className="text-xs font-bold text-eminence-gold hover:text-eminence-gold/80 transition-colors flex items-center gap-1 mt-2"
+            className="text-xs font-bold text-jainil-gold hover:text-jainil-gold/80 transition-colors flex items-center gap-1 mt-2"
           >
             ➕ Add more service
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-eminence-surface/30 p-6 rounded-2xl border border-eminence-border/10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-jainil-surface/30 p-6 rounded-2xl border border-jainil-border/10">
           <div className="space-y-1">
-            <span className="text-xs text-eminence-muted block">Package worth</span>
-            <span className="text-xl font-serif font-semibold text-eminence-text">₹{packageWorth.toLocaleString("en-IN")}</span>
+            <span className="text-xs text-jainil-muted block">Package worth</span>
+            <span className="text-xl font-serif font-semibold text-jainil-text">₹{packageWorth.toLocaleString("en-IN")}</span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-eminence-muted block">Total Savings in INR</span>
+            <span className="text-xs text-jainil-muted block">Total Savings in INR</span>
             <span className="text-xl font-serif font-semibold text-green-600">₹{totalSavingsInr.toLocaleString("en-IN")}</span>
           </div>
           <div className="space-y-1">
-            <span className="text-xs text-eminence-muted block">Total Savings in %</span>
+            <span className="text-xs text-jainil-muted block">Total Savings in %</span>
             <span className="text-xl font-serif font-semibold text-green-600">{totalSavingsPct}%</span>
           </div>
         </div>
@@ -14289,44 +14329,44 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
         </div>
       </form>
 
-      <div className="eminence-card overflow-hidden">
-        <div className="px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-eminence-border/20">
+      <div className="jainil-card overflow-hidden">
+        <div className="px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-jainil-border/20">
           <p className="overline">Manage Packages ({filtered.length})</p>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-eminence-muted">
+            <div className="flex items-center gap-2 text-xs text-jainil-muted">
               Show
-              <select value={showEntries} onChange={e => setShowEntries(Number(e.target.value))} className="bg-eminence-surface border border-eminence-border px-2 py-1 text-xs rounded">
+              <select value={showEntries} onChange={e => setShowEntries(Number(e.target.value))} className="bg-jainil-surface border border-jainil-border px-2 py-1 text-xs rounded">
                 {[10, 25, 50].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
               entries
             </div>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-muted" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-muted" />
               <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-2 bg-eminence-surface border border-eminence-border text-xs rounded-lg w-48 focus:outline-none focus:border-eminence-gold"
+                className="pl-8 pr-3 py-2 bg-jainil-surface border border-jainil-border text-xs rounded-lg w-48 focus:outline-none focus:border-jainil-gold"
                 placeholder="Search..." />
             </div>
           </div>
         </div>
 
         {displayed.length === 0 ? (
-          <p className="text-center py-16 text-eminence-muted italic text-sm">No data available in table</p>
+          <p className="text-center py-16 text-jainil-muted italic text-sm">No data available in table</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-eminence-border/20 text-left">
+                <tr className="border-b border-jainil-border/20 text-left">
                   {["Package", "Duration (In Days)", "Valid upto", "Price", "Manage"].map(h => (
-                    <th key={h} className="px-6 py-4 text-xs text-eminence-muted uppercase tracking-wider font-bold whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-6 py-4 text-xs text-jainil-muted uppercase tracking-wider font-bold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {displayed.map(p => (
-                  <tr key={p.id} className="border-b border-eminence-border/10 hover:bg-eminence-surface/30 transition-colors">
+                  <tr key={p.id} className="border-b border-jainil-border/10 hover:bg-jainil-surface/30 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="font-semibold text-eminence-text">{p.name}</div>
-                      <div className="text-[10px] text-eminence-muted mt-1">
+                      <div className="font-semibold text-jainil-text">{p.name}</div>
+                      <div className="text-[10px] text-jainil-muted mt-1">
                         {p.services?.map((s, idx) => `${s.service_name} (x${s.quantity})`).join(", ")}
                       </div>
                     </td>
@@ -14336,7 +14376,7 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button type="button" onClick={() => startEdit(p)}
-                          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${editingId === p.id ? "bg-eminence-gold text-white border-eminence-gold" : "border-eminence-gold/40 text-eminence-gold hover:bg-eminence-gold hover:text-white"}`}>
+                          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${editingId === p.id ? "bg-jainil-gold text-white border-jainil-gold" : "border-jainil-gold/40 text-jainil-gold hover:bg-jainil-gold hover:text-white"}`}>
                           {editingId === p.id ? "Editing..." : "Edit"}
                         </button>
                         <button type="button" onClick={() => handleDelete(p.id)}
@@ -14353,9 +14393,9 @@ function AdminPackagesPanel({ packages, services, refresh, t }) {
         )}
 
         {filtered.length > showEntries && (
-          <p className="text-center py-4 text-xs text-eminence-muted">
+          <p className="text-center py-4 text-xs text-jainil-muted">
             Showing {displayed.length} of {filtered.length} entries.{" "}
-            <button type="button" onClick={() => setShowEntries(prev => prev + 10)} className="text-eminence-gold hover:underline font-bold">Show more</button>
+            <button type="button" onClick={() => setShowEntries(prev => prev + 10)} className="text-jainil-gold hover:underline font-bold">Show more</button>
           </p>
         )}
       </div>
@@ -14378,7 +14418,7 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
   const existingCategories = [...new Set(services.map(s => s.category).filter(Boolean))].sort();
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
-  const inputCls = "w-full bg-eminence-surface border border-eminence-border px-3 py-2.5 focus:outline-none focus:border-eminence-gold text-sm rounded-lg transition-colors";
+  const inputCls = "w-full bg-jainil-surface border border-jainil-border px-3 py-2.5 focus:outline-none focus:border-jainil-gold text-sm rounded-lg transition-colors";
 
   const startEdit = (svc) => {
     setForm({
@@ -14447,14 +14487,14 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Add Service Form */}
-      <form onSubmit={submit} className="eminence-card p-8 space-y-6">
+      <form onSubmit={submit} className="jainil-card p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="overline text-eminence-gold">{editingId ? "Edit Service" : "Add Service"}</p>
-            {editingId && <p className="text-[10px] text-eminence-muted mt-1">Editing existing service. Cancel to discard changes.</p>}
+            <p className="overline text-jainil-gold">{editingId ? "Edit Service" : "Add Service"}</p>
+            {editingId && <p className="text-[10px] text-jainil-muted mt-1">Editing existing service. Cancel to discard changes.</p>}
           </div>
           {editingId && (
-            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-eminence-muted border border-eminence-border px-4 py-2 rounded-xl hover:bg-eminence-surface transition-colors">
+            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-jainil-muted border border-jainil-border px-4 py-2 rounded-xl hover:bg-jainil-surface transition-colors">
               Cancel
             </button>
           )}
@@ -14463,11 +14503,11 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
         {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Service Name <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Service Name <span className="text-rose-500">*</span></label>
             <input type="text" required value={form.name} onChange={e => set("name", e.target.value)} className={inputCls} placeholder="Service name" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Category <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Category <span className="text-rose-500">*</span></label>
             <SearchableServiceCategorySelect
               value={form.category}
               onChange={(val) => set("category", val)}
@@ -14475,15 +14515,15 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
             />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Duration <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Duration <span className="text-rose-500">*</span></label>
             <input type="number" required min={1} value={form.duration_min} onChange={e => set("duration_min", e.target.value)} className={inputCls} placeholder="In minutes" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Price (Excl. Taxes) <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Price (Excl. Taxes) <span className="text-rose-500">*</span></label>
             <input type="number" required min={0} value={form.price} onChange={e => set("price", e.target.value)} className={inputCls} placeholder="500" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Membership Price <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Membership Price <span className="text-rose-500">*</span></label>
             <input type="number" min={0} value={form.membership_price} onChange={e => set("membership_price", e.target.value)} className={inputCls} placeholder="500" />
           </div>
         </div>
@@ -14491,11 +14531,11 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
         {/* Row 2 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Reward Point(s)</label>
+            <label className="text-xs text-jainil-muted block mb-1">Reward Point(s)</label>
             <input type="number" min={0} value={form.reward_points} onChange={e => set("reward_points", e.target.value)} className={inputCls} placeholder="500" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Service For</label>
+            <label className="text-xs text-jainil-muted block mb-1">Service For</label>
             <select value={form.service_for} onChange={e => set("service_for", e.target.value)} className={inputCls}>
               <option value="Men & Women">Men & Women</option>
               <option value="Men">Men</option>
@@ -14511,46 +14551,46 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
       </form>
 
       {/* Manage Services Table */}
-      <div className="eminence-card overflow-hidden">
-        <div className="px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-eminence-border/20">
+      <div className="jainil-card overflow-hidden">
+        <div className="px-8 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-jainil-border/20">
           <p className="overline">Manage Service(s) ({filtered.length})</p>
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-eminence-muted">
+            <div className="flex items-center gap-2 text-xs text-jainil-muted">
               Show
-              <select value={showEntries} onChange={e => setShowEntries(Number(e.target.value))} className="bg-eminence-surface border border-eminence-border px-2 py-1 text-xs rounded">
+              <select value={showEntries} onChange={e => setShowEntries(Number(e.target.value))} className="bg-jainil-surface border border-jainil-border px-2 py-1 text-xs rounded">
                 {[10, 25, 50, 100].map(n => <option key={n} value={n}>{n}</option>)}
               </select>
               entries
             </div>
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-muted" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-muted" />
               <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-2 bg-eminence-surface border border-eminence-border text-xs rounded-lg w-48 focus:outline-none focus:border-eminence-gold"
+                className="pl-8 pr-3 py-2 bg-jainil-surface border border-jainil-border text-xs rounded-lg w-48 focus:outline-none focus:border-jainil-gold"
                 placeholder="Search..." />
             </div>
           </div>
         </div>
 
         {displayed.length === 0 ? (
-          <p className="text-center py-16 text-eminence-muted italic text-sm">No services found.</p>
+          <p className="text-center py-16 text-jainil-muted italic text-sm">No services found.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-eminence-border/20 text-left">
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Name</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Service For</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Category</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Duration</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Price</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Membership Price</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Reward Point</th>
-                  <th className="px-6 py-4 text-[10px] text-eminence-muted uppercase tracking-wider font-bold">Action</th>
+                <tr className="border-b border-jainil-border/20 text-left">
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Name</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Service For</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Category</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Duration</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Price</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Membership Price</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Reward Point</th>
+                  <th className="px-6 py-4 text-[10px] text-jainil-muted uppercase tracking-wider font-bold">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {displayed.map(svc => (
-                  <tr key={svc.id} className={`border-b border-eminence-border/10 hover:bg-eminence-surface/30 transition-colors ${svc.hide_on_website ? "opacity-50" : ""}`}>
+                  <tr key={svc.id} className={`border-b border-jainil-border/10 hover:bg-jainil-surface/30 transition-colors ${svc.hide_on_website ? "opacity-50" : ""}`}>
                     <td className="px-6 py-4 font-medium">{svc.name}</td>
                     <td className="px-6 py-4 text-xs">{svc.service_for || "Men & Women"}</td>
                     <td className="px-6 py-4 text-xs">{svc.category}</td>
@@ -14561,7 +14601,7 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <button type="button" onClick={() => startEdit(svc)}
-                          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${editingId === svc.id ? "bg-eminence-gold text-white border-eminence-gold" : "border-eminence-gold/40 text-eminence-gold hover:bg-eminence-gold hover:text-white"}`}>
+                          className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 border rounded-lg transition-all ${editingId === svc.id ? "bg-jainil-gold text-white border-jainil-gold" : "border-jainil-gold/40 text-jainil-gold hover:bg-jainil-gold hover:text-white"}`}>
                           {editingId === svc.id ? "Editing..." : "Edit"}
                         </button>
                         <button type="button" onClick={() => handleDelete(svc.id)}
@@ -14578,9 +14618,9 @@ function AdminServicesPanel({ services, refresh, t, isSuperAdmin }) {
         )}
 
         {filtered.length > showEntries && (
-          <p className="text-center py-4 text-xs text-eminence-muted">
+          <p className="text-center py-4 text-xs text-jainil-muted">
             Showing {displayed.length} of {filtered.length} entries.{" "}
-            <button type="button" onClick={() => setShowEntries(prev => prev + 10)} className="text-eminence-gold hover:underline font-bold">Show more</button>
+            <button type="button" onClick={() => setShowEntries(prev => prev + 10)} className="text-jainil-gold hover:underline font-bold">Show more</button>
           </p>
         )}
       </div>
@@ -14620,7 +14660,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
     date_of_birth: "", working_hours_from: "10:00", working_hours_to: "19:00",
     base_salary: "", service_provider_type: "Hair Dresser",
     emergency_contact_number: "", emergency_contact_person: "",
-    address: "", gender: "Male", branch: "Surat",
+    address: "", gender: "Male", branch: "Sama Savli",
     date_of_joining: new Date().toISOString().split("T")[0],
     id_proof_image: "", photo: ""
   };
@@ -14663,7 +14703,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
       emergency_contact_person: emp.emergency_contact_person || "",
       address: emp.address || "",
       gender: emp.gender || "Male",
-      branch: emp.branch || "Surat",
+      branch: emp.branch || "Sama Savli",
       date_of_joining: emp.date_of_joining || "",
       id_proof_image: emp.id_proof_image || "",
       photo: emp.photo || ""
@@ -14753,19 +14793,19 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
   };
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
-  const inputCls = "w-full bg-eminence-surface border border-eminence-border px-3 py-2.5 focus:outline-none focus:border-eminence-gold text-sm rounded-lg transition-colors";
+  const inputCls = "w-full bg-jainil-surface border border-jainil-border px-3 py-2.5 focus:outline-none focus:border-jainil-gold text-sm rounded-lg transition-colors";
 
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Form Card */}
-      <form onSubmit={submit} className="eminence-card p-8 space-y-6">
+      <form onSubmit={submit} className="jainil-card p-8 space-y-6">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <p className="overline text-eminence-gold">{editingId ? "Edit Service Provider" : "Add New Service Provider"}</p>
-            {editingId && <p className="text-[10px] text-eminence-muted mt-1">Leave password blank to keep current password</p>}
+            <p className="overline text-jainil-gold">{editingId ? "Edit Service Provider" : "Add New Service Provider"}</p>
+            {editingId && <p className="text-[10px] text-jainil-muted mt-1">Leave password blank to keep current password</p>}
           </div>
           {editingId && (
-            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-eminence-muted border border-eminence-border px-4 py-2 rounded-xl hover:bg-eminence-surface transition-colors">
+            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-jainil-muted border border-jainil-border px-4 py-2 rounded-xl hover:bg-jainil-surface transition-colors">
               Cancel
             </button>
           )}
@@ -14774,12 +14814,12 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
         {/* Row 1 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Enter Name <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Enter Name <span className="text-rose-500">*</span></label>
             <input type="text" required value={form.name} onChange={e => set("name", e.target.value)} className={inputCls} placeholder="Service provider name" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Service Commission</label>
-            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+            <label className="text-xs text-jainil-muted block mb-1">Service Commission</label>
+            <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
               <select
                 value={form.service_commission_type}
                 onChange={(e) => {
@@ -14793,7 +14833,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                     set("service_commission", "");
                   }
                 }}
-                className="bg-transparent border-r border-eminence-border px-3 py-2.5 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+                className="bg-transparent border-r border-jainil-border px-3 py-2.5 text-sm text-jainil-muted focus:outline-none cursor-pointer hover:bg-black/5"
               >
                 <option value="%">%</option>
                 <option value="₹">₹</option>
@@ -14813,8 +14853,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Product Commission</label>
-            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+            <label className="text-xs text-jainil-muted block mb-1">Product Commission</label>
+            <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
               <select
                 value={form.product_commission_type}
                 onChange={(e) => {
@@ -14828,7 +14868,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                     set("product_commission", "");
                   }
                 }}
-                className="bg-transparent border-r border-eminence-border px-3 py-2.5 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+                className="bg-transparent border-r border-jainil-border px-3 py-2.5 text-sm text-jainil-muted focus:outline-none cursor-pointer hover:bg-black/5"
               >
                 <option value="%">%</option>
                 <option value="₹">₹</option>
@@ -14848,8 +14888,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Package Commission</label>
-            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+            <label className="text-xs text-jainil-muted block mb-1">Package Commission</label>
+            <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
               <select
                 value={form.package_commission_type}
                 onChange={(e) => {
@@ -14863,7 +14903,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                     set("package_commission", "");
                   }
                 }}
-                className="bg-transparent border-r border-eminence-border px-3 py-2.5 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+                className="bg-transparent border-r border-jainil-border px-3 py-2.5 text-sm text-jainil-muted focus:outline-none cursor-pointer hover:bg-black/5"
               >
                 <option value="%">%</option>
                 <option value="₹">₹</option>
@@ -14883,8 +14923,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Member Commission</label>
-            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+            <label className="text-xs text-jainil-muted block mb-1">Member Commission</label>
+            <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
               <select
                 value={form.member_commission_type}
                 onChange={(e) => {
@@ -14898,7 +14938,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                     set("member_commission", "");
                   }
                 }}
-                className="bg-transparent border-r border-eminence-border px-3 py-2.5 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+                className="bg-transparent border-r border-jainil-border px-3 py-2.5 text-sm text-jainil-muted focus:outline-none cursor-pointer hover:bg-black/5"
               >
                 <option value="%">%</option>
                 <option value="₹">₹</option>
@@ -14918,8 +14958,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Wig Fitting Commission</label>
-            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+            <label className="text-xs text-jainil-muted block mb-1">Wig Fitting Commission</label>
+            <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
               <select
                 value={form.wigfitting_commission_type}
                 onChange={(e) => {
@@ -14933,7 +14973,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                     set("wigfitting_commission", "");
                   }
                 }}
-                className="bg-transparent border-r border-eminence-border px-3 py-2.5 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+                className="bg-transparent border-r border-jainil-border px-3 py-2.5 text-sm text-jainil-muted focus:outline-none cursor-pointer hover:bg-black/5"
               >
                 <option value="%">%</option>
                 <option value="₹">₹</option>
@@ -14956,11 +14996,11 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Monthly Target (₹)</label>
+            <label className="text-xs text-jainil-muted block mb-1">Monthly Target (₹)</label>
             <input type="number" min={0} value={form.monthly_target} onChange={e => set("monthly_target", e.target.value)} className={inputCls} placeholder="e.g. 50000" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Date of Birth</label>
+            <label className="text-xs text-jainil-muted block mb-1">Date of Birth</label>
             <input type="date" value={form.date_of_birth} onChange={e => set("date_of_birth", e.target.value)} className={inputCls} />
           </div>
         </div>
@@ -14968,25 +15008,25 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
         {/* Working Hours, Salary, Type, Contacts, Address */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="md:col-span-2 lg:col-span-2">
-            <label className="text-xs text-eminence-muted block mb-1">Working Hours <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Working Hours <span className="text-rose-500">*</span></label>
             <div className="flex gap-2 items-center">
               <input type="time" required value={form.working_hours_from} onChange={e => set("working_hours_from", e.target.value)} className={`${inputCls} flex-1`} />
-              <span className="text-eminence-muted text-xs font-bold">TO</span>
+              <span className="text-jainil-muted text-xs font-bold">TO</span>
               <input type="time" required value={form.working_hours_to} onChange={e => set("working_hours_to", e.target.value)} className={`${inputCls} flex-1`} />
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Monthly Salary <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Monthly Salary <span className="text-rose-500">*</span></label>
             <input type="number" required min={0} value={form.base_salary} onChange={e => set("base_salary", e.target.value)} className={inputCls} placeholder="Monthly salary" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Service Provider Type <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Service Provider Type <span className="text-rose-500">*</span></label>
             <select required value={form.service_provider_type} onChange={e => set("service_provider_type", e.target.value)} className={inputCls}>
               {SERVICE_PROVIDER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-xs text-eminence-muted block">Contact Number <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block">Contact Number <span className="text-rose-500">*</span></label>
             {form.phones.map((p, idx) => (
               <div key={idx} className="flex gap-2 items-center">
                 <input type="text" required={idx === 0} value={p}
@@ -14996,26 +15036,26 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                 />
                 {form.phones.length > 1 && (
                   <button type="button" onClick={() => set("phones", form.phones.filter((_, i) => i !== idx))}
-                    className="text-eminence-muted hover:text-red-500 text-xs px-1">✕</button>
+                    className="text-jainil-muted hover:text-red-500 text-xs px-1">✕</button>
                 )}
               </div>
             ))}
-            <button type="button" onClick={() => set("phones", [...form.phones, ""])} className="text-xs text-eminence-gold hover:underline font-bold">+ Add Number</button>
+            <button type="button" onClick={() => set("phones", [...form.phones, ""])} className="text-xs text-jainil-gold hover:underline font-bold">+ Add Number</button>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Email Address</label>
+            <label className="text-xs text-jainil-muted block mb-1">Email Address</label>
             <input type="email" required value={form.email} onChange={e => set("email", e.target.value)} className={inputCls} placeholder="Email" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Emergency Contact Number</label>
+            <label className="text-xs text-jainil-muted block mb-1">Emergency Contact Number</label>
             <input type="text" value={form.emergency_contact_number} onChange={e => set("emergency_contact_number", e.target.value)} className={inputCls} placeholder="Emergency contact" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Emergency Contact Person</label>
+            <label className="text-xs text-jainil-muted block mb-1">Emergency Contact Person</label>
             <input type="text" value={form.emergency_contact_person} onChange={e => set("emergency_contact_person", e.target.value)} className={inputCls} placeholder="Emergency contact person" />
           </div>
           <div className="md:col-span-2 lg:col-span-4">
-            <label className="text-xs text-eminence-muted block mb-1">Address</label>
+            <label className="text-xs text-jainil-muted block mb-1">Address</label>
             <input type="text" value={form.address} onChange={e => set("address", e.target.value)} className={inputCls} placeholder="Address" />
           </div>
         </div>
@@ -15023,35 +15063,35 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
         {/* Row 4 */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Username</label>
+            <label className="text-xs text-jainil-muted block mb-1">Username</label>
             <input type="text" value={form.username} onChange={e => set("username", e.target.value)} className={inputCls} placeholder="Username" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">{editingId ? "New Password (optional)" : "Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">{editingId ? "New Password (optional)" : "Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
             <input type="password" required={!editingId} value={form.password} onChange={e => set("password", e.target.value)} className={inputCls}
               placeholder={editingId ? "Leave blank to keep current" : "Password"} />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">{editingId ? "Confirm New Password" : "Confirm Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">{editingId ? "Confirm New Password" : "Confirm Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
             <input type="password" required={!editingId} value={form.confirmPassword} onChange={e => set("confirmPassword", e.target.value)} className={inputCls}
               placeholder="Confirm password" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Gender <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Gender <span className="text-rose-500">*</span></label>
             <div className="flex gap-6 items-center h-[42px]">
               {["Male", "Female"].map(g => (
                 <label key={g} className="flex items-center gap-2 cursor-pointer group">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${form.gender === g ? "border-eminence-gold" : "border-eminence-border group-hover:border-eminence-gold/50"}`}>
-                    {form.gender === g && <div className="w-2 h-2 rounded-full bg-eminence-gold" />}
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${form.gender === g ? "border-jainil-gold" : "border-jainil-border group-hover:border-jainil-gold/50"}`}>
+                    {form.gender === g && <div className="w-2 h-2 rounded-full bg-jainil-gold" />}
                   </div>
                   <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={e => set("gender", e.target.value)} className="sr-only" />
-                  <span className={`text-sm ${form.gender === g ? "text-eminence-gold font-bold" : "text-eminence-muted"}`}>{g}</span>
+                  <span className={`text-sm ${form.gender === g ? "text-jainil-gold font-bold" : "text-jainil-muted"}`}>{g}</span>
                 </label>
               ))}
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Branch <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Branch <span className="text-rose-500">*</span></label>
             <select required value={form.branch} onChange={e => set("branch", e.target.value)} className={inputCls}>
               {branches.map(b => {
                 const bName = typeof b === "string" ? b : (b?.name || "Unknown");
@@ -15064,15 +15104,15 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
         {/* Row 5 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Date of Joining <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Date of Joining <span className="text-rose-500">*</span></label>
             <input type="date" required value={form.date_of_joining} onChange={e => set("date_of_joining", e.target.value)} className={inputCls} />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Upload ID Proof</label>
+            <label className="text-xs text-jainil-muted block mb-1">Upload ID Proof</label>
             <ImageUpload value={form.id_proof_image} onChange={val => set("id_proof_image", val)} testId="sp-id-proof" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Upload Photo</label>
+            <label className="text-xs text-jainil-muted block mb-1">Upload Photo</label>
             <ImageUpload value={form.photo} onChange={val => set("photo", val)} testId="sp-photo" />
           </div>
         </div>
@@ -15088,7 +15128,7 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
       <div>
         <p className="overline mb-4">Registered Service Providers ({serviceEmployees.length})</p>
         {serviceEmployees.length === 0 && (
-          <div className="eminence-card p-12 text-center text-eminence-muted italic text-sm">
+          <div className="jainil-card p-12 text-center text-jainil-muted italic text-sm">
             No service providers registered yet. Use the form above to add one.
           </div>
         )}
@@ -15096,13 +15136,13 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
           {serviceEmployees.map(emp => {
             const inactive = emp.is_active === false;
             return (
-              <div key={emp.id} className={`eminence-card p-6 space-y-4 transition-all ${inactive ? "opacity-60 border-red-500/30 bg-red-500/[0.02]" : ""}`}>
+              <div key={emp.id} className={`jainil-card p-6 space-y-4 transition-all ${inactive ? "opacity-60 border-red-500/30 bg-red-500/[0.02]" : ""}`}>
                 {/* Header */}
                 <div className="flex items-start gap-4">
                   {emp.photo ? (
-                    <img src={emp.photo} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-eminence-gold/30" />
+                    <img src={emp.photo} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-jainil-gold/30" />
                   ) : (
-                    <div className="w-14 h-14 rounded-full bg-eminence-surface border-2 border-eminence-border flex items-center justify-center font-bold text-eminence-gold text-lg">
+                    <div className="w-14 h-14 rounded-full bg-jainil-surface border-2 border-jainil-border flex items-center justify-center font-bold text-jainil-gold text-lg">
                       {emp.name ? emp.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "SP"}
                     </div>
                   )}
@@ -15111,50 +15151,50 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                       <h4 className="font-serif text-lg truncate">{emp.name}</h4>
                       {inactive && <span className="text-[9px] uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/25 px-2 py-0.5 rounded font-bold">Inactive</span>}
                     </div>
-                    <p className="text-xs text-eminence-muted truncate">{emp.email}</p>
-                    <p className="text-xs text-eminence-muted">{emp.phone_numbers && emp.phone_numbers.length > 0 ? emp.phone_numbers.join(" / ") : (emp.phone || "No phone")}</p>
+                    <p className="text-xs text-jainil-muted truncate">{emp.email}</p>
+                    <p className="text-xs text-jainil-muted">{emp.phone_numbers && emp.phone_numbers.length > 0 ? emp.phone_numbers.join(" / ") : (emp.phone || "No phone")}</p>
                   </div>
-                  <span className="uppercase text-[10px] tracking-wider text-eminence-gold border border-eminence-gold/40 px-2.5 py-0.5 rounded-full bg-eminence-gold/5 font-bold whitespace-nowrap">
+                  <span className="uppercase text-[10px] tracking-wider text-jainil-gold border border-jainil-gold/40 px-2.5 py-0.5 rounded-full bg-jainil-gold/5 font-bold whitespace-nowrap">
                     {emp.service_provider_type || "Service"}
                   </span>
                 </div>
 
                 {/* Details grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 py-3 border-t border-b border-eminence-border/20 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 py-3 border-t border-b border-jainil-border/20 text-xs">
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Service Comm.</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Service Comm.</span>
                     <span className="font-medium text-emerald-600 font-serif">{emp.commission_rate !== undefined ? `${(emp.commission_rate * 100).toFixed(0)}%` : "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Product Comm.</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Product Comm.</span>
                     <span className="font-medium text-emerald-600 font-serif">{emp.product_commission_rate !== undefined ? `${(emp.product_commission_rate * 100).toFixed(0)}%` : "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Monthly Salary</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Monthly Salary</span>
                     <span className="font-medium font-serif">₹{(emp.base_salary || 0).toLocaleString("en-IN")}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Working Hours</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Working Hours</span>
                     <span className="font-medium">{emp.working_hours_from || "—"} – {emp.working_hours_to || "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Gender</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Gender</span>
                     <span className="font-medium">{emp.gender || "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Joined</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Joined</span>
                     <span className="font-medium">{emp.date_of_joining || (emp.created_at ? new Date(emp.created_at).toLocaleDateString() : "—")}</span>
                   </div>
                 </div>
 
                 {/* Emergency & Address */}
                 {(emp.emergency_contact_number || emp.address) && (
-                  <div className="text-xs bg-eminence-surface/20 p-3 rounded-lg border border-eminence-border/10 space-y-1">
+                  <div className="text-xs bg-jainil-surface/20 p-3 rounded-lg border border-jainil-border/10 space-y-1">
                     {emp.emergency_contact_number && (
-                      <p><span className="text-[9px] text-eminence-muted uppercase font-bold tracking-wider">Emergency:</span> {emp.emergency_contact_person ? `${emp.emergency_contact_person} — ` : ""}{emp.emergency_contact_number}</p>
+                      <p><span className="text-[9px] text-jainil-muted uppercase font-bold tracking-wider">Emergency:</span> {emp.emergency_contact_person ? `${emp.emergency_contact_person} — ` : ""}{emp.emergency_contact_number}</p>
                     )}
                     {emp.address && (
-                      <p><span className="text-[9px] text-eminence-muted uppercase font-bold tracking-wider">Address:</span> {emp.address}</p>
+                      <p><span className="text-[9px] text-jainil-muted uppercase font-bold tracking-wider">Address:</span> {emp.address}</p>
                     )}
                   </div>
                 )}
@@ -15163,8 +15203,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                 <div className="grid grid-cols-2 gap-4">
                   {emp.id_proof_image && (
                     <div>
-                      <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-1">ID Proof</span>
-                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-eminence-border/30">
+                      <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-1">ID Proof</span>
+                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-jainil-border/30">
                         <img src={emp.id_proof_image} alt="ID Proof" className="w-full h-full object-cover transition-transform duration-300 group-hover/doc:scale-105" />
                         <a href={emp.id_proof_image} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover/doc:opacity-100 flex items-center justify-center text-[10px] text-white font-bold transition-opacity">View</a>
                       </div>
@@ -15172,8 +15212,8 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                   )}
                   {emp.photo && (
                     <div>
-                      <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-1">Photo</span>
-                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-eminence-border/30">
+                      <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-1">Photo</span>
+                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-jainil-border/30">
                         <img src={emp.photo} alt="Photo" className="w-full h-full object-cover transition-transform duration-300 group-hover/doc:scale-105" />
                         <a href={emp.photo} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover/doc:opacity-100 flex items-center justify-center text-[10px] text-white font-bold transition-opacity">View</a>
                       </div>
@@ -15182,9 +15222,9 @@ function ServiceProviderPanel({ employees, refresh, t, branches = [] }) {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-2 border-t border-eminence-border/10 flex-wrap gap-2">
+                <div className="flex items-center justify-between pt-2 border-t border-jainil-border/10 flex-wrap gap-2">
                   <button type="button" onClick={() => startEdit(emp)}
-                    className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 border rounded-xl transition-all border-eminence-gold/40 text-eminence-gold hover:bg-eminence-gold hover:text-white ${editingId === emp.id ? "bg-eminence-gold text-white" : ""}`}>
+                    className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 border rounded-xl transition-all border-jainil-gold/40 text-jainil-gold hover:bg-jainil-gold hover:text-white ${editingId === emp.id ? "bg-jainil-gold text-white" : ""}`}>
                     {editingId === emp.id ? "✎ Currently Editing" : "Edit Details"}
                   </button>
                   <div className="flex items-center gap-2">
@@ -15283,25 +15323,25 @@ function AttendanceKiosk({ employees, refresh }) {
   };
 
   return (
-    <div className="eminence-card p-8 max-w-xl mx-auto space-y-6 animate-fade-in bg-white shadow-lg rounded-3xl border border-eminence-border/30">
+    <div className="jainil-card p-8 max-w-xl mx-auto space-y-6 animate-fade-in bg-white shadow-lg rounded-3xl border border-jainil-border/30">
       <div className="text-center">
-        <p className="overline text-eminence-gold">Attendance Verification Kiosk</p>
+        <p className="overline text-jainil-gold">Attendance Verification Kiosk</p>
         <h3 className="font-serif text-2xl text-gray-900 mt-1">Staff Check-in Station</h3>
-        <p className="text-xs text-eminence-muted mt-2">
+        <p className="text-xs text-jainil-muted mt-2">
           Verify and check-in / check-out employees arriving at the salon one by one.
         </p>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="text-xs text-eminence-muted block mb-1 font-bold uppercase tracking-wider">Select Employee</label>
+          <label className="text-xs text-jainil-muted block mb-1 font-bold uppercase tracking-wider">Select Employee</label>
           <select
             value={selectedEmpId}
             onChange={(e) => {
               setSelectedEmpId(e.target.value);
               setImgSrc(null);
             }}
-            className="w-full bg-eminence-surface border border-eminence-border px-3 py-2.5 focus:outline-none focus:border-eminence-gold text-sm rounded-lg"
+            className="w-full bg-jainil-surface border border-jainil-border px-3 py-2.5 focus:outline-none focus:border-jainil-gold text-sm rounded-lg"
           >
             <option value="">-- Choose Employee --</option>
             {employees.filter(e => e.role !== "sales").map(e => (
@@ -15311,30 +15351,30 @@ function AttendanceKiosk({ employees, refresh }) {
         </div>
 
         <div className="flex gap-4">
-          <label className="flex-1 flex items-center justify-center gap-2 border border-eminence-border p-3 rounded-xl cursor-pointer hover:bg-eminence-surface/40 transition-colors">
+          <label className="flex-1 flex items-center justify-center gap-2 border border-jainil-border p-3 rounded-xl cursor-pointer hover:bg-jainil-surface/40 transition-colors">
             <input
               type="radio"
               name="kiosk-type"
               checked={!isCheckout}
               onChange={() => setIsCheckout(false)}
-              className="accent-eminence-gold"
+              className="accent-jainil-gold"
             />
             <span className="text-xs font-bold uppercase tracking-wider text-gray-700">Check-In</span>
           </label>
-          <label className="flex-1 flex items-center justify-center gap-2 border border-eminence-border p-3 rounded-xl cursor-pointer hover:bg-eminence-surface/40 transition-colors">
+          <label className="flex-1 flex items-center justify-center gap-2 border border-jainil-border p-3 rounded-xl cursor-pointer hover:bg-jainil-surface/40 transition-colors">
             <input
               type="radio"
               name="kiosk-type"
               checked={isCheckout}
               onChange={() => setIsCheckout(true)}
-              className="accent-eminence-gold"
+              className="accent-jainil-gold"
             />
             <span className="text-xs font-bold uppercase tracking-wider text-gray-700">Check-Out</span>
           </label>
         </div>
 
         {selectedEmpId && (
-          <div className="relative w-full aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-eminence-border/60 flex items-center justify-center shadow-inner">
+          <div className="relative w-full aspect-square bg-gray-50 rounded-2xl overflow-hidden border border-jainil-border/60 flex items-center justify-center shadow-inner">
             {!imgSrc ? (
               <Webcam
                 audio={false}
@@ -15356,7 +15396,7 @@ function AttendanceKiosk({ employees, refresh }) {
               <button
                 type="button"
                 onClick={capture}
-                className="flex items-center gap-2 bg-eminence-gold text-white px-6 py-2.5 rounded-xl uppercase tracking-widest text-[10px] hover:bg-black transition-colors"
+                className="flex items-center gap-2 bg-jainil-gold text-white px-6 py-2.5 rounded-xl uppercase tracking-widest text-[10px] hover:bg-black transition-colors"
               >
                 <Camera size={14} /> Capture Photo
               </button>
@@ -15365,7 +15405,7 @@ function AttendanceKiosk({ employees, refresh }) {
                 <button
                   type="button"
                   onClick={retake}
-                  className="flex items-center gap-2 border border-eminence-border px-6 py-2.5 rounded-xl uppercase tracking-widest text-[10px] hover:bg-eminence-surface transition-colors"
+                  className="flex items-center gap-2 border border-jainil-border px-6 py-2.5 rounded-xl uppercase tracking-widest text-[10px] hover:bg-jainil-surface transition-colors"
                 >
                   <RefreshCw size={14} /> Retake
                 </button>
@@ -15404,7 +15444,7 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
     address: "", gender: "Male",
     date_of_joining: new Date().toISOString().split("T")[0],
     id_proof_image: "", photo: "",
-    branch: "Surat", section: "Men",
+    branch: "Sama Savli", section: "Men",
     monthly_target: ""
   };
   const [form, setForm] = useState(emptyForm);
@@ -15450,7 +15490,7 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
       date_of_joining: emp.date_of_joining || "",
       id_proof_image: emp.id_proof_image || "",
       photo: emp.photo || "",
-      branch: emp.branch || "Surat",
+      branch: emp.branch || "Sama Savli",
       section: emp.section || "Men",
       monthly_target: emp.monthly_target || ""
     });
@@ -15544,18 +15584,18 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
   };
 
   const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
-  const inputCls = "w-full bg-eminence-surface border border-eminence-border px-3 py-2.5 focus:outline-none focus:border-eminence-gold text-sm rounded-lg transition-colors";
+  const inputCls = "w-full bg-jainil-surface border border-jainil-border px-3 py-2.5 focus:outline-none focus:border-jainil-gold text-sm rounded-lg transition-colors";
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <form onSubmit={submit} className="eminence-card p-8 space-y-6">
+      <form onSubmit={submit} className="jainil-card p-8 space-y-6">
         <div className="flex items-center justify-between mb-2">
           <div>
-            <p className="overline text-eminence-gold">{editingId ? "Edit Sales Staff" : "Add New Sales Staff"}</p>
-            {editingId && <p className="text-[10px] text-eminence-muted mt-1">Leave password blank to keep current password</p>}
+            <p className="overline text-jainil-gold">{editingId ? "Edit Sales Staff" : "Add New Sales Staff"}</p>
+            {editingId && <p className="text-[10px] text-jainil-muted mt-1">Leave password blank to keep current password</p>}
           </div>
           {editingId && (
-            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-eminence-muted border border-eminence-border px-4 py-2 rounded-xl hover:bg-eminence-surface transition-colors">
+            <button type="button" onClick={resetForm} className="text-xs font-bold uppercase tracking-widest text-jainil-muted border border-jainil-border px-4 py-2 rounded-xl hover:bg-jainil-surface transition-colors">
               Cancel
             </button>
           )}
@@ -15563,16 +15603,16 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="md:col-span-2">
-            <label className="text-xs text-eminence-muted block mb-1">Enter Name <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Enter Name <span className="text-rose-500">*</span></label>
             <input type="text" required value={form.name} onChange={e => set("name", e.target.value)} className={inputCls} placeholder="Sales staff name" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Base Commission</label>
-            <div className="flex bg-eminence-surface border border-eminence-border rounded-lg overflow-hidden focus-within:border-eminence-gold transition-colors">
+            <label className="text-xs text-jainil-muted block mb-1">Base Commission</label>
+            <div className="flex bg-jainil-surface border border-jainil-border rounded-lg overflow-hidden focus-within:border-jainil-gold transition-colors">
               <select
                 value={form.commission_type || "%"}
                 onChange={e => set("commission_type", e.target.value)}
-                className="bg-transparent border-r border-eminence-border px-3 py-2 text-sm text-eminence-muted focus:outline-none cursor-pointer hover:bg-black/5"
+                className="bg-transparent border-r border-jainil-border px-3 py-2 text-sm text-jainil-muted focus:outline-none cursor-pointer hover:bg-black/5"
               >
                 <option value="%">%</option>
                 <option value="₹">₹</option>
@@ -15589,14 +15629,14 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Date of Birth</label>
+            <label className="text-xs text-jainil-muted block mb-1">Date of Birth</label>
             <input type="date" value={form.date_of_birth} onChange={e => set("date_of_birth", e.target.value)} className={inputCls} />
           </div>
         </div>
 
         {/* Custom Target & Commission Range Structure (₹ and %) */}
-        <div className="p-5 bg-gradient-to-r from-emerald-500/5 via-eminence-surface to-emerald-500/5 border border-eminence-border/60 rounded-2xl space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-eminence-border/30">
+        <div className="p-5 bg-gradient-to-r from-emerald-500/5 via-jainil-surface to-emerald-500/5 border border-jainil-border/60 rounded-2xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-jainil-border/30">
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-sm text-gray-900">Target-Based Custom Commission Structure</span>
@@ -15604,7 +15644,7 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                   Tiered Slabs (₹ & %)
                 </span>
               </div>
-              <p className="text-xs text-eminence-muted mt-0.5">
+              <p className="text-xs text-jainil-muted mt-0.5">
                 Set multiple sales target milestones (min to max in ₹) and configure commission in fixed ₹ or % percentage.
               </p>
             </div>
@@ -15621,18 +15661,14 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
 
           {form.custom_commission_enabled && (
             <div className="space-y-3 animate-in fade-in duration-200">
-              <div className="grid grid-cols-12 gap-2 text-[11px] font-bold uppercase tracking-wider text-eminence-muted px-2">
-                <div className="col-span-4">Target Range (Min ₹)</div>
-                <div className="col-span-4">Target Range (Max ₹ / Above)</div>
-                <div className="col-span-3">Commission Payout</div>
-                <div className="col-span-1 text-center">Action</div>
-              </div>
-
               {form.commission_slabs.map((slab, sIdx) => (
-                <div key={sIdx} className="grid grid-cols-12 gap-2 items-center bg-white p-2.5 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="col-span-4">
+                <div key={sIdx} className="grid grid-cols-1 sm:grid-cols-10 items-start sm:items-center gap-3 bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm relative w-full">
+                  
+                  {/* Min Target */}
+                  <div className="sm:col-span-3 w-full relative">
+                    <label className="text-[10px] text-jainil-muted font-bold uppercase tracking-wider mb-1.5 block">Min Target (₹)</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">₹</span>
+                      <span className="absolute left-2.5 top-2.5 text-xs text-gray-400 font-bold">₹</span>
                       <input
                         type="number"
                         min={0}
@@ -15642,15 +15678,17 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                           updated[sIdx].min_target = e.target.value;
                           set("commission_slabs", updated);
                         }}
-                        className="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:bg-white focus:outline-none focus:border-emerald-500"
-                        placeholder="From ₹ (e.g. 0)"
+                        className="w-full pl-6 pr-2 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:bg-white focus:outline-none focus:border-emerald-500 transition-colors"
+                        placeholder="0"
                       />
                     </div>
                   </div>
 
-                  <div className="col-span-4">
+                  {/* Max Target */}
+                  <div className="sm:col-span-3 w-full relative">
+                    <label className="text-[10px] text-jainil-muted font-bold uppercase tracking-wider mb-1.5 block">Max Target (₹)</label>
                     <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-gray-400 font-bold">₹</span>
+                      <span className="absolute left-2.5 top-2.5 text-xs text-gray-400 font-bold">₹</span>
                       <input
                         type="number"
                         min={0}
@@ -15660,14 +15698,16 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                           updated[sIdx].max_target = e.target.value;
                           set("commission_slabs", updated);
                         }}
-                        className="w-full pl-7 pr-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:bg-white focus:outline-none focus:border-emerald-500"
-                        placeholder="To ₹ (leave blank for Above)"
+                        className="w-full pl-6 pr-2 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold focus:bg-white focus:outline-none focus:border-emerald-500 transition-colors"
+                        placeholder="Above"
                       />
                     </div>
                   </div>
 
-                  <div className="col-span-3">
-                    <div className="flex bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-emerald-500 focus-within:bg-white">
+                  {/* Payout */}
+                  <div className="sm:col-span-3 w-full relative">
+                    <label className="text-[10px] text-jainil-muted font-bold uppercase tracking-wider mb-1.5 block">Commission</label>
+                    <div className="flex bg-gray-50 border border-gray-200 rounded-lg overflow-hidden focus-within:border-emerald-500 focus-within:bg-white transition-colors">
                       <select
                         value={slab.type || "%"}
                         onChange={e => {
@@ -15678,7 +15718,7 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                         className="bg-gray-100 border-r border-gray-200 px-2 py-2 text-xs font-bold text-gray-700 focus:outline-none cursor-pointer"
                       >
                         <option value="%">%</option>
-                        <option value="₹">₹ (Fixed)</option>
+                        <option value="₹">₹</option>
                       </select>
                       <input
                         type="number"
@@ -15691,20 +15731,21 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                           set("commission_slabs", updated);
                         }}
                         className="w-full px-3 py-2 bg-transparent text-sm font-semibold focus:outline-none"
-                        placeholder={slab.type === "%" ? "e.g. 10%" : "e.g. ₹2000"}
+                        placeholder={slab.type === "%" ? "10%" : "₹2000"}
                       />
                     </div>
                   </div>
 
-                  <div className="col-span-1 flex justify-center">
+                  {/* Action */}
+                  <div className="sm:col-span-1 sm:mt-6 flex justify-end sm:justify-center w-full">
                     {form.commission_slabs.length > 1 && (
                       <button
                         type="button"
                         onClick={() => set("commission_slabs", form.commission_slabs.filter((_, idx) => idx !== sIdx))}
-                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
+                        className="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors border border-transparent hover:border-rose-100"
                         title="Remove slab"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={18} />
                       </button>
                     )}
                   </div>
@@ -15731,29 +15772,29 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="md:col-span-2 lg:col-span-2">
-            <label className="text-xs text-eminence-muted block mb-1">Working Hours <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Working Hours <span className="text-rose-500">*</span></label>
             <div className="flex gap-2 items-center">
               <input type="time" required value={form.working_hours_from} onChange={e => set("working_hours_from", e.target.value)} className={`${inputCls} flex-1`} />
-              <span className="text-eminence-muted text-xs font-bold">TO</span>
+              <span className="text-jainil-muted text-xs font-bold">TO</span>
               <input type="time" required value={form.working_hours_to} onChange={e => set("working_hours_to", e.target.value)} className={`${inputCls} flex-1`} />
             </div>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Monthly Salary <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Monthly Salary <span className="text-rose-500">*</span></label>
             <input type="number" required min={0} value={form.base_salary} onChange={e => set("base_salary", e.target.value)} className={inputCls} placeholder="Monthly salary" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Monthly Target</label>
+            <label className="text-xs text-jainil-muted block mb-1">Monthly Target</label>
             <input type="number" min={0} value={form.monthly_target} onChange={e => set("monthly_target", e.target.value)} className={inputCls} placeholder="Monthly target" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Sales Staff Type <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Sales Staff Type <span className="text-rose-500">*</span></label>
             <select required value={form.sales_staff_type} onChange={e => set("sales_staff_type", e.target.value)} className={inputCls}>
               {SALES_STAFF_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
           <div className="space-y-2">
-            <label className="text-xs text-eminence-muted block">Contact Number <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block">Contact Number <span className="text-rose-500">*</span></label>
             {form.phones.map((p, idx) => (
               <div key={idx} className="flex gap-2 items-center">
                 <input type="text" required={idx === 0} value={p}
@@ -15763,26 +15804,26 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                 />
                 {form.phones.length > 1 && (
                   <button type="button" onClick={() => set("phones", form.phones.filter((_, i) => i !== idx))}
-                    className="text-eminence-muted hover:text-red-500 text-xs px-1">✕</button>
+                    className="text-jainil-muted hover:text-red-500 text-xs px-1">✕</button>
                 )}
               </div>
             ))}
-            <button type="button" onClick={() => set("phones", [...form.phones, ""])} className="text-xs text-eminence-gold hover:underline font-bold">+ Add Number</button>
+            <button type="button" onClick={() => set("phones", [...form.phones, ""])} className="text-xs text-jainil-gold hover:underline font-bold">+ Add Number</button>
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Email Address</label>
+            <label className="text-xs text-jainil-muted block mb-1">Email Address</label>
             <input type="email" required value={form.email} onChange={e => set("email", e.target.value)} className={inputCls} placeholder="Email" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Emergency Contact Number</label>
+            <label className="text-xs text-jainil-muted block mb-1">Emergency Contact Number</label>
             <input type="text" value={form.emergency_contact_number} onChange={e => set("emergency_contact_number", e.target.value)} className={inputCls} placeholder="Emergency contact" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Emergency Contact Person</label>
+            <label className="text-xs text-jainil-muted block mb-1">Emergency Contact Person</label>
             <input type="text" value={form.emergency_contact_person} onChange={e => set("emergency_contact_person", e.target.value)} className={inputCls} placeholder="Emergency contact person" />
           </div>
           <div className="md:col-span-2 lg:col-span-2">
-            <label className="text-xs text-eminence-muted block mb-1">Branch <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Branch <span className="text-rose-500">*</span></label>
             <select required value={form.branch} onChange={e => set("branch", e.target.value)} className={inputCls}>
               {branches.map(b => {
                 const bName = typeof b === "string" ? b : (b?.name || "Unknown");
@@ -15791,43 +15832,43 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
             </select>
           </div>
           <div className="md:col-span-2 lg:col-span-2">
-            <label className="text-xs text-eminence-muted block mb-1">Section <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Section <span className="text-rose-500">*</span></label>
             <select required value={form.section} onChange={e => set("section", e.target.value)} className={inputCls}>
               <option value="Men">Men</option>
               <option value="Female">Female</option>
             </select>
           </div>
           <div className="md:col-span-2 lg:col-span-4">
-            <label className="text-xs text-eminence-muted block mb-1">Address</label>
+            <label className="text-xs text-jainil-muted block mb-1">Address</label>
             <input type="text" value={form.address} onChange={e => set("address", e.target.value)} className={inputCls} placeholder="Address" />
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Username</label>
+            <label className="text-xs text-jainil-muted block mb-1">Username</label>
             <input type="text" value={form.username} onChange={e => set("username", e.target.value)} className={inputCls} placeholder="Username" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">{editingId ? "New Password (optional)" : "Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">{editingId ? "New Password (optional)" : "Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
             <input type="password" required={!editingId} value={form.password} onChange={e => set("password", e.target.value)} className={inputCls}
               placeholder={editingId ? "Leave blank to keep current" : "Password"} />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">{editingId ? "Confirm New Password" : "Confirm Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">{editingId ? "Confirm New Password" : "Confirm Password"} <span className="text-rose-500">{editingId ? "" : "*"}</span></label>
             <input type="password" required={!editingId} value={form.confirmPassword} onChange={e => set("confirmPassword", e.target.value)} className={inputCls}
               placeholder="Confirm password" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Gender <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Gender <span className="text-rose-500">*</span></label>
             <div className="flex gap-6 items-center h-[42px]">
               {["Male", "Female"].map(g => (
                 <label key={g} className="flex items-center gap-2 cursor-pointer group">
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${form.gender === g ? "border-eminence-gold" : "border-eminence-border group-hover:border-eminence-gold/50"}`}>
-                    {form.gender === g && <div className="w-2 h-2 rounded-full bg-eminence-gold" />}
+                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all ${form.gender === g ? "border-jainil-gold" : "border-jainil-border group-hover:border-jainil-gold/50"}`}>
+                    {form.gender === g && <div className="w-2 h-2 rounded-full bg-jainil-gold" />}
                   </div>
                   <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={e => set("gender", e.target.value)} className="sr-only" />
-                  <span className={`text-sm ${form.gender === g ? "text-eminence-gold font-bold" : "text-eminence-muted"}`}>{g}</span>
+                  <span className={`text-sm ${form.gender === g ? "text-jainil-gold font-bold" : "text-jainil-muted"}`}>{g}</span>
                 </label>
               ))}
             </div>
@@ -15836,15 +15877,15 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Date of Joining <span className="text-rose-500">*</span></label>
+            <label className="text-xs text-jainil-muted block mb-1">Date of Joining <span className="text-rose-500">*</span></label>
             <input type="date" required value={form.date_of_joining} onChange={e => set("date_of_joining", e.target.value)} className={inputCls} />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Upload ID Proof</label>
+            <label className="text-xs text-jainil-muted block mb-1">Upload ID Proof</label>
             <ImageUpload value={form.id_proof_image} onChange={val => set("id_proof_image", val)} testId="ss-id-proof" />
           </div>
           <div>
-            <label className="text-xs text-eminence-muted block mb-1">Upload Photo</label>
+            <label className="text-xs text-jainil-muted block mb-1">Upload Photo</label>
             <ImageUpload value={form.photo} onChange={val => set("photo", val)} testId="ss-photo" />
           </div>
         </div>
@@ -15859,7 +15900,7 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
       <div>
         <p className="overline mb-4">Registered Sales Staff ({salesEmployees.length})</p>
         {salesEmployees.length === 0 && (
-          <div className="eminence-card p-12 text-center text-eminence-muted italic text-sm">
+          <div className="jainil-card p-12 text-center text-jainil-muted italic text-sm">
             No sales staff registered yet. Use the form above to add one.
           </div>
         )}
@@ -15867,12 +15908,12 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
           {salesEmployees.map(emp => {
             const inactive = emp.is_active === false;
             return (
-              <div key={emp.id} className={`eminence-card p-6 space-y-4 transition-all ${inactive ? "opacity-60 border-red-500/30 bg-red-500/[0.02]" : ""}`}>
+              <div key={emp.id} className={`jainil-card p-6 space-y-4 transition-all ${inactive ? "opacity-60 border-red-500/30 bg-red-500/[0.02]" : ""}`}>
                 <div className="flex items-start gap-4">
                   {emp.photo ? (
-                    <img src={emp.photo} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-eminence-gold/30" />
+                    <img src={emp.photo} alt="" className="w-14 h-14 rounded-full object-cover border-2 border-jainil-gold/30" />
                   ) : (
-                    <div className="w-14 h-14 rounded-full bg-eminence-surface border-2 border-eminence-border flex items-center justify-center font-bold text-eminence-gold text-lg">
+                    <div className="w-14 h-14 rounded-full bg-jainil-surface border-2 border-jainil-border flex items-center justify-center font-bold text-jainil-gold text-lg">
                       {emp.name ? emp.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2) : "SS"}
                     </div>
                   )}
@@ -15881,49 +15922,49 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                       <h4 className="font-serif text-lg truncate">{emp.name}</h4>
                       {inactive && <span className="text-[9px] uppercase tracking-wider bg-rose-500/10 text-rose-500 border border-rose-500/25 px-2 py-0.5 rounded font-bold">Inactive</span>}
                     </div>
-                    <p className="text-xs text-eminence-muted truncate">{emp.email}</p>
-                    <p className="text-xs text-eminence-muted">{emp.phone_numbers && emp.phone_numbers.length > 0 ? emp.phone_numbers.join(" / ") : (emp.phone || "No phone")}</p>
+                    <p className="text-xs text-jainil-muted truncate">{emp.email}</p>
+                    <p className="text-xs text-jainil-muted">{emp.phone_numbers && emp.phone_numbers.length > 0 ? emp.phone_numbers.join(" / ") : (emp.phone || "No phone")}</p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <span className="uppercase text-[10px] tracking-wider text-eminence-gold border border-eminence-gold/40 px-2.5 py-0.5 rounded-full bg-eminence-gold/5 font-bold whitespace-nowrap">
+                    <span className="uppercase text-[10px] tracking-wider text-jainil-gold border border-jainil-gold/40 px-2.5 py-0.5 rounded-full bg-jainil-gold/5 font-bold whitespace-nowrap">
                       {emp.service_provider_type || "Sales"}
                     </span>
-                    <span className="text-[10px] font-medium text-eminence-muted">
+                    <span className="text-[10px] font-medium text-jainil-muted">
                       {emp.branch} {emp.section ? `• ${emp.section}` : ""}
                     </span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 py-3 border-t border-b border-eminence-border/20 text-xs">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 py-3 border-t border-b border-jainil-border/20 text-xs">
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Commission</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Commission</span>
                     <span className="font-medium text-emerald-600 font-serif">{emp.commission_rate !== undefined ? `${(emp.commission_rate * 100).toFixed(0)}%` : "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Monthly Salary</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Monthly Salary</span>
                     <span className="font-medium font-serif">₹{(emp.base_salary || 0).toLocaleString("en-IN")}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Working Hours</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Working Hours</span>
                     <span className="font-medium">{emp.working_hours_from || "—"} – {emp.working_hours_to || "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Gender</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Gender</span>
                     <span className="font-medium">{emp.gender || "—"}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-0.5">Joined</span>
+                    <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-0.5">Joined</span>
                     <span className="font-medium">{emp.date_of_joining || (emp.created_at ? new Date(emp.created_at).toLocaleDateString() : "—")}</span>
                   </div>
                 </div>
 
                 {(emp.emergency_contact_number || emp.address) && (
-                  <div className="text-xs bg-eminence-surface/20 p-3 rounded-lg border border-eminence-border/10 space-y-1">
+                  <div className="text-xs bg-jainil-surface/20 p-3 rounded-lg border border-jainil-border/10 space-y-1">
                     {emp.emergency_contact_number && (
-                      <p><span className="text-[9px] text-eminence-muted uppercase font-bold tracking-wider">Emergency:</span> {emp.emergency_contact_person ? `${emp.emergency_contact_person} — ` : ""}{emp.emergency_contact_number}</p>
+                      <p><span className="text-[9px] text-jainil-muted uppercase font-bold tracking-wider">Emergency:</span> {emp.emergency_contact_person ? `${emp.emergency_contact_person} — ` : ""}{emp.emergency_contact_number}</p>
                     )}
                     {emp.address && (
-                      <p><span className="text-[9px] text-eminence-muted uppercase font-bold tracking-wider">Address:</span> {emp.address}</p>
+                      <p><span className="text-[9px] text-jainil-muted uppercase font-bold tracking-wider">Address:</span> {emp.address}</p>
                     )}
                   </div>
                 )}
@@ -15931,8 +15972,8 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                 <div className="grid grid-cols-2 gap-4">
                   {emp.id_proof_image && (
                     <div>
-                      <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-1">ID Proof</span>
-                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-eminence-border/30">
+                      <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-1">ID Proof</span>
+                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-jainil-border/30">
                         <img src={emp.id_proof_image} alt="ID Proof" className="w-full h-full object-cover transition-transform duration-300 group-hover/doc:scale-105" />
                         <a href={emp.id_proof_image} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover/doc:opacity-100 flex items-center justify-center text-[10px] text-white font-bold transition-opacity">View</a>
                       </div>
@@ -15940,8 +15981,8 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                   )}
                   {emp.photo && (
                     <div>
-                      <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block mb-1">Photo</span>
-                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-eminence-border/30">
+                      <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block mb-1">Photo</span>
+                      <div className="relative group/doc w-24 h-16 overflow-hidden rounded-lg border border-jainil-border/30">
                         <img src={emp.photo} alt="Photo" className="w-full h-full object-cover transition-transform duration-300 group-hover/doc:scale-105" />
                         <a href={emp.photo} target="_blank" rel="noreferrer" className="absolute inset-0 bg-black/40 opacity-0 group-hover/doc:opacity-100 flex items-center justify-center text-[10px] text-white font-bold transition-opacity">View</a>
                       </div>
@@ -15949,9 +15990,9 @@ function SalesStaffPanel({ employees, refresh, t, branches = [] }) {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-eminence-border/10 flex-wrap gap-2">
+                <div className="flex items-center justify-between pt-2 border-t border-jainil-border/10 flex-wrap gap-2">
                   <button type="button" onClick={() => startEdit(emp)}
-                    className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 border rounded-xl transition-all border-eminence-gold/40 text-eminence-gold hover:bg-eminence-gold hover:text-white ${editingId === emp.id ? "bg-eminence-gold text-white" : ""}`}>
+                    className={`text-[10px] font-bold uppercase tracking-widest px-4 py-2 border rounded-xl transition-all border-jainil-gold/40 text-jainil-gold hover:bg-jainil-gold hover:text-white ${editingId === emp.id ? "bg-jainil-gold text-white" : ""}`}>
                     {editingId === emp.id ? "✎ Currently Editing" : "Edit Details"}
                   </button>
                   <div className="flex items-center gap-2">
@@ -16082,34 +16123,34 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
   return (
     <div className="space-y-6">
       {/* Gallery Media Manager Accordion */}
-      <div className="eminence-card bg-white border border-eminence-border rounded-xl overflow-hidden shadow-sm">
+      <div className="jainil-card bg-white border border-jainil-border rounded-xl overflow-hidden shadow-sm">
         <div
           onClick={() => setIsMediaManagerExpanded(!isMediaManagerExpanded)}
           className="p-5 flex items-center justify-between cursor-pointer hover:bg-gray-50/50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-eminence-gold/10 flex items-center justify-center text-eminence-gold">
+            <div className="w-10 h-10 rounded-full bg-jainil-gold/10 flex items-center justify-center text-jainil-gold">
               <ShoppingBag size={18} />
             </div>
             <div>
               <h3 className="font-serif text-lg text-gray-800">Consultation Form Gallery Media</h3>
-              <p className="text-xs text-eminence-muted">Manage the photos and videos shown in the client-facing consultation form.</p>
+              <p className="text-xs text-jainil-muted">Manage the photos and videos shown in the client-facing consultation form.</p>
             </div>
           </div>
-          <button className="text-xs uppercase tracking-widest text-eminence-gold font-bold flex items-center gap-1">
+          <button className="text-xs uppercase tracking-widest text-jainil-gold font-bold flex items-center gap-1">
             {isMediaManagerExpanded ? "Collapse" : "Manage Media"}
             {isMediaManagerExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
         </div>
 
         {isMediaManagerExpanded && (
-          <div className="border-t border-eminence-border/50 bg-gray-50/30 p-6 space-y-6 animate-in slide-in-from-top-2">
+          <div className="border-t border-jainil-border/50 bg-gray-50/30 p-6 space-y-6 animate-in slide-in-from-top-2">
             {/* Photos */}
             <div>
-              <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold">Photos ({images.length})</p>
+              <p className="text-xs uppercase tracking-widest text-jainil-muted mb-3 font-bold">Photos ({images.length})</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
                 {images.map((src, idx) => (
-                  <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-eminence-border/40 bg-white">
+                  <div key={idx} className="relative aspect-square rounded-xl overflow-hidden border border-jainil-border/40 bg-white">
                     <img src={src.startsWith("http") || src.startsWith("blob:") || src.startsWith("data:") ? src : `${api.defaults.baseURL?.replace(/\/api$/, "") || ""}${src.startsWith("/") ? "" : "/"}${src}`} alt="" className="w-full h-full object-cover" />
                     <button
                       type="button"
@@ -16121,8 +16162,8 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </div>
                 ))}
               </div>
-              <div className="bg-white p-4 border border-dashed border-eminence-border/60 rounded-xl">
-                <p className="text-[10px] font-bold text-eminence-muted uppercase mb-1.5">Add Photo Link / File</p>
+              <div className="bg-white p-4 border border-dashed border-jainil-border/60 rounded-xl">
+                <p className="text-[10px] font-bold text-jainil-muted uppercase mb-1.5">Add Photo Link / File</p>
                 <ImageUpload
                   value=""
                   onChange={(url) => {
@@ -16137,10 +16178,10 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
 
             {/* Videos */}
             <div>
-              <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold">Videos ({videos.length})</p>
+              <p className="text-xs uppercase tracking-widest text-jainil-muted mb-3 font-bold">Videos ({videos.length})</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-4">
                 {videos.map((src, idx) => (
-                  <div key={idx} className="relative aspect-video rounded-xl overflow-hidden border border-eminence-border/40 bg-black">
+                  <div key={idx} className="relative aspect-video rounded-xl overflow-hidden border border-jainil-border/40 bg-black">
                     <video src={src.startsWith("http") || src.startsWith("blob:") || src.startsWith("data:") ? src : `${api.defaults.baseURL?.replace(/\/api$/, "") || ""}${src.startsWith("/") ? "" : "/"}${src}`} className="w-full h-full object-cover" muted />
                     <button
                       type="button"
@@ -16152,8 +16193,8 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </div>
                 ))}
               </div>
-              <div className="bg-white p-4 border border-dashed border-eminence-border/60 rounded-xl">
-                <p className="text-[10px] font-bold text-eminence-muted uppercase mb-1.5">Add Video Link / File</p>
+              <div className="bg-white p-4 border border-dashed border-jainil-border/60 rounded-xl">
+                <p className="text-[10px] font-bold text-jainil-muted uppercase mb-1.5">Add Video Link / File</p>
                 <ImageUpload
                   value=""
                   onChange={(url) => {
@@ -16166,12 +16207,12 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
               </div>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-eminence-border/40">
+            <div className="flex justify-end pt-2 border-t border-jainil-border/40">
               <button
                 type="button"
                 disabled={saving}
                 onClick={handleSave}
-                className="px-6 py-3 bg-eminence-gold hover:bg-eminence-gold/90 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-md transition-all hover:scale-[1.02] disabled:opacity-50"
+                className="px-6 py-3 bg-jainil-gold hover:bg-jainil-gold/90 text-white font-bold text-xs uppercase tracking-widest rounded-lg shadow-md transition-all hover:scale-[1.02] disabled:opacity-50"
               >
                 {saving ? "Saving..." : "Save Gallery Changes"}
               </button>
@@ -16181,10 +16222,10 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
       </div>
 
       {/* Consultancy Records Filter Section */}
-      <div className="eminence-card bg-white p-5 border border-eminence-border rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div className="jainil-card bg-white p-5 border border-jainil-border rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div>
           <h3 className="font-serif text-lg text-gray-800">Consultation Records</h3>
-          <p className="text-xs text-eminence-muted">List of styling and diagnostic consult forms filled by users.</p>
+          <p className="text-xs text-jainil-muted">List of styling and diagnostic consult forms filled by users.</p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           {/* Search by client name or phone */}
@@ -16195,7 +16236,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search by client name or phone..."
-              className="w-full pl-9 pr-8 py-1.5 bg-eminence-surface border border-eminence-border rounded-lg text-xs text-gray-700 focus:outline-none focus:border-eminence-gold transition-colors"
+              className="w-full pl-9 pr-8 py-1.5 bg-jainil-surface border border-jainil-border rounded-lg text-xs text-gray-700 focus:outline-none focus:border-jainil-gold transition-colors"
             />
             {searchQuery && (
               <button
@@ -16212,7 +16253,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
             <select
               value={selectedSalesPerson}
               onChange={e => setSelectedSalesPerson(e.target.value)}
-              className="bg-eminence-surface border border-eminence-border rounded-lg px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-eminence-gold"
+              className="bg-jainil-surface border border-jainil-border rounded-lg px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-jainil-gold"
             >
               <option value="">All Salespersons</option>
               {salesPersons.map(sp => (
@@ -16225,43 +16266,43 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
 
       <div className="space-y-4">
         {filteredConsultations.map((c) => (
-          <div key={c.id} className="eminence-card bg-white border border-eminence-border rounded-lg overflow-hidden transition-all duration-300">
+          <div key={c.id} className="jainil-card bg-white border border-jainil-border rounded-lg overflow-hidden transition-all duration-300">
             <div className="p-5 flex flex-wrap lg:flex-nowrap items-center justify-between gap-4">
 
               <div className="flex items-center gap-4 min-w-[250px]">
-                <div className="w-10 h-10 rounded-full bg-eminence-gold/10 flex items-center justify-center text-eminence-gold">
+                <div className="w-10 h-10 rounded-full bg-jainil-gold/10 flex items-center justify-center text-jainil-gold">
                   <User size={18} />
                 </div>
                 <div>
                   <p className="font-serif text-lg leading-tight text-gray-800">{c.name}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <Phone size={12} className="text-eminence-muted" />
-                    <span className="text-xs text-eminence-muted">{c.phone}</span>
+                    <Phone size={12} className="text-jainil-muted" />
+                    <span className="text-xs text-jainil-muted">{c.phone}</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-4 flex-1">
                 <div className="min-w-[100px]">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Date</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Date</p>
                   <p className="text-sm font-medium text-gray-800">{c.date || "N/A"}</p>
                 </div>
 
                 <div className="min-w-[90px]">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Location</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Location</p>
                   <p className="text-sm font-medium flex items-center gap-1 text-gray-800">
-                    <MapPin size={12} className="text-eminence-gold shrink-0" />
+                    <MapPin size={12} className="text-jainil-gold shrink-0" />
                     {c.location || "N/A"}
                   </p>
                 </div>
 
                 <div className="min-w-[130px]">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Consulted By</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Consulted By</p>
                   <p className="text-sm font-medium text-gray-800">{c.consulted_by || "Unknown"}</p>
                 </div>
 
                 <div className="min-w-[90px]">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-1">Status</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-1">Status</p>
                   <span className={`text-xs uppercase tracking-wider font-bold px-2.5 py-1 rounded-full border ${c.status === "Closed"
                     ? "text-red-600 bg-red-50 border-red-100"
                     : c.status === "HOT" || c.status === "hot"
@@ -16283,7 +16324,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                     setEditingConsultation(c);
                     setEditForm({ ...c });
                   }}
-                  className="text-xs uppercase tracking-widest text-eminence-gold hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-eminence-border rounded-full hover:bg-gray-50"
+                  className="text-xs uppercase tracking-widest text-jainil-gold hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-jainil-border rounded-full hover:bg-gray-50"
                 >
                   <Edit size={12} />
                   Edit
@@ -16333,7 +16374,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
 
                 <button
                   onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
-                  className="text-xs uppercase tracking-widest text-eminence-gold hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-eminence-border rounded-full hover:bg-gray-50"
+                  className="text-xs uppercase tracking-widest text-jainil-gold hover:text-black transition-colors flex items-center gap-1 px-4 py-2 border border-jainil-border rounded-full hover:bg-gray-50"
                 >
                   {expandedId === c.id ? "Hide Details" : "View Details"}
                   {expandedId === c.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
@@ -16343,27 +16384,27 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
 
             {/* Expanded Details Section */}
             {expandedId === c.id && (
-              <div className="border-t border-eminence-border/50 bg-gray-50/50 p-6 animate-in slide-in-from-top-2">
+              <div className="border-t border-jainil-border/50 bg-gray-50/50 p-6 animate-in slide-in-from-top-2">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Expected Look</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Expected Look</h4>
                       <p className="text-sm text-gray-700">{c.expected_look || "Not Specified"}</p>
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Lifestyle</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Lifestyle</h4>
                       <p className="text-sm text-gray-700">{c.lifestyle || "Not Specified"}</p>
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Reason for Visit</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Reason for Visit</h4>
                       <p className="text-sm text-gray-700">{c.reason || "Not Specified"}</p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Past Treatments</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Past Treatments</h4>
                       {c.past_treatments && c.past_treatments.length > 0 ? (
                         <ul className="list-disc pl-4 text-sm text-gray-700">
                           {c.past_treatments.map((pt, i) => <li key={i}>{pt}</li>)}
@@ -16371,7 +16412,7 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                       ) : <p className="text-sm text-gray-500 italic">None reported</p>}
                     </div>
                     <div>
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-gold mb-1">Additional Queries</h4>
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-gold mb-1">Additional Queries</h4>
                       {c.additional_questions && c.additional_questions.length > 0 ? (
                         <ul className="list-disc pl-4 text-sm text-gray-700">
                           {c.additional_questions.map((aq, i) => <li key={i}>{aq}</li>)}
@@ -16381,28 +16422,28 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </div>
 
                   <div className="space-y-4">
-                    <div className="bg-white p-4 border border-eminence-border rounded shadow-sm">
-                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-eminence-muted mb-2 border-b border-eminence-border pb-1">Internal Details</h4>
+                    <div className="bg-white p-4 border border-jainil-border rounded shadow-sm">
+                      <h4 className="text-[10px] uppercase font-bold tracking-widest text-jainil-muted mb-2 border-b border-jainil-border pb-1">Internal Details</h4>
                       <div className="space-y-2 mt-2">
                         <div className="flex justify-between">
-                          <span className="text-xs text-eminence-muted">Budget Range:</span>
+                          <span className="text-xs text-jainil-muted">Budget Range:</span>
                           <span className="text-xs font-bold">{c.budget_range || "N/A"}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-xs text-eminence-muted">Expected Rev:</span>
+                          <span className="text-xs text-jainil-muted">Expected Rev:</span>
                           <span className="text-xs font-bold text-emerald-600">₹{c.revenue || 0}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-xs text-eminence-muted">Source:</span>
+                          <span className="text-xs text-jainil-muted">Source:</span>
                           <span className="text-xs font-bold">{c.source || "N/A"}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-xs text-eminence-muted">Size / Color:</span>
+                          <span className="text-xs text-jainil-muted">Size / Color:</span>
                           <span className="text-xs font-bold">{c.size_color || "N/A"}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-xs text-eminence-muted">Follow Up:</span>
-                          <span className="text-xs font-bold text-eminence-gold">{c.follow_up_date || "None"}</span>
+                          <span className="text-xs text-jainil-muted">Follow Up:</span>
+                          <span className="text-xs font-bold text-jainil-gold">{c.follow_up_date || "None"}</span>
                         </div>
                       </div>
                     </div>
@@ -16425,11 +16466,11 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
       </div>
 
       {filteredConsultations.length === 0 && (
-        <div className="py-20 text-center text-eminence-muted bg-white rounded-xl border border-dashed border-eminence-border/60">
+        <div className="py-20 text-center text-jainil-muted bg-white rounded-xl border border-dashed border-jainil-border/60">
           <User className="mx-auto mb-2 text-gray-300" size={32} />
           <p className="font-semibold text-gray-700">No consultation records match your filter.</p>
           {searchQuery && (
-            <p className="text-xs text-eminence-muted mt-1">Try clearing your search: "{searchQuery}"</p>
+            <p className="text-xs text-jainil-muted mt-1">Try clearing your search: "{searchQuery}"</p>
           )}
         </div>
       )}
@@ -16438,10 +16479,10 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
       {editingConsultation && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
-            <div className="p-6 bg-eminence-surface border-b border-gray-100 flex justify-between items-center shrink-0">
+            <div className="p-6 bg-jainil-surface border-b border-gray-100 flex justify-between items-center shrink-0">
               <div>
                 <h4 className="font-serif text-2xl text-gray-900">Edit Consultation Record</h4>
-                <p className="text-xs text-eminence-muted">Updating record for {editingConsultation.name}</p>
+                <p className="text-xs text-jainil-muted">Updating record for {editingConsultation.name}</p>
               </div>
               <button onClick={() => setEditingConsultation(null)} className="p-2 hover:bg-gray-100 rounded-full"><X size={18} /></button>
             </div>
@@ -16449,16 +16490,16 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
             <form onSubmit={handleUpdateConsultation} className="p-6 overflow-y-auto space-y-4 flex-1 text-sm">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Client Name</label>
-                  <input type="text" required value={editForm.name || ""} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Client Name</label>
+                  <input type="text" required value={editForm.name || ""} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">WhatsApp Number</label>
-                  <input type="tel" required value={editForm.phone || ""} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">WhatsApp Number</label>
+                  <input type="tel" required value={editForm.phone || ""} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Location</label>
-                  <select value={editForm.location || "Baroda"} onChange={e => setEditForm({ ...editForm, location: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Location</label>
+                  <select value={editForm.location || "Baroda"} onChange={e => setEditForm({ ...editForm, location: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     {branches.map(b => {
                       const bName = typeof b === "string" ? b : (b?.name || "Unknown");
                       return <option key={bName} value={bName}>{bName}</option>;
@@ -16466,12 +16507,12 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Date</label>
-                  <input type="date" value={editForm.date || ""} onChange={e => setEditForm({ ...editForm, date: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Date</label>
+                  <input type="date" value={editForm.date || ""} onChange={e => setEditForm({ ...editForm, date: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Expected Look</label>
-                  <select value={editForm.expected_look || ""} onChange={e => setEditForm({ ...editForm, expected_look: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Expected Look</label>
+                  <select value={editForm.expected_look || ""} onChange={e => setEditForm({ ...editForm, expected_look: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     <option value="">Select Look</option>
                     <option value="Natural (Daily Use)">Natural (Daily Use)</option>
                     <option value="Professional (Formal)">Professional (Formal)</option>
@@ -16480,8 +16521,8 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Lifestyle</label>
-                  <select value={editForm.lifestyle || ""} onChange={e => setEditForm({ ...editForm, lifestyle: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Lifestyle</label>
+                  <select value={editForm.lifestyle || ""} onChange={e => setEditForm({ ...editForm, lifestyle: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     <option value="">Select Lifestyle</option>
                     <option value="Office / Business">Office / Business</option>
                     <option value="Travelling / Outdoor">Travelling / Outdoor</option>
@@ -16490,8 +16531,8 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Reason for Visit</label>
-                  <select value={editForm.reason || ""} onChange={e => setEditForm({ ...editForm, reason: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Reason for Visit</label>
+                  <select value={editForm.reason || ""} onChange={e => setEditForm({ ...editForm, reason: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     <option value="">Select Reason</option>
                     <option value="Confidence Boost Karne Ke Liye">Confidence Boost</option>
                     <option value="Job / Business Growth Ke Liye">Job / Business Growth</option>
@@ -16500,8 +16541,8 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Budget Range</label>
-                  <select value={editForm.budget_range || ""} onChange={e => setEditForm({ ...editForm, budget_range: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Budget Range</label>
+                  <select value={editForm.budget_range || ""} onChange={e => setEditForm({ ...editForm, budget_range: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     <option value="">Select Budget</option>
                     <option value="Basic">Basic (₹10,000 to ₹18,000)</option>
                     <option value="Recommended Standard">Standard (₹23,000 to ₹30,000)</option>
@@ -16509,12 +16550,12 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Consulted By</label>
-                  <input type="text" value={editForm.consulted_by || ""} onChange={e => setEditForm({ ...editForm, consulted_by: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Consulted By</label>
+                  <input type="text" value={editForm.consulted_by || ""} onChange={e => setEditForm({ ...editForm, consulted_by: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Source</label>
-                  <select value={editForm.source || "Direct"} onChange={e => setEditForm({ ...editForm, source: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Source</label>
+                  <select value={editForm.source || "Direct"} onChange={e => setEditForm({ ...editForm, source: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     <option value="Direct">Direct</option>
                     <option value="DMT">DMT</option>
                     <option value="Repeat">Repeat</option>
@@ -16524,8 +16565,8 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Status</label>
-                  <select value={editForm.status || "Warm"} onChange={e => setEditForm({ ...editForm, status: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg">
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Status</label>
+                  <select value={editForm.status || "Warm"} onChange={e => setEditForm({ ...editForm, status: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg">
                     <option value="Hot">Hot</option>
                     <option value="Warm">Warm</option>
                     <option value="Cold">Cold</option>
@@ -16534,34 +16575,34 @@ function ConsultationsPanel({ consultations, orders = [], refresh, t, branches =
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Revenue / Expected Revenue (₹)</label>
-                  <input type="number" value={editForm.revenue || ""} onChange={e => setEditForm({ ...editForm, revenue: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Revenue / Expected Revenue (₹)</label>
+                  <input type="number" value={editForm.revenue || ""} onChange={e => setEditForm({ ...editForm, revenue: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Follow-up Date</label>
-                  <input type="date" value={editForm.follow_up_date || ""} onChange={e => setEditForm({ ...editForm, follow_up_date: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Follow-up Date</label>
+                  <input type="date" value={editForm.follow_up_date || ""} onChange={e => setEditForm({ ...editForm, follow_up_date: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Size & Color</label>
-                  <input type="text" value={editForm.size_color || ""} onChange={e => setEditForm({ ...editForm, size_color: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" placeholder="Size x Size | Color" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Size & Color</label>
+                  <input type="text" value={editForm.size_color || ""} onChange={e => setEditForm({ ...editForm, size_color: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" placeholder="Size x Size | Color" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Token Amount (₹)</label>
-                  <input type="number" value={editForm.token_amount || ""} onChange={e => setEditForm({ ...editForm, token_amount: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" placeholder="Enter token amount" />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Token Amount (₹)</label>
+                  <input type="number" value={editForm.token_amount || ""} onChange={e => setEditForm({ ...editForm, token_amount: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" placeholder="Enter token amount" />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Comment for Token Received</label>
-                  <input type="text" value={editForm.token_comment || ""} onChange={e => setEditForm({ ...editForm, token_comment: e.target.value })} className="w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold rounded-lg" placeholder="Token comments..." />
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Comment for Token Received</label>
+                  <input type="text" value={editForm.token_comment || ""} onChange={e => setEditForm({ ...editForm, token_comment: e.target.value })} className="w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold rounded-lg" placeholder="Token comments..." />
                 </div>
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-1">Notes</label>
-                <textarea value={editForm.notes || ""} onChange={e => setEditForm({ ...editForm, notes: e.target.value })} rows="3" className="w-full border border-eminence-border p-3 focus:outline-none focus:border-eminence-gold bg-transparent resize-none rounded-lg text-sm" placeholder="Notes..."></textarea>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-1">Notes</label>
+                <textarea value={editForm.notes || ""} onChange={e => setEditForm({ ...editForm, notes: e.target.value })} rows="3" className="w-full border border-jainil-border p-3 focus:outline-none focus:border-jainil-gold bg-transparent resize-none rounded-lg text-sm" placeholder="Notes..."></textarea>
               </div>
 
               <div className="pt-4 border-t border-gray-100 flex justify-end gap-3 shrink-0">
-                <button type="button" onClick={() => setEditingConsultation(null)} className="px-5 py-2.5 border border-eminence-border text-eminence-muted hover:bg-gray-50 rounded-lg text-xs uppercase tracking-widest font-bold">Cancel</button>
-                <button type="submit" disabled={updating} className="px-6 py-2.5 bg-eminence-gold hover:bg-eminence-gold/90 text-white rounded-lg text-xs uppercase tracking-widest font-bold disabled:opacity-50 flex items-center gap-2">
+                <button type="button" onClick={() => setEditingConsultation(null)} className="px-5 py-2.5 border border-jainil-border text-jainil-muted hover:bg-gray-50 rounded-lg text-xs uppercase tracking-widest font-bold">Cancel</button>
+                <button type="submit" disabled={updating} className="px-6 py-2.5 bg-jainil-gold hover:bg-jainil-gold/90 text-white rounded-lg text-xs uppercase tracking-widest font-bold disabled:opacity-50 flex items-center gap-2">
                   {updating ? "Saving..." : "Save Changes"}
                 </button>
               </div>
@@ -16581,7 +16622,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
   const [source, setSource] = useState("Main Warehouse");
 
   const branchList = branches.map(b => typeof b === "string" ? b : b.name);
-  const [destination, setDestination] = useState(branchList[0] || "Surat");
+  const [destination, setDestination] = useState(branchList[0] || "Sama Savli");
   const [employeeId, setEmployeeId] = useState("");
   const [remarks, setRemarks] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16642,7 +16683,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
     <div className="max-w-2xl mx-auto bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
       <div>
         <h2 className="font-serif text-2xl text-gray-800">Transfer Products</h2>
-        <p className="text-xs text-eminence-muted">Transfer inventory stock between branches or hand over products to staff.</p>
+        <p className="text-xs text-jainil-muted">Transfer inventory stock between branches or hand over products to staff.</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -16655,7 +16696,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
             onChange={e => { setProductSearch(e.target.value); setProductId(""); setShowProductDrop(true); }}
             onFocus={() => setShowProductDrop(true)}
             onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
-            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
             autoComplete="off"
           />
           {showProductDrop && filteredTransferProducts.length > 0 && (
@@ -16664,7 +16705,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
                 <div
                   key={p.id}
                   onMouseDown={() => handleTransferProductSelect(p)}
-                  className="px-4 py-2.5 hover:bg-eminence-gold/10 cursor-pointer text-sm flex justify-between items-center"
+                  className="px-4 py-2.5 hover:bg-jainil-gold/10 cursor-pointer text-sm flex justify-between items-center"
                 >
                   <span className="font-medium text-gray-900">{p.name}</span>
                   <span className="text-xs text-gray-400 ml-2">Stock: {p.stock || 0}</span>
@@ -16694,7 +16735,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
               max={currentStock}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
             />
           </div>
           <div>
@@ -16702,7 +16743,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
             <select
               value={employeeId}
               onChange={(e) => setEmployeeId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
             >
               <option value="">-- Choose Staff --</option>
               {employees.map(e => (
@@ -16718,7 +16759,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
             <select
               value={source}
               onChange={(e) => setSource(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
             >
               <option value="Main Warehouse">Main Warehouse</option>
               {branches.map(b => {
@@ -16732,7 +16773,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
             <select
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
             >
               {branches.map(b => {
                 const name = typeof b === "string" ? b : b.name;
@@ -16749,7 +16790,7 @@ function ProductTransferPanel({ products, employees, onComplete, branches = [] }
             rows="3"
             value={remarks}
             onChange={(e) => setRemarks(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+            className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
             placeholder="Reason for transfer..."
           />
         </div>
@@ -16772,7 +16813,7 @@ function ProductTransferredLogPanel({ transfers, refreshData }) {
       <div className="flex justify-between items-center bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Transferred Products History</h2>
-          <p className="text-xs text-eminence-muted">Log of all branch-to-branch or staff inventory stock transfers.</p>
+          <p className="text-xs text-jainil-muted">Log of all branch-to-branch or staff inventory stock transfers.</p>
         </div>
         <button onClick={refreshData} className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 text-xs font-bold uppercase rounded-lg">
           Refresh Logs
@@ -16781,7 +16822,7 @@ function ProductTransferredLogPanel({ transfers, refreshData }) {
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden overflow-x-auto">
         {transfers.length === 0 ? (
-          <div className="p-20 text-center text-eminence-muted italic">
+          <div className="p-20 text-center text-jainil-muted italic">
             No transfer records found.
           </div>
         ) : (
@@ -16822,7 +16863,7 @@ function ProductTransferredLogPanel({ transfers, refreshData }) {
 function ProductAddStockPanel({ products, vendors, onComplete }) {
   const { t } = useLang();
   const { user } = useAuth();
-  const isSuperAdmin = user?.email === "superadmin@jainil.com" || user?.email === "superadmin@jainilhairsaloon.com" || user?.email === "superadmin@eminence.com" || user?.email?.startsWith("superadmin@") || user?.role === "super_admin" || user?.is_super_admin === true;
+  const isSuperAdmin = user?.email === "superadmin@jainil.com" || user?.email === "superadmin@jainilhairsaloon.com" || user?.email === "superadmin@jainil.com" || user?.email?.startsWith("superadmin@") || user?.role === "super_admin" || user?.is_super_admin === true;
 
   const makeEmptyRow = () => ({
     id: Date.now() + Math.random(),
@@ -16936,12 +16977,12 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
       <div className="flex justify-between items-center border-b pb-4 border-gray-100">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Add Product Stock</h2>
-          <p className="text-xs text-eminence-muted">Log new physical product inventory incoming from external vendors.</p>
+          <p className="text-xs text-jainil-muted">Log new physical product inventory incoming from external vendors.</p>
         </div>
         <button
           type="button"
           onClick={addRow}
-          className="flex items-center gap-2 bg-eminence-gold text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl hover:bg-yellow-600 transition-colors whitespace-nowrap shadow-sm"
+          className="flex items-center gap-2 bg-jainil-gold text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl hover:bg-yellow-600 transition-colors whitespace-nowrap shadow-sm"
         >
           <Plus size={14} /> Add Row
         </button>
@@ -16955,7 +16996,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
             <select
               value={vendorId}
               onChange={e => setVendorId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-white"
             >
               <option value="">- Choose Vendor -</option>
               {vendors.map(v => (
@@ -16969,7 +17010,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
               type="text"
               value={invoiceNo}
               onChange={e => setInvoiceNo(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-white"
               placeholder="e.g. INV-1002"
             />
           </div>
@@ -16979,7 +17020,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
               type="text"
               value={remarks}
               onChange={e => setRemarks(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-white"
+              className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-white"
               placeholder="e.g. regular stock replenishment"
             />
           </div>
@@ -17021,14 +17062,14 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                             onChange={e => updateRow(idx, { productSearch: e.target.value, productId: "", sku: "", customerDisplayName: "", showDrop: true })}
                             onFocus={() => updateRow(idx, { showDrop: true })}
                             onBlur={() => updateRow(idx, { showDrop: false })}
-                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
+                            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50/70"
                             autoComplete="off"
                           />
                           {row.productId && (() => {
                             const selectedP = products.find(p => p.id === row.productId);
                             if (selectedP && (selectedP.volume || selectedP.measurement_unit)) {
                               return (
-                                <div className="text-[10px] text-eminence-gold font-bold uppercase tracking-wider mt-1 px-1">
+                                <div className="text-[10px] text-jainil-gold font-bold uppercase tracking-wider mt-1 px-1">
                                   {selectedP.volume ? `${selectedP.volume} ` : ""}{selectedP.measurement_unit || ""}
                                 </div>
                               );
@@ -17059,7 +17100,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                                       </span>
                                     )}
                                     {(p.volume || p.measurement_unit) && (
-                                      <span className="text-[9px] text-eminence-gold uppercase tracking-wider font-semibold">
+                                      <span className="text-[9px] text-jainil-gold uppercase tracking-wider font-semibold">
                                         {p.volume ? `${p.volume} ` : ""}{p.measurement_unit || ""}
                                       </span>
                                     )}
@@ -17083,7 +17124,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                           placeholder="Customer Display Name"
                           value={row.customerDisplayName || ""}
                           onChange={e => updateRow(idx, { customerDisplayName: e.target.value })}
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50/70"
                         />
                       </td>
 
@@ -17094,7 +17135,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                           placeholder="SKU"
                           value={row.sku || ""}
                           onChange={e => updateRow(idx, { sku: e.target.value })}
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs font-mono focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs font-mono focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50/70"
                         />
                       </td>
 
@@ -17106,7 +17147,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                           value={row.quantity}
                           onChange={e => updateRow(idx, { quantity: e.target.value })}
                           placeholder="0"
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50/70 font-mono"
                         />
                       </td>
 
@@ -17119,7 +17160,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                           value={row.costPrice}
                           onChange={e => updateRow(idx, { costPrice: e.target.value })}
                           placeholder="0.00"
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50/70 font-mono"
                         />
                       </td>
 
@@ -17132,7 +17173,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                           value={row.sellingPrice}
                           onChange={e => updateRow(idx, { sellingPrice: e.target.value })}
                           placeholder="Optional"
-                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50/70 font-mono"
+                          className="w-full border border-gray-200 rounded-lg px-2.5 py-2 text-xs text-left focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50/70 font-mono"
                         />
                       </td>
 
@@ -17166,7 +17207,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
         <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 text-sm mt-4">
           <div className="flex flex-wrap gap-4 items-center">
             <div>
-              <span className="text-[10px] text-eminence-muted block font-bold uppercase tracking-wider mb-1">Items Total</span>
+              <span className="text-[10px] text-jainil-muted block font-bold uppercase tracking-wider mb-1">Items Total</span>
               <span className="font-serif font-bold text-gray-900 text-lg">₹{overallTotal.toLocaleString("en-IN")}</span>
             </div>
             <div>
@@ -17177,14 +17218,14 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
                 max={overallTotal}
                 value={discount}
                 onChange={e => setDiscount(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-32 focus:ring-1 focus:ring-eminence-gold focus:outline-none bg-white font-mono text-right"
+                className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm w-32 focus:ring-1 focus:ring-jainil-gold focus:outline-none bg-white font-mono text-right"
                 placeholder="0"
               />
             </div>
           </div>
           <div className="text-right">
-            <span className="text-[10px] text-eminence-muted block font-bold uppercase tracking-wider mb-1">Grand Total</span>
-            <span className="font-serif font-bold text-eminence-gold text-2xl">₹{grandTotal.toLocaleString("en-IN")}</span>
+            <span className="text-[10px] text-jainil-muted block font-bold uppercase tracking-wider mb-1">Grand Total</span>
+            <span className="font-serif font-bold text-jainil-gold text-2xl">₹{grandTotal.toLocaleString("en-IN")}</span>
           </div>
         </div>
 
@@ -17192,7 +17233,7 @@ function ProductAddStockPanel({ products, vendors, onComplete }) {
         <button
           type="button"
           onClick={addRow}
-          className="w-full py-3 border-2 border-dashed border-eminence-gold/40 text-eminence-gold hover:border-eminence-gold hover:bg-eminence-gold/5 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
+          className="w-full py-3 border-2 border-dashed border-jainil-gold/40 text-jainil-gold hover:border-jainil-gold hover:bg-jainil-gold/5 rounded-2xl text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
         >
           <Plus size={14} /> Add Another Product Row
         </button>
@@ -17330,7 +17371,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden p-8 space-y-6">
         <div>
           <h2 className="font-serif text-2xl text-gray-800">Use Product in Salon</h2>
-          <p className="text-xs text-eminence-muted">Record in-house consumption of products (shampoo, styling gel, treatment dyes) during client services.</p>
+          <p className="text-xs text-jainil-muted">Record in-house consumption of products (shampoo, styling gel, treatment dyes) during client services.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -17344,14 +17385,14 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                 onChange={e => { setProductSearch(e.target.value); setProductId(""); setShowProductDrop(true); }}
                 onFocus={() => setShowProductDrop(true)}
                 onBlur={() => setTimeout(() => setShowProductDrop(false), 200)}
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                 autoComplete="off"
               />
               {productId && (() => {
                 const selectedP = safeProducts.find(p => p.id === productId);
                 if (selectedP && (selectedP.volume || selectedP.measurement_unit)) {
                   return (
-                    <div className="text-[10px] text-eminence-gold font-bold uppercase tracking-wider mt-1 px-1">
+                    <div className="text-[10px] text-jainil-gold font-bold uppercase tracking-wider mt-1 px-1">
                       {selectedP.volume ? `${selectedP.volume} ` : ""}{selectedP.measurement_unit || ""}
                     </div>
                   );
@@ -17364,14 +17405,14 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                     <div
                       key={p.id}
                       onMouseDown={() => handleUseProductSelect(p)}
-                      className="px-4 py-2.5 hover:bg-eminence-gold/10 cursor-pointer text-sm flex flex-col text-left"
+                      className="px-4 py-2.5 hover:bg-jainil-gold/10 cursor-pointer text-sm flex flex-col text-left"
                     >
                       <div className="flex justify-between items-center w-full">
                         <span className="font-medium text-gray-900">{p.name}</span>
                         <span className="text-xs text-gray-400 ml-2">Stock: {p.stock || 0}</span>
                       </div>
                       {(p.volume || p.measurement_unit) && (
-                        <span className="text-[10px] text-eminence-gold uppercase tracking-wider font-semibold mt-0.5">
+                        <span className="text-[10px] text-jainil-gold uppercase tracking-wider font-semibold mt-0.5">
                           {p.volume ? `${p.volume} ` : ""}{p.measurement_unit || ""}
                         </span>
                       )}
@@ -17390,7 +17431,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
               <select
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
               >
                 <option value="">-- Choose Staff --</option>
                 {safeEmployees.map(e => (
@@ -17409,7 +17450,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                 max={currentStock}
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
               />
             </div>
             <div>
@@ -17418,7 +17459,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                 type="text"
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                 placeholder="e.g. used for hair wash treatment"
               />
             </div>
@@ -17445,7 +17486,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                 placeholder="Search..."
                 value={usageSearchQuery}
                 onChange={e => setUsageSearchQuery(e.target.value)}
-                className="bg-white border border-gray-200 rounded px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-eminence-gold w-48"
+                className="bg-white border border-gray-200 rounded px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-jainil-gold w-48"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -17453,7 +17494,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
               <select
                 value={providerFilter}
                 onChange={e => setProviderFilter(e.target.value)}
-                className="bg-white border border-gray-200 rounded px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-eminence-gold"
+                className="bg-white border border-gray-200 rounded px-3 py-1.5 text-xs text-gray-700 focus:outline-none focus:border-jainil-gold"
               >
                 <option value="">All Staff</option>
                 {serviceProviders.map(p => (
@@ -17464,7 +17505,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
           </div>
         </div>
         {filteredUsages.length === 0 ? (
-          <div className="p-12 text-center text-eminence-muted italic">
+          <div className="p-12 text-center text-jainil-muted italic">
             No consumption records found.
           </div>
         ) : (
@@ -17496,7 +17537,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                             setEditingUsage(u);
                             setEditForm({ ...u });
                           }}
-                          className="p-1 hover:bg-gray-100 rounded text-eminence-gold hover:text-black transition-colors"
+                          className="p-1 hover:bg-gray-100 rounded text-jainil-gold hover:text-black transition-colors"
                           title="Edit Usage Log"
                         >
                           <Edit size={14} />
@@ -17515,10 +17556,10 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
       {editingUsage && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-lg overflow-hidden flex flex-col animate-fade-in">
-            <div className="p-6 bg-eminence-surface border-b border-gray-100 flex justify-between items-center">
+            <div className="p-6 bg-jainil-surface border-b border-gray-100 flex justify-between items-center">
               <div>
                 <h4 className="font-serif text-xl text-gray-900">Edit Product Consumption Log</h4>
-                <p className="text-xs text-eminence-muted">Updating log for {editingUsage.product_name}</p>
+                <p className="text-xs text-jainil-muted">Updating log for {editingUsage.product_name}</p>
               </div>
               <button onClick={() => setEditingUsage(null)} className="p-2 hover:bg-gray-100 rounded-full"><X size={18} /></button>
             </div>
@@ -17536,7 +17577,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                       employee_name: emp ? emp.name : "Unknown"
                     });
                   }}
-                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                 >
                   <option value="">-- Choose Staff --</option>
                   {safeEmployees.map(e => (
@@ -17552,7 +17593,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                   min="1"
                   value={editForm.quantity || ""}
                   onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                 />
               </div>
 
@@ -17562,14 +17603,14 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                   type="text"
                   value={editForm.remarks || ""}
                   onChange={(e) => setEditForm({ ...editForm, remarks: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:outline-none bg-gray-50"
+                  className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:outline-none bg-gray-50"
                   placeholder="e.g. used for hair wash treatment"
                 />
               </div>
 
               <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
-                <button type="button" onClick={() => setEditingUsage(null)} className="px-5 py-2.5 border border-eminence-border text-eminence-muted hover:bg-gray-50 rounded-lg text-xs uppercase tracking-widest font-bold">Cancel</button>
-                <button type="submit" disabled={updating} className="px-6 py-2.5 bg-eminence-gold hover:bg-eminence-gold/90 text-white rounded-lg text-xs uppercase tracking-widest font-bold disabled:opacity-50 flex items-center gap-2">
+                <button type="button" onClick={() => setEditingUsage(null)} className="px-5 py-2.5 border border-jainil-border text-jainil-muted hover:bg-gray-50 rounded-lg text-xs uppercase tracking-widest font-bold">Cancel</button>
+                <button type="submit" disabled={updating} className="px-6 py-2.5 bg-jainil-gold hover:bg-jainil-gold/90 text-white rounded-lg text-xs uppercase tracking-widest font-bold disabled:opacity-50 flex items-center gap-2">
                   {updating ? "Saving..." : "Save Changes"}
                 </button>
               </div>
@@ -17582,12 +17623,12 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
       {selectedHistoryProduct && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[80] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl border border-gray-200 shadow-2xl w-full max-w-4xl max-h-[85vh] overflow-hidden flex flex-col animate-fade-in">
-            <div className="p-6 bg-eminence-surface border-b border-gray-100 flex justify-between items-center">
+            <div className="p-6 bg-jainil-surface border-b border-gray-100 flex justify-between items-center">
               <div>
                 <h4 className="font-serif text-xl text-gray-900 flex items-center gap-2">
-                  <Clock className="text-eminence-gold" size={20} /> Product History Log
+                  <Clock className="text-jainil-gold" size={20} /> Product History Log
                 </h4>
-                <p className="text-xs text-eminence-muted">
+                <p className="text-xs text-jainil-muted">
                   Detailed sale, salon usage, and stock log for <strong className="text-gray-900">{selectedHistoryProduct.name}</strong>
                 </p>
               </div>
@@ -17596,21 +17637,21 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
 
             <div className="p-6 overflow-y-auto flex-1 space-y-4">
               {/* Product Stats Quick Info */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-eminence-surface/40 p-4 rounded-xl border border-eminence-border/10 text-xs">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-jainil-surface/40 p-4 rounded-xl border border-jainil-border/10 text-xs">
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Product ID</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Product ID</span>
                   <span className="font-mono font-bold text-gray-900">{selectedHistoryProduct.id}</span>
                 </div>
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Category</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Category</span>
                   <span className="font-bold text-gray-900">{selectedHistoryProduct.category || "—"}</span>
                 </div>
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Selling Price</span>
-                  <span className="font-serif font-bold text-eminence-gold text-sm">₹{Number(selectedHistoryProduct.price || 0).toLocaleString("en-IN")}</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Selling Price</span>
+                  <span className="font-serif font-bold text-jainil-gold text-sm">₹{Number(selectedHistoryProduct.price || 0).toLocaleString("en-IN")}</span>
                 </div>
                 <div>
-                  <span className="text-eminence-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Current Stock</span>
+                  <span className="text-jainil-muted block font-medium uppercase tracking-wider text-[9px] mb-1">Current Stock</span>
                   <span className={`font-bold text-sm ${selectedHistoryProduct.stock <= 5 ? "text-red-500" : "text-emerald-600"}`}>
                     {selectedHistoryProduct.stock} units
                   </span>
@@ -17619,20 +17660,20 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
 
               {isLoadingHistory ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-eminence-gold" />
-                  <p className="text-xs text-eminence-muted">Fetching usage and sale logs...</p>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-jainil-gold" />
+                  <p className="text-xs text-jainil-muted">Fetching usage and sale logs...</p>
                 </div>
               ) : productHistory.length === 0 ? (
-                <div className="text-center py-16 bg-eminence-surface/20 border border-dashed border-eminence-border rounded-xl">
+                <div className="text-center py-16 bg-jainil-surface/20 border border-dashed border-jainil-border rounded-xl">
                   <Clock className="mx-auto text-gray-300 mb-2" size={32} />
                   <p className="text-sm font-semibold text-gray-700">No History Logs Found</p>
-                  <p className="text-xs text-eminence-muted mt-1">This product has no recorded stock logs, salon usages, or sales.</p>
+                  <p className="text-xs text-jainil-muted mt-1">This product has no recorded stock logs, salon usages, or sales.</p>
                 </div>
               ) : (
-                <div className="border border-eminence-border/10 rounded-xl overflow-hidden bg-white">
+                <div className="border border-jainil-border/10 rounded-xl overflow-hidden bg-white">
                   <table className="w-full text-left border-collapse text-xs">
                     <thead>
-                      <tr className="bg-eminence-surface border-b border-eminence-border/20 text-eminence-muted uppercase font-bold text-[9px] tracking-wider">
+                      <tr className="bg-jainil-surface border-b border-jainil-border/20 text-jainil-muted uppercase font-bold text-[9px] tracking-wider">
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Activity</th>
                         <th className="px-4 py-3 text-right">Quantity</th>
@@ -17682,7 +17723,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
                             </td>
                             <td className="px-4 py-3.5 text-gray-500">
                               <div className="font-semibold text-gray-700">{item.employee_name}</div>
-                              {item.remarks && <div className="text-[10px] text-eminence-muted mt-0.5 italic">"{item.remarks}"</div>}
+                              {item.remarks && <div className="text-[10px] text-jainil-muted mt-0.5 italic">"{item.remarks}"</div>}
                             </td>
                           </tr>
                         );
@@ -17693,7 +17734,7 @@ function ProductUsePanel({ products = [], employees = [], usages = [], onComplet
               )}
             </div>
 
-            <div className="p-6 bg-eminence-surface border-t border-gray-100 flex justify-end">
+            <div className="p-6 bg-jainil-surface border-t border-gray-100 flex justify-end">
               <button
                 onClick={() => setSelectedHistoryProduct(null)}
                 className="px-5 py-2.5 bg-gray-900 hover:bg-black text-white text-xs uppercase tracking-widest font-bold rounded-lg transition-all"
@@ -17901,11 +17942,11 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 className="font-serif text-3xl text-gray-900">Leave Approvals</h2>
-          <p className="text-sm text-eminence-muted">Manage and approve employee leave applications</p>
+          <p className="text-sm text-jainil-muted">Manage and approve employee leave applications</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 bg-eminence-gold text-white text-sm font-bold uppercase tracking-widest px-5 py-3 rounded-xl hover:bg-yellow-600 transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-jainil-gold text-white text-sm font-bold uppercase tracking-widest px-5 py-3 rounded-xl hover:bg-yellow-600 transition-colors shadow-sm"
         >
           <Plus size={16} /> Add Leave Request
         </button>
@@ -18086,7 +18127,7 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
                 <select
                   value={newLeaveEmp}
                   onChange={(e) => setNewLeaveEmp(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:border-eminence-gold transition-shadow bg-gray-50"
+                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:border-jainil-gold transition-shadow bg-gray-50"
                   required
                 >
                   <option value="">- Choose Employee -</option>
@@ -18102,14 +18143,14 @@ const ApproveLeavesPanel = ({ leaveRequests, refresh, isSuperAdmin, employees })
                   type="date"
                   value={newLeaveDate}
                   onChange={(e) => setNewLeaveDate(e.target.value)}
-                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-eminence-gold focus:border-eminence-gold transition-shadow bg-gray-50"
+                  className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-jainil-gold focus:border-jainil-gold transition-shadow bg-gray-50"
                   required
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-eminence-gold text-white text-sm font-bold uppercase tracking-widest px-6 py-4 rounded-xl hover:bg-yellow-600 transition-colors mt-4"
+                className="w-full bg-jainil-gold text-white text-sm font-bold uppercase tracking-widest px-6 py-4 rounded-xl hover:bg-yellow-600 transition-colors mt-4"
               >
                 Submit Request
               </button>

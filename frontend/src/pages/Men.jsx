@@ -80,7 +80,7 @@ export default function Men() {
   ];
 
   return (
-    <div className="bg-white overflow-hidden selection:bg-eminence-gold selection:text-white">
+    <div className="bg-white overflow-hidden selection:bg-jainil-gold selection:text-white">
       {/* HERO SECTION SLIDER */}
       <section className="relative h-auto overflow-hidden" ref={emblaRef}>
         <div className="flex w-full">
@@ -97,11 +97,11 @@ export default function Men() {
       </section>
 
       {/* INFORMATIVE VIDEOS SECTION */}
-      <section className="py-24 md:py-32 bg-eminence-surface">
+      <section className="py-24 md:py-32 bg-jainil-surface">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl text-eminence-text mb-4">Informative Guides</h2>
-            <p className="text-eminence-muted text-sm uppercase tracking-widest">Learn everything about your hair journey</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-jainil-text mb-4">Informative Guides</h2>
+            <p className="text-jainil-muted text-sm uppercase tracking-widest">Learn everything about your hair journey</p>
           </div>
           <div className="grid md:grid-cols-3 gap-12 max-w-[1500px] mx-auto">
             {informativeVideos.map((v, i) => (
@@ -141,14 +141,14 @@ export default function Men() {
       </section>
 
       {/* WHY CHOOSE SECTION */}
-      <section className="py-24 md:py-32 bg-eminence-surface">
+      <section className="py-24 md:py-32 bg-jainil-surface">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-20">
-            <h2 className="font-serif text-4xl md:text-6xl text-eminence-text mb-6">
+            <h2 className="font-serif text-4xl md:text-6xl text-jainil-text mb-6">
               {t("menWhyTitle")}
             </h2>
-            <div className="w-16 h-px bg-eminence-gold mx-auto mb-8" />
-            <p className="text-eminence-muted max-w-xl mx-auto text-sm md:text-base">
+            <div className="w-16 h-px bg-jainil-gold mx-auto mb-8" />
+            <p className="text-jainil-muted max-w-xl mx-auto text-sm md:text-base">
               {t("menWhySub")}
             </p>
           </div>
@@ -156,11 +156,11 @@ export default function Men() {
           <div className="grid md:grid-cols-3 gap-12">
             {features.map((f, i) => (
               <div key={i} className="text-center space-y-6 group">
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm border border-eminence-border/30 group-hover:border-eminence-gold transition-colors duration-500">
-                  <f.icon className="text-eminence-gold" size={32} strokeWidth={1.5} />
+                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm border border-jainil-border/30 group-hover:border-jainil-gold transition-colors duration-500">
+                  <f.icon className="text-jainil-gold" size={32} strokeWidth={1.5} />
                 </div>
-                <h3 className="font-serif text-2xl text-eminence-text">{f.title}</h3>
-                <p className="text-eminence-muted text-sm leading-relaxed px-4">{f.sub}</p>
+                <h3 className="font-serif text-2xl text-jainil-text">{f.title}</h3>
+                <p className="text-jainil-muted text-sm leading-relaxed px-4">{f.sub}</p>
               </div>
             ))}
           </div>
@@ -171,8 +171,8 @@ export default function Men() {
       <section className="py-24 md:py-32 bg-white">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl text-eminence-text mb-4">Real Transformations</h2>
-            <p className="text-eminence-muted text-sm uppercase tracking-widest">Watch our clients' new look in action</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-jainil-text mb-4">Real Transformations</h2>
+            <p className="text-jainil-muted text-sm uppercase tracking-widest">Watch our clients' new look in action</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {clientVideos.map((v, i) => (
@@ -192,11 +192,11 @@ export default function Men() {
       />
 
       {/* CLIENT REVIEWS SECTION */}
-      <section className="py-24 md:py-32 bg-eminence-surface">
+      <section className="py-24 md:py-32 bg-jainil-surface">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl text-eminence-text mb-4">What Our Clients Say</h2>
-            <p className="text-eminence-muted text-sm uppercase tracking-widest">Real stories from real men</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-jainil-text mb-4">What Our Clients Say</h2>
+            <p className="text-jainil-muted text-sm uppercase tracking-widest">Real stories from real men</p>
           </div>
           <div className="grid md:grid-cols-2 gap-12 max-w-[1500px] mx-auto">
             {clientReviews.map((v, i) => (
@@ -236,17 +236,17 @@ export default function Men() {
       </section>
 
       {/* FAQ VIDEOS (ON CLICK) */}
-      <section className="py-24 md:py-32 bg-eminence-surface">
+      <section className="py-24 md:py-32 bg-jainil-surface">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl text-eminence-text mb-4">Common Questions</h2>
-            <p className="text-eminence-muted text-sm uppercase tracking-widest">Video guides for your hair system</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-jainil-text mb-4">Common Questions</h2>
+            <p className="text-jainil-muted text-sm uppercase tracking-widest">Video guides for your hair system</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             {faqVideos.map((v, i) => (
               <div key={i} className="group relative aspect-[9/16] bg-black rounded-lg overflow-hidden cursor-pointer shadow-lg">
                 <video src={v.url} className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
-                <div className="faq-overlay absolute inset-0 bg-eminence-gold/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center group-hover:bg-eminence-gold/95 transition-all duration-500">
+                <div className="faq-overlay absolute inset-0 bg-jainil-gold/90 backdrop-blur-sm z-20 flex flex-col items-center justify-center p-6 text-center group-hover:bg-jainil-gold/95 transition-all duration-500">
                   <p className="text-white text-xs md:text-sm lg:text-base uppercase tracking-[0.2em] font-bold leading-tight mb-6 drop-shadow-sm">
                     {v.title}
                   </p>
@@ -282,7 +282,7 @@ export default function Men() {
       <section className="py-24 md:py-32 bg-white">
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12">
           <div className="text-center mb-20">
-            <h2 className="font-serif text-4xl md:text-6xl text-eminence-text mb-6">
+            <h2 className="font-serif text-4xl md:text-6xl text-jainil-text mb-6">
               {t("menSystemsTitle")}
             </h2>
           </div>
@@ -305,28 +305,28 @@ export default function Men() {
                       onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1599351431247-f132f82f23b9?w=800"; }}
                     />
                     {isProduct && (
-                      <div className="absolute top-4 left-4 bg-eminence-gold text-white text-[9px] uppercase tracking-widest px-3 py-1 font-bold rounded-full">
+                      <div className="absolute top-4 left-4 bg-jainil-gold text-white text-[9px] uppercase tracking-widest px-3 py-1 font-bold rounded-full">
                         Premium
                       </div>
                     )}
                   </div>
                   <div className="p-8 flex flex-col flex-grow">
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-eminence-gold font-bold mb-4">
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-jainil-gold font-bold mb-4">
                       {isProduct ? (item.category || "Hair System") : "Handcrafted"}
                     </p>
-                    <h3 className="font-serif text-2xl text-eminence-text mb-4 leading-tight group-hover:text-eminence-gold transition-colors">{title}</h3>
-                    <p className="text-eminence-muted text-xs leading-relaxed mb-6 line-clamp-2">
+                    <h3 className="font-serif text-2xl text-jainil-text mb-4 leading-tight group-hover:text-jainil-gold transition-colors">{title}</h3>
+                    <p className="text-jainil-muted text-xs leading-relaxed mb-6 line-clamp-2">
                       {sub}
                     </p>
                     
                     <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
                       {isProduct ? (
-                        <span className="text-xl font-bold text-eminence-text">₹{item.price.toLocaleString("en-IN")}</span>
+                        <span className="text-xl font-bold text-jainil-text">₹{item.price.toLocaleString("en-IN")}</span>
                       ) : (
-                        <span className="text-[11px] uppercase tracking-widest text-eminence-gold font-bold">Consultation Required</span>
+                        <span className="text-[11px] uppercase tracking-widest text-jainil-gold font-bold">Consultation Required</span>
                       )}
-                      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-eminence-gold transition-colors duration-500">
-                        <ArrowRight size={14} className="text-eminence-muted group-hover:text-white" />
+                      <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-jainil-gold transition-colors duration-500">
+                        <ArrowRight size={14} className="text-jainil-muted group-hover:text-white" />
                       </div>
                     </div>
                   </div>
@@ -338,9 +338,9 @@ export default function Men() {
       </section>
 
       {/* PROCESS TIMELINE */}
-      <section className="py-24 md:py-32 bg-eminence-surfaceAlt">
+      <section className="py-24 md:py-32 bg-jainil-surfaceAlt">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-          <h2 className="font-serif text-4xl md:text-6xl text-eminence-text text-center mb-24">
+          <h2 className="font-serif text-4xl md:text-6xl text-jainil-text text-center mb-24">
             {t("menProcessTitle")}
           </h2>
 
@@ -353,14 +353,14 @@ export default function Men() {
                     alt={t(`menStep${step}Title`)}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-white rounded-full flex items-center justify-center text-eminence-gold font-serif text-2xl shadow-lg border-2 border-white">
+                  <div className="absolute top-4 left-4 w-12 h-12 bg-white rounded-full flex items-center justify-center text-jainil-gold font-serif text-2xl shadow-lg border-2 border-white">
                     {step}
                   </div>
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
                 </div>
                 <div>
-                  <h4 className="font-serif text-2xl text-eminence-text mb-3">{t(`menStep${step}Title`)}</h4>
-                  <p className="text-eminence-muted text-sm leading-relaxed px-4">{t(`menStep${step}Sub`)}</p>
+                  <h4 className="font-serif text-2xl text-jainil-text mb-3">{t(`menStep${step}Title`)}</h4>
+                  <p className="text-jainil-muted text-sm leading-relaxed px-4">{t(`menStep${step}Sub`)}</p>
                 </div>
               </div>
             ))}
@@ -370,8 +370,8 @@ export default function Men() {
 
 
       {/* FINAL CTA */}
-      <section className="py-24 bg-eminence-text text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-eminence-gold/5 skew-x-12 transform translate-x-32" />
+      <section className="py-24 bg-jainil-text text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-jainil-gold/5 skew-x-12 transform translate-x-32" />
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12 text-center relative z-10">
           <h2 className="font-serif text-4xl md:text-7xl mb-10 leading-tight">
             Ready to change <br className="hidden md:block" /> your life?

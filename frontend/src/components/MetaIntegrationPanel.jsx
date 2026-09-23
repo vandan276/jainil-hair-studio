@@ -66,7 +66,7 @@ export default function MetaIntegrationPanel() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Webhook-Key": config.webhook_secret || "eminence_secret_123",
+          "X-Webhook-Key": config.webhook_secret || "jainil_secret_123",
         },
         body: JSON.stringify({
           name: simData.name,
@@ -91,7 +91,7 @@ export default function MetaIntegrationPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-20">
-        <span className="text-eminence-gold font-serif text-lg tracking-wider">Loading Configuration...</span>
+        <span className="text-jainil-gold font-serif text-lg tracking-wider">Loading Configuration...</span>
       </div>
     );
   }
@@ -101,12 +101,12 @@ export default function MetaIntegrationPanel() {
       {/* HEADER SECTION */}
       <div className="glass-card p-6 md:p-8 rounded-2xl">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 bg-eminence-gold/10 rounded-full flex items-center justify-center text-eminence-gold shrink-0">
+          <div className="w-12 h-12 bg-jainil-gold/10 rounded-full flex items-center justify-center text-jainil-gold shrink-0">
             <CheckCircle2 size={24} />
           </div>
           <div>
-            <h3 className="font-serif text-2xl text-eminence-text mb-2">Meta Ads Lead Webhook Integration</h3>
-            <p className="text-sm text-eminence-muted leading-relaxed">
+            <h3 className="font-serif text-2xl text-jainil-text mb-2">Meta Ads Lead Webhook Integration</h3>
+            <p className="text-sm text-jainil-muted leading-relaxed">
               Capture leads directly from your Facebook and Instagram Lead Ads forms in real-time. Meta uses webhooks to notify the system instantly when a user submits a form.
             </p>
           </div>
@@ -116,22 +116,22 @@ export default function MetaIntegrationPanel() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* WEBHOOK DETAILS CARD */}
         <div className="glass-card p-6 md:p-8 rounded-2xl lg:col-span-2 space-y-6">
-          <h4 className="font-serif text-xl text-eminence-text border-b border-eminence-border pb-4">Webhook Details</h4>
+          <h4 className="font-serif text-xl text-jainil-text border-b border-jainil-border pb-4">Webhook Details</h4>
           
           <div className="space-y-4">
             <div>
-              <label className="overline block text-[10px] text-eminence-muted mb-1.5">Callback Webhook URL</label>
-              <div className="flex items-center gap-2 bg-eminence-surface border border-eminence-border p-3 rounded-lg">
-                <code className="text-xs text-eminence-text select-all font-mono break-all flex-1">{webhookUrl}</code>
+              <label className="overline block text-[10px] text-jainil-muted mb-1.5">Callback Webhook URL</label>
+              <div className="flex items-center gap-2 bg-jainil-surface border border-jainil-border p-3 rounded-lg">
+                <code className="text-xs text-jainil-text select-all font-mono break-all flex-1">{webhookUrl}</code>
                 <button 
                   onClick={() => copyToClipboard(webhookUrl)}
-                  className="p-1.5 hover:bg-eminence-gold/10 text-eminence-muted hover:text-eminence-gold rounded transition-colors"
+                  className="p-1.5 hover:bg-jainil-gold/10 text-jainil-muted hover:text-jainil-gold rounded transition-colors"
                   title="Copy URL"
                 >
                   <Copy size={16} />
                 </button>
               </div>
-              <p className="text-[11px] text-eminence-muted mt-1.5">
+              <p className="text-[11px] text-jainil-muted mt-1.5">
                 Paste this URL in the Meta Webhooks Configuration inside your Developer Account.
               </p>
             </div>
@@ -139,44 +139,44 @@ export default function MetaIntegrationPanel() {
             <form onSubmit={handleSave} className="space-y-5 pt-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="overline block text-[10px] text-eminence-muted mb-1.5">Webhook Verify Token</label>
+                  <label className="overline block text-[10px] text-jainil-muted mb-1.5">Webhook Verify Token</label>
                   <input
                     type="text"
                     value={config.verify_token}
                     onChange={(e) => setConfig({ ...config, verify_token: e.target.value })}
-                    placeholder="e.g. eminence_salon_verify_2026"
-                    className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-eminence-gold"
+                    placeholder="e.g. jainil_salon_verify_2026"
+                    className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-jainil-gold"
                   />
-                  <p className="text-[10px] text-eminence-muted mt-1">
+                  <p className="text-[10px] text-jainil-muted mt-1">
                     Token defined on Meta App config to verify your endpoint ownership.
                   </p>
                 </div>
 
                 <div>
-                  <label className="overline block text-[10px] text-eminence-muted mb-1.5">Test Webhook Secret Key</label>
+                  <label className="overline block text-[10px] text-jainil-muted mb-1.5">Test Webhook Secret Key</label>
                   <input
                     type="text"
                     value={config.webhook_secret}
                     onChange={(e) => setConfig({ ...config, webhook_secret: e.target.value })}
-                    placeholder="e.g. eminence_secret_123"
-                    className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-eminence-gold"
+                    placeholder="e.g. jainil_secret_123"
+                    className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 rounded-lg text-sm focus:outline-none focus:border-jainil-gold"
                   />
-                  <p className="text-[10px] text-eminence-muted mt-1">
+                  <p className="text-[10px] text-jainil-muted mt-1">
                     Used to authenticate test webhook calls and mock simulator leads.
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="overline block text-[10px] text-eminence-muted mb-1.5">FB Page Access Token</label>
+                <label className="overline block text-[10px] text-jainil-muted mb-1.5">FB Page Access Token</label>
                 <textarea
                   rows={4}
                   value={config.page_access_token}
                   onChange={(e) => setConfig({ ...config, page_access_token: e.target.value })}
                   placeholder="Paste Meta Permanent Page Access Token here..."
-                  className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 rounded-lg text-sm font-mono focus:outline-none focus:border-eminence-gold"
+                  className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 rounded-lg text-sm font-mono focus:outline-none focus:border-jainil-gold"
                 />
-                <p className="text-[10px] text-eminence-muted mt-1">
+                <p className="text-[10px] text-jainil-muted mt-1">
                   Required to query Meta Graph API for retrieval of actual lead form values (Name, WhatsApp, Email).
                 </p>
               </div>
@@ -203,46 +203,46 @@ export default function MetaIntegrationPanel() {
         {/* WEBHOOK SIMULATOR / TEST LEAD GENERATOR */}
         <div className="glass-card p-6 md:p-8 rounded-2xl flex flex-col justify-between">
           <div>
-            <h4 className="font-serif text-xl text-eminence-text border-b border-eminence-border pb-4 mb-6">Ads Simulator</h4>
+            <h4 className="font-serif text-xl text-jainil-text border-b border-jainil-border pb-4 mb-6">Ads Simulator</h4>
             
-            <p className="text-xs text-eminence-muted mb-6 leading-relaxed">
+            <p className="text-xs text-jainil-muted mb-6 leading-relaxed">
               Use this simulator to test your webhook integration. Submitting this form sends an authentic request directly to `/webhooks/facebook` to verify that leads register in the CRM database instantly.
             </p>
 
             <form onSubmit={handleSimulate} className="space-y-4">
               <div>
-                <label className="overline block text-[10px] text-eminence-muted mb-1">Test Contact Name</label>
+                <label className="overline block text-[10px] text-jainil-muted mb-1">Test Contact Name</label>
                 <input
                   type="text"
                   required
                   value={simData.name}
                   onChange={(e) => setSimData({ ...simData, name: e.target.value })}
                   placeholder="e.g. John Doe"
-                  className="w-full bg-eminence-surface border border-eminence-border px-4 py-2.5 rounded-lg text-xs focus:outline-none focus:border-eminence-gold"
+                  className="w-full bg-jainil-surface border border-jainil-border px-4 py-2.5 rounded-lg text-xs focus:outline-none focus:border-jainil-gold"
                 />
               </div>
 
               <div>
-                <label className="overline block text-[10px] text-eminence-muted mb-1">Test Phone Number</label>
+                <label className="overline block text-[10px] text-jainil-muted mb-1">Test Phone Number</label>
                 <input
                   type="tel"
                   required
                   value={simData.phone}
                   onChange={(e) => setSimData({ ...simData, phone: e.target.value })}
                   placeholder="e.g. +91 9999988888"
-                  className="w-full bg-eminence-surface border border-eminence-border px-4 py-2.5 rounded-lg text-xs focus:outline-none focus:border-eminence-gold"
+                  className="w-full bg-jainil-surface border border-jainil-border px-4 py-2.5 rounded-lg text-xs focus:outline-none focus:border-jainil-gold"
                 />
               </div>
 
               <div>
-                <label className="overline block text-[10px] text-eminence-muted mb-1">Ad Campaign Name</label>
+                <label className="overline block text-[10px] text-jainil-muted mb-1">Ad Campaign Name</label>
                 <input
                   type="text"
                   required
                   value={simData.campaign}
                   onChange={(e) => setSimData({ ...simData, campaign: e.target.value })}
                   placeholder="e.g. Summer Offer campaign"
-                  className="w-full bg-eminence-surface border border-eminence-border px-4 py-2.5 rounded-lg text-xs focus:outline-none focus:border-eminence-gold"
+                  className="w-full bg-jainil-surface border border-jainil-border px-4 py-2.5 rounded-lg text-xs focus:outline-none focus:border-jainil-gold"
                 />
               </div>
 
@@ -257,8 +257,8 @@ export default function MetaIntegrationPanel() {
             </form>
           </div>
           
-          <div className="border-t border-eminence-border pt-4 mt-6 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-eminence-gold font-bold">
+          <div className="border-t border-jainil-border pt-4 mt-6 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-jainil-gold font-bold">
               Meta CRM Connection Active
             </span>
           </div>

@@ -73,7 +73,7 @@ export default function ReportsDropdown({ label }) {
         <div
           role="menu"
           aria-orientation="vertical"
-          className="absolute left-0 mt-2 w-72 bg-white border border-eminence-border rounded-2xl shadow-xl p-2 z-50 flex flex-col gap-1 animate-fade-in origin-top-left"
+          className="absolute left-0 mt-2 w-72 bg-white border border-jainil-border rounded-2xl shadow-xl p-2 z-50 flex flex-col gap-1 animate-fade-in origin-top-left"
         >
           {reportItems.map((item) => (
             <DropdownItem

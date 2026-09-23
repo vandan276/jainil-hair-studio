@@ -40,11 +40,11 @@ export default function Navbar() {
 
   const solid = true;
   const isMenPage = location.pathname === "/men";
-  const txt = "text-eminence-text";
+  const txt = "text-jainil-text";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <div className="transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-eminence-border shadow-sm">
+      <div className="transition-all duration-300 bg-white/95 backdrop-blur-md border-b border-jainil-border shadow-sm">
         <div className="max-w-[1500px] mx-auto px-3 sm:px-6 lg:px-12 h-16 sm:h-20 flex items-center justify-between">
           <nav className="hidden lg:flex items-center gap-10 flex-1">
             {links.map((l) => {
@@ -53,7 +53,7 @@ export default function Navbar() {
                 <a
                   key={l.to}
                   href={l.to}
-                  className={`text-[12px] uppercase tracking-[0.18em] font-medium transition-colors duration-300 ${location.pathname === l.to ? "text-eminence-gold" : `${txt} hover:opacity-70`}`}
+                  className={`text-[12px] uppercase tracking-[0.18em] font-medium transition-colors duration-300 ${location.pathname === l.to ? "text-jainil-gold" : `${txt} hover:opacity-70`}`}
                 >
                   {l.label}
                 </a>
@@ -64,7 +64,7 @@ export default function Navbar() {
                   end={l.to === "/"}
                   data-testid={`nav-${l.to.replace("/", "") || "home"}`}
                   className={({ isActive }) =>
-                    `text-[12px] uppercase tracking-[0.18em] font-medium transition-colors duration-300 ${isActive ? "text-eminence-gold" : `${txt} hover:opacity-70`}`
+                    `text-[12px] uppercase tracking-[0.18em] font-medium transition-colors duration-300 ${isActive ? "text-jainil-gold" : `${txt} hover:opacity-70`}`
                   }
                 >
                   {l.label}
@@ -89,13 +89,13 @@ export default function Navbar() {
                 <span>{LANGUAGES.find((l) => l.code === lang)?.label || "EN"}</span>
               </button>
               {langOpen && (
-                <div className="absolute right-0 top-full mt-2 bg-white border border-eminence-border min-w-[140px] shadow-lg z-50" data-testid="lang-dropdown">
+                <div className="absolute right-0 top-full mt-2 bg-white border border-jainil-border min-w-[140px] shadow-lg z-50" data-testid="lang-dropdown">
                   {LANGUAGES.map((l) => (
                     <button
                       key={l.code}
                       onClick={() => { setLang(l.code); setLangOpen(false); }}
                       data-testid={`lang-${l.code}`}
-                      className={`w-full text-left px-4 py-3 text-sm hover:bg-eminence-surface ${lang === l.code ? "text-eminence-gold font-semibold" : "text-eminence-text"}`}
+                      className={`w-full text-left px-4 py-3 text-sm hover:bg-jainil-surface ${lang === l.code ? "text-jainil-gold font-semibold" : "text-jainil-text"}`}
                     >
                       {l.name}
                     </button>
@@ -124,16 +124,7 @@ export default function Navbar() {
               </Link>
             )}
 
-            {!isEmployee && (
-              <Link to="/cart" className={`relative ${txt} hover:opacity-70 transition-opacity`} data-testid="nav-cart">
-                <ShoppingBag size={20} />
-                {count > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-eminence-gold text-white text-[10px] w-4 h-4 flex items-center justify-center font-semibold">
-                    {count}
-                  </span>
-                )}
-              </Link>
-            )}
+
 
             <button onClick={() => setOpen(!open)} className={`lg:hidden ${txt}`} data-testid="nav-menu-toggle">
               {open ? <X size={22} /> : <Menu size={22} />}
@@ -142,18 +133,18 @@ export default function Navbar() {
         </div>
 
         {open && (
-          <div className="lg:hidden border-t border-eminence-border bg-white">
+          <div className="lg:hidden border-t border-jainil-border bg-white">
             <div className="px-6 py-6 flex flex-col gap-4">
               {links.map((l) => {
                 const isStaffPath = l.to.startsWith("/billing") || l.to.startsWith("/consultancy") || l.to.startsWith("/admin") || l.to.endsWith("-panel");
                 return isStaffPath ? (
                   <a key={l.to} href={l.to}
-                    className="text-sm font-medium text-eminence-text hover:text-eminence-gold uppercase tracking-[0.18em]">
+                    className="text-sm font-medium text-jainil-text hover:text-jainil-gold uppercase tracking-[0.18em]">
                     {l.label}
                   </a>
                 ) : (
                   <NavLink key={l.to} to={l.to} onClick={() => setOpen(false)}
-                    className="text-sm font-medium text-eminence-text hover:text-eminence-gold uppercase tracking-[0.18em]">
+                    className="text-sm font-medium text-jainil-text hover:text-jainil-gold uppercase tracking-[0.18em]">
                     {l.label}
                   </NavLink>
                 );
@@ -162,7 +153,7 @@ export default function Navbar() {
                 <>
                   <a 
                     href={user.role === "admin" ? "/admin" : (user.role === "sales" ? "/sales-panel" : (user.role === "service" ? "/service-panel" : (user.role === "receptionist" ? "/receptionist-panel" : "/dashboard")))} 
-                    className="text-sm font-medium text-eminence-text uppercase tracking-[0.18em]"
+                    className="text-sm font-medium text-jainil-text uppercase tracking-[0.18em]"
                   >
                     {user.role === "admin" ? t("admin") : (user.role === "sales" ? t("salesPanel") : (user.role === "service" ? "Service Panel" : (user.role === "receptionist" ? "Receptionist Panel" : t("account"))))}
                   </a>
@@ -172,7 +163,7 @@ export default function Navbar() {
                   </button>
                 </>
               ) : (
-                <Link to="/login" onClick={() => setOpen(false)} className="text-sm font-medium text-eminence-text uppercase tracking-[0.18em]">{t("signIn")}</Link>
+                <Link to="/login" onClick={() => setOpen(false)} className="text-sm font-medium text-jainil-text uppercase tracking-[0.18em]">{t("signIn")}</Link>
               )}
             </div>
           </div>

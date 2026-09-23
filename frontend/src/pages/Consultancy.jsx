@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -17,12 +18,15 @@ export default function Consultancy() {
   const [clientReviews, setClientReviews] = useState({ images: [], videos: [] });
   const [gallery, setGallery] = useState([]);
   const [openFolder, setOpenFolder] = useState(null);
+  const [newPair, setNewPair] = useState({ before_img: "", after_img: "", title: "" });
   const [editBeforeAfter, setEditBeforeAfter] = useState({ images: [], videos: [] });
+  const [editBeforeAfterList, setEditBeforeAfterList] = useState([]);
   const [editClientReviews, setEditClientReviews] = useState({ images: [], videos: [] });
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isLookbookOpen, setIsLookbookOpen] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [activePdfViewer, setActivePdfViewer] = useState(null);
+  const [isSavingGallery, setIsSavingGallery] = useState(false);
   
   const [beforeAfterList, setBeforeAfterList] = useState([]);
 
@@ -31,7 +35,10 @@ export default function Consultancy() {
       .then(res => {
         const d = res.data || {};
         setBeforeAfter(d.before_after || { images: [], videos: [] });
+        setEditBeforeAfter(d.before_after || { images: [], videos: [] });
+        setEditBeforeAfterList(d.before_after_list || []);
         setClientReviews(d.client_reviews || { images: [], videos: [] });
+        setEditClientReviews(d.client_reviews || { images: [], videos: [] });
         setBeforeAfterList(d.before_after_list || []);
 
         let galleryItems = d.gallery || [];
@@ -186,24 +193,24 @@ export default function Consultancy() {
     }
   };
 
-  const inputCls = "w-full border-b border-eminence-border py-2 px-1 focus:outline-none focus:border-eminence-gold bg-transparent";
+  const inputCls = "w-full border-b border-jainil-border py-2 px-1 focus:outline-none focus:border-jainil-gold bg-transparent";
 
   return (
     <div className="max-w-5xl mx-auto px-3 sm:px-6 py-8 sm:py-12">
       <div className="text-center mb-6 sm:mb-10">
-        <h1 className="text-2xl sm:text-3xl font-light uppercase tracking-[0.2em] text-eminence-text mb-2">Consultation Form</h1>
-        <p className="text-eminence-muted font-light tracking-widest text-xs sm:text-sm">Help us understand your needs</p>
+        <h1 className="text-2xl sm:text-3xl font-light uppercase tracking-[0.2em] text-jainil-text mb-2">Consultation Form</h1>
+        <p className="text-jainil-muted font-light tracking-widest text-xs sm:text-sm">Help us understand your needs</p>
       </div>
 
       {/* Step Indicator */}
       <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10">
-        <button onClick={() => setStep(1)} className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 1 ? "bg-eminence-gold text-white shadow-lg shadow-eminence-gold/20" : "bg-eminence-surface text-eminence-muted border border-eminence-border hover:border-eminence-gold/50"}`}>
-          <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 1 ? "bg-white/20" : "bg-eminence-border/50"}`}>1</span>
+        <button onClick={() => setStep(1)} className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 1 ? "bg-jainil-gold text-white shadow-lg shadow-jainil-gold/20" : "bg-jainil-surface text-jainil-muted border border-jainil-border hover:border-jainil-gold/50"}`}>
+          <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 1 ? "bg-white/20" : "bg-jainil-border/50"}`}>1</span>
           Client & Questionnaire
         </button>
-        <ChevronRight size={16} className="text-eminence-muted" />
-        <button onClick={() => { if (formData.name && formData.phone) setStep(2); }} className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 2 ? "bg-eminence-gold text-white shadow-lg shadow-eminence-gold/20" : "bg-eminence-surface text-eminence-muted border border-eminence-border hover:border-eminence-gold/50"}`}>
-          <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 2 ? "bg-white/20" : "bg-eminence-border/50"}`}>2</span>
+        <ChevronRight size={16} className="text-jainil-muted" />
+        <button onClick={() => { if (formData.name && formData.phone) setStep(2); }} className={`flex items-center gap-2 px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${step === 2 ? "bg-jainil-gold text-white shadow-lg shadow-jainil-gold/20" : "bg-jainil-surface text-jainil-muted border border-jainil-border hover:border-jainil-gold/50"}`}>
+          <span className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${step === 2 ? "bg-white/20" : "bg-jainil-border/50"}`}>2</span>
           Staff Only
         </button>
       </div>
@@ -211,29 +218,29 @@ export default function Consultancy() {
       <form onSubmit={handleSubmit}>
         {/* ===== STEP 1: Client Details + Questionnaire ===== */}
         {step === 1 && (
-          <div className="space-y-8 sm:space-y-10 bg-white p-4 sm:p-8 border border-eminence-border shadow-sm animate-fade-in rounded-2xl">
+          <div className="space-y-8 sm:space-y-10 bg-white p-4 sm:p-8 border border-jainil-border shadow-sm animate-fade-in rounded-2xl">
             {/* SECTION 1: CUSTOMER DETAILS */}
             <div className="space-y-6">
-              <h2 className="text-lg uppercase tracking-[0.15em] border-b border-eminence-border pb-2">1. Client Details</h2>
+              <h2 className="text-lg uppercase tracking-[0.15em] border-b border-jainil-border pb-2">1. Client Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Date</label>
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Date</label>
                   <input type="date" name="date" value={formData.date} onChange={handleChange} className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Location</label>
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Location</label>
                   <select name="location" value={formData.location} onChange={handleChange} className={`${inputCls} appearance-none`}>
                     <option value="Sama Savli">Sama Savli (Baroda)</option>
                     <option value="Sevasi">Sevasi (Baroda)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Client Name *</label>
+                  <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Client Name *</label>
                   <input type="text" name="name" value={formData.name} onChange={handleChange} required className={inputCls} placeholder="Full Name" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-xs uppercase tracking-widest text-eminence-muted">WhatsApp Number *</label>
+                    <label className="block text-xs uppercase tracking-widest text-jainil-muted">WhatsApp Number *</label>
                     {isFetchingLead && <span className="text-[10px] text-emerald-600 font-bold animate-pulse">Auto-fetching lead...</span>}
                   </div>
                   <input 
@@ -252,7 +259,7 @@ export default function Consultancy() {
 
             {/* SECTION 2: QUESTIONNAIRE */}
             <div className="space-y-8">
-              <h2 className="text-lg uppercase tracking-[0.15em] border-b border-eminence-border pb-2">2. Needs & Preferences</h2>
+              <h2 className="text-lg uppercase tracking-[0.15em] border-b border-jainil-border pb-2">2. Needs & Preferences</h2>
               
               {/* Q1 */}
               <div>
@@ -260,8 +267,8 @@ export default function Consultancy() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {["Hair Treatment", "Hair Transplant", "Wig Use Kiya Hai", "None"].map(opt => (
                     <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={formData.past_treatments.includes(opt)} onChange={() => handleCheckbox("past_treatments", opt)} className="accent-eminence-gold" />
-                      <span className="text-eminence-muted hover:text-eminence-text transition-colors">{opt}</span>
+                      <input type="checkbox" checked={formData.past_treatments.includes(opt)} onChange={() => handleCheckbox("past_treatments", opt)} className="accent-jainil-gold" />
+                      <span className="text-jainil-muted hover:text-jainil-text transition-colors">{opt}</span>
                     </label>
                   ))}
                 </div>
@@ -325,8 +332,8 @@ export default function Consultancy() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {["Office / Business", "Travelling / Outdoor", "Fitness / Gym", "Casual / Home Use"].map(opt => (
                     <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="lifestyle" value={opt} checked={formData.lifestyle === opt} onChange={handleChange} className="accent-eminence-gold" />
-                      <span className="text-eminence-muted hover:text-eminence-text transition-colors">{opt}</span>
+                      <input type="radio" name="lifestyle" value={opt} checked={formData.lifestyle === opt} onChange={handleChange} className="accent-jainil-gold" />
+                      <span className="text-jainil-muted hover:text-jainil-text transition-colors">{opt}</span>
                     </label>
                   ))}
                 </div>
@@ -338,8 +345,8 @@ export default function Consultancy() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   {["Confidence Boost Karne Ke Liye", "Job / Business Growth Ke Liye", "Special Event (Wedding, Party)", "Medical Reason"].map(opt => (
                     <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="reason" value={opt} checked={formData.reason === opt} onChange={handleChange} className="accent-eminence-gold" />
-                      <span className="text-eminence-muted hover:text-eminence-text transition-colors">{opt}</span>
+                      <input type="radio" name="reason" value={opt} checked={formData.reason === opt} onChange={handleChange} className="accent-jainil-gold" />
+                      <span className="text-jainil-muted hover:text-jainil-text transition-colors">{opt}</span>
                     </label>
                   ))}
                 </div>
@@ -351,8 +358,8 @@ export default function Consultancy() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                   {["Comfort & Fit (Kya yeh comfortable hoga?)", "Durability (Kitne time tak chalega?)", "Water & Sweat Resistance (Paani me ja sakte hain?)", "Natural Look (Kya yeh natural lagega?)", "Security (Kya yeh nikal nahi jaayega?)", "Service / Maintenance"].map(opt => (
                     <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                      <input type="checkbox" checked={formData.additional_questions.includes(opt)} onChange={() => handleCheckbox("additional_questions", opt)} className="accent-eminence-gold" />
-                      <span className="text-eminence-muted hover:text-eminence-text transition-colors">{opt}</span>
+                      <input type="checkbox" checked={formData.additional_questions.includes(opt)} onChange={() => handleCheckbox("additional_questions", opt)} className="accent-jainil-gold" />
+                      <span className="text-jainil-muted hover:text-jainil-text transition-colors">{opt}</span>
                     </label>
                   ))}
                 </div>
@@ -367,10 +374,10 @@ export default function Consultancy() {
                     { label: "Recommended Standard", range: "₹18,000 to ₹26,000" },
                     { label: "Premium", range: "Above ₹30,000" }
                   ].map(opt => (
-                    <label key={opt.label} className={`border p-4 text-center cursor-pointer transition-all ${formData.budget_range === opt.label ? 'border-eminence-gold bg-eminence-gold/5' : 'border-eminence-border hover:border-eminence-gold/50'}`}>
+                    <label key={opt.label} className={`border p-4 text-center cursor-pointer transition-all ${formData.budget_range === opt.label ? 'border-jainil-gold bg-jainil-gold/5' : 'border-jainil-border hover:border-jainil-gold/50'}`}>
                       <input type="radio" name="budget_range" value={opt.label} checked={formData.budget_range === opt.label} onChange={handleChange} className="hidden" />
-                      <div className="text-xs uppercase tracking-widest text-eminence-muted mb-2">{opt.label}</div>
-                      <div className="font-medium text-eminence-text">{opt.range}</div>
+                      <div className="text-xs uppercase tracking-widest text-jainil-muted mb-2">{opt.label}</div>
+                      <div className="font-medium text-jainil-text">{opt.range}</div>
                     </label>
                   ))}
                 </div>
@@ -380,8 +387,13 @@ export default function Consultancy() {
             {/* Media Gallery Folder View - 2 Large Cards Matching Design */}
             {!openFolder ? (
               <div className="space-y-6 pt-6">
-                <div className="flex items-center justify-between border-b border-eminence-border pb-2">
+                <div className="flex items-center justify-between border-b border-jainil-border pb-2">
                   <h2 className="text-lg uppercase tracking-[0.15em] font-serif">VIDEOS & IMAGES GALLERY</h2>
+                  {true && (
+                    <button type="button" onClick={() => setIsEditorOpen(true)} className="px-3 py-1.5 bg-jainil-gold text-white text-[10px] font-bold uppercase tracking-widest hover:bg-jainil-gold/90 transition-all rounded-lg">
+                      Edit Gallery
+                    </button>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -420,65 +432,70 @@ export default function Consultancy() {
               </div>
             ) : (
               <div className="space-y-6 pt-6">
-                <div className="flex items-center justify-between border-b border-eminence-border pb-2">
+                <div className="flex items-center justify-between border-b border-jainil-border pb-2">
                   <div className="flex items-center gap-2">
                     <button 
                       type="button"
                       onClick={() => setOpenFolder(null)}
-                      className="flex items-center gap-1 text-xs uppercase tracking-widest font-bold text-eminence-muted hover:text-black transition-colors"
+                      className="flex items-center gap-1 text-xs uppercase tracking-widest font-bold text-jainil-muted hover:text-black transition-colors"
                     >
                       <ChevronLeft size={16} /> Back to Gallery
                     </button>
-                    <span className="text-eminence-border">|</span>
+                    <span className="text-jainil-border">|</span>
                     <h2 className="text-lg uppercase tracking-[0.15em] font-serif font-bold text-gray-900">
                       {openFolder === "client_reviews" ? "Client Reviews" : "Before & After Images"}
                     </h2>
                   </div>
+                  {true && (
+                    <button type="button" onClick={() => setIsEditorOpen(true)} className="px-3 py-1.5 bg-jainil-gold text-white text-[10px] font-bold uppercase tracking-widest hover:bg-jainil-gold/90 transition-all rounded-lg">
+                      Upload
+                    </button>
+                  )}
                 </div>
 
                 {openFolder === "client_reviews" ? (
                   <div className="space-y-8 animate-fade-in py-4">
                     <div>
-                      <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold text-center">Client Review Photos</p>
+                      <p className="text-xs uppercase tracking-widest text-jainil-muted mb-3 font-bold text-center">Client Review Photos</p>
                       {clientReviews.images.length > 0 ? (
                         <Carousel className="w-full max-w-md mx-auto relative px-8" opts={{ align: "start", loop: true }}>
                           <CarouselContent className="-ml-3">
                             {clientReviews.images.map((src, idx) => (
                               <CarouselItem key={idx} className="pl-3 basis-full">
-                                <div onClick={() => setLightbox({ type: "image", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg">
+                                <div onClick={() => setLightbox({ type: "image", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-jainil-border/30 hover:border-jainil-gold/50 transition-all hover:shadow-lg">
                                   <img src={getMediaUrl(src)} alt={`Review ${idx + 1}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                               </CarouselItem>
                             ))}
                           </CarouselContent>
-                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-jainil-border" />
+                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-jainil-border" />
                         </Carousel>
                       ) : (
-                        <p className="text-xs text-eminence-muted italic text-center py-6">No review photos uploaded yet.</p>
+                        <p className="text-xs text-jainil-muted italic text-center py-6">No review photos uploaded yet.</p>
                       )}
                     </div>
                     {clientReviews.videos.length > 0 && (
                       <div>
-                        <p className="text-xs uppercase tracking-widest text-eminence-muted mb-3 font-bold text-center">Client Review Videos</p>
+                        <p className="text-xs uppercase tracking-widest text-jainil-muted mb-3 font-bold text-center">Client Review Videos</p>
                         <Carousel className="w-full max-w-xl mx-auto relative px-8" opts={{ align: "start", loop: true }}>
                           <CarouselContent className="-ml-3">
                             {clientReviews.videos.map((src, idx) => (
                               <CarouselItem key={idx} className="pl-3 basis-full">
-                                <div onClick={() => setLightbox({ type: "video", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-video overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg bg-black/5">
+                                <div onClick={() => setLightbox({ type: "video", src: getMediaUrl(src) })} className="relative group cursor-pointer aspect-video overflow-hidden rounded-xl border border-jainil-border/30 hover:border-jainil-gold/50 transition-all hover:shadow-lg bg-black/5">
                                   <video src={getMediaUrl(src)} className="w-full h-full object-cover" muted preload="metadata" />
                                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
                                     <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
-                                      <Play size={20} className="text-eminence-gold ml-0.5" fill="currentColor" />
+                                      <Play size={20} className="text-jainil-gold ml-0.5" fill="currentColor" />
                                     </div>
                                   </div>
                                 </div>
                               </CarouselItem>
                             ))}
                           </CarouselContent>
-                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-jainil-border" />
+                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-jainil-border" />
                         </Carousel>
                       </div>
                     )}
@@ -529,7 +546,7 @@ export default function Consultancy() {
                               <CarouselItem key={idx} className="pl-3 basis-full">
                                 <div
                                   onClick={() => setLightbox({ type: "image", src: getMediaUrl(src) })}
-                                  className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-eminence-border/30 hover:border-eminence-gold/50 transition-all hover:shadow-lg"
+                                  className="relative group cursor-pointer aspect-square overflow-hidden rounded-xl border border-jainil-border/30 hover:border-jainil-gold/50 transition-all hover:shadow-lg"
                                 >
                                   <img src={getMediaUrl(src)} alt={"Transformation " + (idx + 1)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -537,9 +554,16 @@ export default function Consultancy() {
                               </CarouselItem>
                             ))}
                           </CarouselContent>
-                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
-                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-eminence-border" />
+                          <CarouselPrevious className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-jainil-border" />
+                          <CarouselNext className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/90 shadow hover:bg-white border-jainil-border" />
                         </Carousel>
+                      </div>
+                    )}
+                    
+                    {(!beforeAfterList || beforeAfterList.length === 0) && (!beforeAfter?.images || beforeAfter.images.length === 0) && (
+                      <div className="text-center py-12 border border-dashed border-gray-300 rounded-2xl bg-gray-50/50">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">No Transformations Found</p>
+                        <p className="text-sm text-gray-400">Click the "Upload" button above to add before & after photos.</p>
                       </div>
                     )}
                   </div>
@@ -551,7 +575,7 @@ export default function Consultancy() {
             <button 
               type="button" 
               onClick={goToNext}
-              className="w-full bg-eminence-gold text-white uppercase tracking-[0.2em] text-sm py-4 hover:bg-black transition-colors flex justify-center items-center gap-2"
+              className="w-full bg-jainil-gold text-white uppercase tracking-[0.2em] text-sm py-4 hover:bg-black transition-colors flex justify-center items-center gap-2"
             >
               Next — Staff Details
               <ChevronRight size={18} />
@@ -561,41 +585,41 @@ export default function Consultancy() {
 
         {/* ===== STEP 2: Staff Only (Internal Details) ===== */}
         {step === 2 && (
-          <div className="space-y-6 bg-white p-8 border border-eminence-border shadow-sm animate-fade-in">
+          <div className="space-y-6 bg-white p-8 border border-jainil-border shadow-sm animate-fade-in">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg uppercase tracking-[0.15em] border-b border-eminence-border pb-2 text-eminence-gold flex-1">3. Internal Details (Staff Only)</h2>
+              <h2 className="text-lg uppercase tracking-[0.15em] border-b border-jainil-border pb-2 text-jainil-gold flex-1">3. Internal Details (Staff Only)</h2>
             </div>
 
             {/* Summary of client info from step 1 */}
-            <div className="bg-eminence-surface/30 border border-eminence-border/20 rounded-xl p-4 flex flex-wrap gap-6 text-xs">
+            <div className="bg-jainil-surface/30 border border-jainil-border/20 rounded-xl p-4 flex flex-wrap gap-6 text-xs">
               <div>
-                <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block">Client</span>
+                <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block">Client</span>
                 <span className="font-medium">{formData.name}</span>
               </div>
               <div>
-                <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block">Phone</span>
+                <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block">Phone</span>
                 <span className="font-medium">{formData.phone}</span>
               </div>
               <div>
-                <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block">Location</span>
+                <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block">Location</span>
                 <span className="font-medium">{formData.location}</span>
               </div>
               {formData.budget_range && (
                 <div>
-                  <span className="text-[10px] text-eminence-muted uppercase font-bold tracking-wider block">Budget</span>
-                  <span className="font-medium text-eminence-gold">{formData.budget_range}</span>
+                  <span className="text-[10px] text-jainil-muted uppercase font-bold tracking-wider block">Budget</span>
+                  <span className="font-medium text-jainil-gold">{formData.budget_range}</span>
                 </div>
               )}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Consulted By</label>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Consulted By</label>
                 <input type="text" name="consulted_by" value={formData.consulted_by} onChange={handleChange} className={inputCls} />
               </div>
               
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Source</label>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Source</label>
                 <select name="source" value={formData.source} onChange={handleChange} className={`${inputCls} appearance-none`}>
                   <option value="Direct">Direct</option>
                   <option value="DMT">DMT</option>
@@ -607,7 +631,7 @@ export default function Consultancy() {
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Status</label>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Status</label>
                 <select name="status" value={formData.status} onChange={handleChange} className={`${inputCls} appearance-none`}>
                   <option value="Hot">Hot</option>
                   <option value="Warm">Warm</option>
@@ -618,23 +642,23 @@ export default function Consultancy() {
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Revenue / Expected Revenue (₹)</label>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Revenue / Expected Revenue (₹)</label>
                 <input type="number" name="revenue" value={formData.revenue} onChange={handleChange} className={inputCls} placeholder="e.g. 25000" />
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Follow-up Date</label>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Follow-up Date</label>
                 <input type="date" name="follow_up_date" value={formData.follow_up_date} onChange={handleChange} className={inputCls} />
               </div>
 
               <div>
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Size & Color (e.g., 9x7 | Natural Black)</label>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Size & Color (e.g., 9x7 | Natural Black)</label>
                 <input type="text" name="size_color" value={formData.size_color} onChange={handleChange} className={inputCls} placeholder="Size x Size | Color" />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-xs uppercase tracking-widest text-eminence-muted mb-2">Notes</label>
-                <textarea name="notes" value={formData.notes} onChange={handleChange} rows="3" className="w-full border border-eminence-border p-3 focus:outline-none focus:border-eminence-gold bg-transparent resize-none" placeholder="Any additional details or observations..."></textarea>
+                <label className="block text-xs uppercase tracking-widest text-jainil-muted mb-2">Notes</label>
+                <textarea name="notes" value={formData.notes} onChange={handleChange} rows="3" className="w-full border border-jainil-border p-3 focus:outline-none focus:border-jainil-gold bg-transparent resize-none" placeholder="Any additional details or observations..."></textarea>
               </div>
             </div>
 
@@ -643,7 +667,7 @@ export default function Consultancy() {
               <button 
                 type="button" 
                 onClick={goBack}
-                className="flex-1 border border-eminence-border text-eminence-muted uppercase tracking-[0.2em] text-sm py-4 hover:bg-eminence-surface transition-colors flex justify-center items-center gap-2"
+                className="flex-1 border border-jainil-border text-jainil-muted uppercase tracking-[0.2em] text-sm py-4 hover:bg-jainil-surface transition-colors flex justify-center items-center gap-2"
               >
                 <ChevronLeft size={18} />
                 Back
@@ -651,7 +675,7 @@ export default function Consultancy() {
               <button 
                 type="submit" 
                 disabled={loading}
-                className="flex-[2] bg-eminence-gold text-white uppercase tracking-[0.2em] text-sm py-4 hover:bg-black transition-colors disabled:opacity-70 flex justify-center items-center gap-2"
+                className="flex-[2] bg-jainil-gold text-white uppercase tracking-[0.2em] text-sm py-4 hover:bg-black transition-colors disabled:opacity-70 flex justify-center items-center gap-2"
               >
                 {loading && <Loader2 size={16} className="animate-spin" />}
                 {loading ? "Saving..." : "Save Consultation"}
@@ -662,44 +686,130 @@ export default function Consultancy() {
       </form>
 
       {/* Lightbox Modal */}
-      {lightbox && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setLightbox(null)}>
-          <button onClick={() => setLightbox(null)} className="absolute top-6 right-6 text-white/80 hover:text-white transition-colors z-10">
-            <X size={28} />
+      {lightbox && typeof document !== 'undefined' && createPortal(
+        <div 
+          onClick={() => setLightbox(null)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999999, backgroundColor: 'rgba(0, 0, 0, 0.95)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+        >
+          <button 
+            onClick={() => setLightbox(null)} 
+            style={{ position: 'absolute', top: '24px', right: '24px', zIndex: 99999999, backgroundColor: '#ef4444', color: 'white', padding: '12px', borderRadius: '50%', border: '2px solid white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+          >
+            <X size={32} strokeWidth={3} />
           </button>
-          <div className="max-w-4xl max-h-[85vh] w-full" onClick={e => e.stopPropagation()}>
+          <div style={{ width: '100%', height: '100%', maxWidth: '1200px', maxHeight: '90vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={e => e.stopPropagation()}>
             {lightbox.type === "image" ? (
-              <img src={lightbox.src} alt="Consultation" className="w-full h-full object-contain rounded-xl" />
+              <img src={lightbox.src} alt="Consultation" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} />
             ) : (
-              <video src={lightbox.src} controls autoPlay className="w-full max-h-[85vh] rounded-xl" />
+              <video src={lightbox.src} controls autoPlay style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '12px', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }} />
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* Admin Gallery Editor Modal */}
-      {isEditorOpen && user?.role === "admin" && (
-        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      {isEditorOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999999, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+        >
           <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col animate-fade-in">
-            <button onClick={() => setIsEditorOpen(false)} className="absolute top-4 right-4 text-eminence-muted hover:text-eminence-text transition-colors">
+            <button onClick={() => setIsEditorOpen(false)} className="absolute top-4 right-4 text-jainil-muted hover:text-jainil-text transition-colors">
               <X size={20} />
             </button>
-            <div className="p-8 border-b border-eminence-border">
-              <h3 className="font-serif text-2xl text-eminence-text">Manage Consultation Gallery</h3>
-              <p className="text-xs text-eminence-muted mt-1">Upload and configure photos and videos displayed on the consultation form.</p>
+            <div className="p-8 border-b border-jainil-border">
+              <h3 className="font-serif text-2xl text-jainil-text">Manage Consultation Gallery</h3>
+              <p className="text-xs text-jainil-muted mt-1">Upload and configure photos and videos displayed on the consultation form.</p>
             </div>
             
             <div className="p-8 overflow-y-auto flex-1 space-y-8">
               {/* SECTION 1: Before & After */}
-              <div className="border border-eminence-border/60 rounded-2xl p-6 bg-eminence-surface/10 space-y-6">
-                <h4 className="font-serif text-lg text-eminence-text border-b border-eminence-border pb-2 text-eminence-gold">Before & After Folder</h4>
+              <div className="border border-jainil-border/60 rounded-2xl p-6 bg-jainil-surface/10 space-y-6">
+                <h4 className="font-serif text-lg text-jainil-text border-b border-jainil-border pb-2 text-jainil-gold">Before & After Folder</h4>
                 
+                {/* Transformation Pairs */}
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-jainil-muted mb-3">Transformation Pairs ({editBeforeAfterList.length || 0})</p>
+                  
+                  {editBeforeAfterList.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                      {editBeforeAfterList.map((pair, idx) => (
+                        <div key={idx} className="bg-white rounded-xl border border-jainil-border p-3 flex flex-col relative group">
+                          <div className="grid grid-cols-2 gap-2 mb-2">
+                            <div>
+                              <span className="text-[9px] uppercase tracking-wider font-bold text-gray-500 block mb-1">Before</span>
+                              <img src={getMediaUrl(pair.before_img)} alt="Before" className="w-full aspect-square object-cover rounded-lg border border-jainil-border/50" />
+                            </div>
+                            <div>
+                              <span className="text-[9px] uppercase tracking-wider font-bold text-emerald-700 block mb-1">After</span>
+                              <img src={getMediaUrl(pair.after_img)} alt="After" className="w-full aspect-square object-cover rounded-lg border border-emerald-200" />
+                            </div>
+                          </div>
+                          <p className="text-xs font-bold text-center text-gray-700">{pair.title || `Transformation ${idx + 1}`}</p>
+                          <button
+                            type="button"
+                            onClick={() => setEditBeforeAfterList(prev => prev.filter((_, i) => i !== idx))}
+                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="bg-gray-50 p-4 border border-dashed border-gray-300 rounded-xl mb-8">
+                    <p className="text-xs font-bold text-gray-600 uppercase mb-3 text-center">Add New Transformation Pair</p>
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-gray-500 block mb-1">Before Image</span>
+                        <ImageUpload 
+                          value={newPair.before_img} 
+                          onChange={(url) => {
+                            setNewPair(p => ({ ...p, before_img: url ? url.replace(/http:\/\/localhost:\d+/i, "").replace(/https?:\/\/[^\/]+/i, "") : "" }))
+                          }} 
+                        />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider font-bold text-emerald-700 block mb-1">After Image</span>
+                        <ImageUpload 
+                          value={newPair.after_img} 
+                          onChange={(url) => {
+                            setNewPair(p => ({ ...p, after_img: url ? url.replace(/http:\/\/localhost:\d+/i, "").replace(/https?:\/\/[^\/]+/i, "") : "" }))
+                          }} 
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <input 
+                        type="text" 
+                        value={newPair.title} 
+                        onChange={e => setNewPair(p => ({ ...p, title: e.target.value }))}
+                        placeholder="Title (e.g. Hair Patch Fixing)" 
+                        className="flex-1 w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      />
+                      <button 
+                        type="button"
+                        disabled={!newPair.before_img || !newPair.after_img}
+                        onClick={() => {
+                          setEditBeforeAfterList(prev => [...prev, newPair]);
+                          setNewPair({ before_img: "", after_img: "", title: "" });
+                        }}
+                        className="w-full sm:w-auto px-4 py-2 bg-emerald-700 text-white font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-emerald-800 disabled:opacity-50 transition-colors"
+                      >
+                        Add Pair
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+
                 {/* Before & After Photos */}
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-eminence-muted mb-3">Photos ({editBeforeAfter.images?.length || 0})</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-jainil-muted mb-3">Photos ({editBeforeAfter.images?.length || 0})</p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-4">
                     {(editBeforeAfter.images || []).map((img, i) => (
-                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-eminence-border">
+                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-jainil-border">
                         <img src={getMediaUrl(img)} alt="" className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -714,8 +824,8 @@ export default function Consultancy() {
                       </div>
                     ))}
                   </div>
-                  <div className="bg-white p-4 border border-dashed border-eminence-border rounded-xl">
-                    <p className="text-xs font-bold text-eminence-muted uppercase mb-2">Add Photo to Before & After</p>
+                  <div className="bg-white p-4 border border-dashed border-jainil-border rounded-xl">
+                    <p className="text-xs font-bold text-jainil-muted uppercase mb-2">Add Photo to Before & After</p>
                     <ImageUpload 
                       value="" 
                       onChange={(url) => {
@@ -733,10 +843,10 @@ export default function Consultancy() {
 
                 {/* Before & After Videos */}
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-eminence-muted mb-3">Videos ({editBeforeAfter.videos?.length || 0})</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-jainil-muted mb-3">Videos ({editBeforeAfter.videos?.length || 0})</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
                     {(editBeforeAfter.videos || []).map((vid, i) => (
-                      <div key={i} className="relative group aspect-video rounded-lg overflow-hidden border border-eminence-border bg-black/5">
+                      <div key={i} className="relative group aspect-video rounded-lg overflow-hidden border border-jainil-border bg-black/5">
                         <video src={getMediaUrl(vid)} className="w-full h-full object-cover" muted />
                         <button
                           type="button"
@@ -751,8 +861,8 @@ export default function Consultancy() {
                       </div>
                     ))}
                   </div>
-                  <div className="bg-white p-4 border border-dashed border-eminence-border rounded-xl">
-                    <p className="text-xs font-bold text-eminence-muted uppercase mb-2">Add Video to Before & After</p>
+                  <div className="bg-white p-4 border border-dashed border-jainil-border rounded-xl">
+                    <p className="text-xs font-bold text-jainil-muted uppercase mb-2">Add Video to Before & After</p>
                     <ImageUpload 
                       value="" 
                       onChange={(url) => {
@@ -770,15 +880,15 @@ export default function Consultancy() {
               </div>
 
               {/* SECTION 2: Client Reviews */}
-              <div className="border border-eminence-border/60 rounded-2xl p-6 bg-eminence-surface/10 space-y-6">
-                <h4 className="font-serif text-lg text-eminence-text border-b border-eminence-border pb-2 text-eminence-gold">Client Reviews Folder</h4>
+              <div className="border border-jainil-border/60 rounded-2xl p-6 bg-jainil-surface/10 space-y-6">
+                <h4 className="font-serif text-lg text-jainil-text border-b border-jainil-border pb-2 text-jainil-gold">Client Reviews Folder</h4>
                 
                 {/* Client Reviews Photos */}
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-eminence-muted mb-3">Photos ({editClientReviews.images?.length || 0})</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-jainil-muted mb-3">Photos ({editClientReviews.images?.length || 0})</p>
                   <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4 mb-4">
                     {(editClientReviews.images || []).map((img, i) => (
-                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-eminence-border">
+                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-jainil-border">
                         <img src={getMediaUrl(img)} alt="" className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -793,8 +903,8 @@ export default function Consultancy() {
                       </div>
                     ))}
                   </div>
-                  <div className="bg-white p-4 border border-dashed border-eminence-border rounded-xl">
-                    <p className="text-xs font-bold text-eminence-muted uppercase mb-2">Add Photo to Client Reviews</p>
+                  <div className="bg-white p-4 border border-dashed border-jainil-border rounded-xl">
+                    <p className="text-xs font-bold text-jainil-muted uppercase mb-2">Add Photo to Client Reviews</p>
                     <ImageUpload 
                       value="" 
                       onChange={(url) => {
@@ -812,10 +922,10 @@ export default function Consultancy() {
 
                 {/* Client Reviews Videos */}
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-eminence-muted mb-3">Videos ({editClientReviews.videos?.length || 0})</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-jainil-muted mb-3">Videos ({editClientReviews.videos?.length || 0})</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
                     {(editClientReviews.videos || []).map((vid, i) => (
-                      <div key={i} className="relative group aspect-video rounded-lg overflow-hidden border border-eminence-border bg-black/5">
+                      <div key={i} className="relative group aspect-video rounded-lg overflow-hidden border border-jainil-border bg-black/5">
                         <video src={getMediaUrl(vid)} className="w-full h-full object-cover" muted />
                         <button
                           type="button"
@@ -830,8 +940,8 @@ export default function Consultancy() {
                       </div>
                     ))}
                   </div>
-                  <div className="bg-white p-4 border border-dashed border-eminence-border rounded-xl">
-                    <p className="text-xs font-bold text-eminence-muted uppercase mb-2">Add Video to Client Reviews</p>
+                  <div className="bg-white p-4 border border-dashed border-jainil-border rounded-xl">
+                    <p className="text-xs font-bold text-jainil-muted uppercase mb-2">Add Video to Client Reviews</p>
                     <ImageUpload 
                       value="" 
                       onChange={(url) => {
@@ -849,48 +959,73 @@ export default function Consultancy() {
               </div>
             </div>
 
-            <div className="p-6 border-t border-eminence-border bg-eminence-surface/30 flex justify-end gap-3">
+            <div className="p-6 border-t border-jainil-border bg-jainil-surface/30 flex justify-end gap-3">
               <button
                 type="button"
                 onClick={() => {
                   api.get("/consultation-media").then(res => {
                     setBeforeAfter(res.data.before_after || { images: [], videos: [] });
+                    setBeforeAfterList(res.data.before_after_list || []);
+                    setEditBeforeAfter(res.data.before_after || { images: [], videos: [] });
+                    setEditBeforeAfterList(res.data.before_after_list || []);
                     setClientReviews(res.data.client_reviews || { images: [], videos: [] });
+                    setEditClientReviews(res.data.client_reviews || { images: [], videos: [] });
                     setIsEditorOpen(false);
                   });
                 }}
-                className="px-5 py-2.5 text-xs font-bold uppercase tracking-widest border border-eminence-border text-eminence-muted hover:bg-white rounded-lg transition-colors"
+                className="px-5 py-2.5 text-xs font-bold uppercase tracking-widest border border-jainil-border text-jainil-muted hover:bg-white rounded-lg transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="button"
+                disabled={isSavingGallery}
                 onClick={async () => {
                   try {
+                    setIsSavingGallery(true);
+                    const finalBeforeAfterList = [...editBeforeAfterList];
+                    if (newPair.before_img || newPair.after_img) {
+                      finalBeforeAfterList.push(newPair);
+                      setNewPair({ before_img: "", after_img: "", title: "" });
+                    }
+                    
                     await api.post("/admin/consultation-media", {
                       before_after: editBeforeAfter,
+                      before_after_list: finalBeforeAfterList,
                       client_reviews: editClientReviews
                     });
-                    setBeforeAfter(editBeforeAfter);
-                    setClientReviews(editClientReviews);
+                    const res = await api.get("/consultation-media");
+                    const d = res.data || {};
+                    setBeforeAfter(d.before_after || { images: [], videos: [] });
+                    setBeforeAfterList(d.before_after_list || []);
+                    setEditBeforeAfter(d.before_after || { images: [], videos: [] });
+                    setEditBeforeAfterList(d.before_after_list || []);
+                    setClientReviews(d.client_reviews || { images: [], videos: [] });
+                    setEditClientReviews(d.client_reviews || { images: [], videos: [] });
                     toast.success("Consultation media gallery updated successfully!");
                     setIsEditorOpen(false);
                   } catch (err) {
                     toast.error("Failed to update media: " + err.message);
+                  } finally {
+                    setIsSavingGallery(false);
                   }
                 }}
-                className="px-6 py-2.5 text-xs font-bold uppercase tracking-widest bg-eminence-gold hover:bg-eminence-gold/90 text-white rounded-lg transition-colors shadow-lg shadow-eminence-gold/15"
+                className="px-6 py-2.5 text-xs font-bold uppercase tracking-widest bg-jainil-gold hover:bg-jainil-gold/90 text-white rounded-lg transition-colors shadow-lg shadow-jainil-gold/15 flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                Save Gallery
+                {isSavingGallery && <Loader2 size={14} className="animate-spin" />}
+                {isSavingGallery ? "Saving..." : "Save Gallery"}
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     
       {/* Signature Hair Catalog - Custom Styling Lookbooks Modal */}
-      {isLookbookOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+      {isLookbookOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999999, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+        >
           <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-emerald-100">
             {/* Header */}
             <div className="p-6 md:p-8 bg-gradient-to-b from-emerald-50/70 to-white border-b border-emerald-100/80 relative">
@@ -1009,17 +1144,19 @@ export default function Consultancy() {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* In-App Interactive PDF Viewer Modal */}
-      {activePdfViewer && (
+      {/* Full Screen PDF Viewer Modal */}
+      {activePdfViewer && typeof document !== 'undefined' && createPortal(
         <div 
-          className="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] flex items-center justify-center p-2 md:p-6 animate-fade-in"
           onClick={() => setActivePdfViewer(null)}
+          style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999999, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '16px' }}
         >
           <div 
-            className="bg-white rounded-3xl w-full max-w-5xl h-[92vh] flex flex-col overflow-hidden shadow-2xl border border-white/20"
+            className="bg-white rounded-t-3xl md:rounded-3xl w-full max-w-5xl flex flex-col overflow-hidden shadow-2xl border border-white/20"
+            style={{ height: "calc(100vh - 80px)", maxHeight: "1000px" }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="px-6 py-4 bg-gray-900 text-white flex items-center justify-between border-b border-gray-800">
@@ -1072,7 +1209,8 @@ export default function Consultancy() {
               </object>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
 </div>

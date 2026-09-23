@@ -30,7 +30,7 @@ export default function ConsultationModal({ isOpen, onClose }) {
       });
 
       // 2. Open WhatsApp for direct contact
-      const msg = `Hi Eminence! I'd like to book an expert consultancy.\n\nName: ${form.name}\nPhone: ${form.phone}\nDate: ${form.date}\nTime: ${form.time}\nConcern: ${form.concern}`;
+      const msg = `Hi Jainil! I'd like to book an expert consultancy.\n\nName: ${form.name}\nPhone: ${form.phone}\nDate: ${form.date}\nTime: ${form.time}\nConcern: ${form.concern}`;
       const url = `https://wa.me/912652468800?text=${encodeURIComponent(msg)}`;
       window.open(url, "_blank");
       
@@ -44,64 +44,64 @@ export default function ConsultationModal({ isOpen, onClose }) {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in pointer-events-auto">
       <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-eminence-muted hover:text-eminence-text transition-colors">
+        <button onClick={onClose} className="absolute top-4 right-4 text-jainil-muted hover:text-jainil-text transition-colors">
           <X size={20} />
         </button>
 
         {step === 1 ? (
           <form onSubmit={handleBook} className="p-8">
             <div className="mb-8">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-eminence-gold font-bold mb-2">Virtual Suite</p>
-              <h2 className="font-serif text-3xl text-eminence-text">Book Expert Consultancy</h2>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-jainil-gold font-bold mb-2">Virtual Suite</p>
+              <h2 className="font-serif text-3xl text-jainil-text">Book Expert Consultancy</h2>
             </div>
 
             <div className="space-y-5">
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-eminence-muted block mb-2 font-bold">Full Name</label>
+                <label className="text-[10px] uppercase tracking-wider text-jainil-muted block mb-2 font-bold">Full Name</label>
                 <div className="relative">
-                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-gold" />
+                  <User size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-gold" />
                   <input required value={form.name} onChange={(e) => setForm({...form, name: e.target.value})}
-                    placeholder="John Doe" className="w-full bg-eminence-surface border border-eminence-border pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-eminence-gold" />
+                    placeholder="John Doe" className="w-full bg-jainil-surface border border-jainil-border pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-jainil-gold" />
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-eminence-muted block mb-2 font-bold">Phone Number</label>
+                <label className="text-[10px] uppercase tracking-wider text-jainil-muted block mb-2 font-bold">Phone Number</label>
                 <div className="relative">
-                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-gold" />
+                  <Phone size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-gold" />
                   <input required value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})}
-                    placeholder="+91 00000 00000" className="w-full bg-eminence-surface border border-eminence-border pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-eminence-gold" />
+                    placeholder="+91 00000 00000" className="w-full bg-jainil-surface border border-jainil-border pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-jainil-gold" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] uppercase tracking-wider text-eminence-muted block mb-2 font-bold">Date</label>
+                  <label className="text-[10px] uppercase tracking-wider text-jainil-muted block mb-2 font-bold">Date</label>
                   <div className="relative">
-                    <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-eminence-gold" />
+                    <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-jainil-gold" />
                     <input type="date" required value={form.date} onChange={(e) => setForm({...form, date: e.target.value})}
-                      className="w-full bg-eminence-surface border border-eminence-border pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-eminence-gold" />
+                      className="w-full bg-jainil-surface border border-jainil-border pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-jainil-gold" />
                   </div>
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase tracking-wider text-eminence-muted block mb-2 font-bold">Time</label>
+                  <label className="text-[10px] uppercase tracking-wider text-jainil-muted block mb-2 font-bold">Time</label>
                   <select value={form.time} onChange={(e) => setForm({...form, time: e.target.value})}
-                    className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 text-sm focus:outline-none focus:border-eminence-gold appearance-none">
+                    className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 text-sm focus:outline-none focus:border-jainil-gold appearance-none">
                     {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="text-[10px] uppercase tracking-wider text-eminence-muted block mb-2 font-bold">Primary Concern</label>
+                <label className="text-[10px] uppercase tracking-wider text-jainil-muted block mb-2 font-bold">Primary Concern</label>
                 <select value={form.concern} onChange={(e) => setForm({...form, concern: e.target.value})}
-                  className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 text-sm focus:outline-none focus:border-eminence-gold appearance-none">
+                  className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 text-sm focus:outline-none focus:border-jainil-gold appearance-none">
                   {CONCERNS.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             </div>
 
-            <button type="submit" className="w-full mt-10 bg-eminence-gold hover:bg-eminence-goldHover text-white py-4 text-xs uppercase tracking-[0.2em] font-bold shadow-xl transition-all hover:scale-[1.02] active:scale-95">
+            <button type="submit" className="w-full mt-10 bg-jainil-gold hover:bg-jainil-goldHover text-white py-4 text-xs uppercase tracking-[0.2em] font-bold shadow-xl transition-all hover:scale-[1.02] active:scale-95">
               Confirm & Request Slot
             </button>
           </form>
@@ -110,8 +110,8 @@ export default function ConsultationModal({ isOpen, onClose }) {
             <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-8">
               <CheckCircle2 size={40} className="text-green-500" />
             </div>
-            <h2 className="font-serif text-3xl text-eminence-text mb-4">Request Sent</h2>
-            <p className="text-eminence-muted text-sm leading-relaxed mb-10">
+            <h2 className="font-serif text-3xl text-jainil-text mb-4">Request Sent</h2>
+            <p className="text-jainil-muted text-sm leading-relaxed mb-10">
               We've received your request for <strong>{form.date}</strong> at <strong>{form.time}</strong>. 
               Please check your WhatsApp—our expert will confirm the video link shortly.
             </p>

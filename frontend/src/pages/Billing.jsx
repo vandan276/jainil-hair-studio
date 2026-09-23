@@ -27,13 +27,13 @@ export default function Billing() {
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="font-serif text-3xl md:text-4xl text-gray-900">Billing Desk</h1>
-          <p className="text-sm text-eminence-muted mt-1">
+          <p className="text-sm text-jainil-muted mt-1">
             Create invoices, assign packages, and process customer service records.
           </p>
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm animate-pulse text-eminence-muted uppercase tracking-[0.2em] text-xs">
+          <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm animate-pulse text-jainil-muted uppercase tracking-[0.2em] text-xs">
             Loading billing system...
           </div>
         ) : (

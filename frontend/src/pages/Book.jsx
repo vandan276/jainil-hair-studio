@@ -51,7 +51,7 @@ export default function Book() {
           <div>
             <label className="overline block mb-3">{t("service")}</label>
             <select value={serviceId} onChange={(e) => setServiceId(e.target.value)} required data-testid="book-service-select"
-              className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 text-eminence-text focus:outline-none focus:border-eminence-gold">
+              className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 text-jainil-text focus:outline-none focus:border-jainil-gold">
               <option value="">{t("selectService")}</option>
               {services.map((s) => (
                 <option key={s.id} value={s.id}>{s.name} · ₹{s.price.toLocaleString("en-IN")}</option>
@@ -62,7 +62,7 @@ export default function Book() {
           <div>
             <label className="overline block mb-3">{t("stylist")}</label>
             <select value={stylistId} onChange={(e) => setStylistId(e.target.value)} data-testid="book-stylist-select"
-              className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 text-eminence-text focus:outline-none focus:border-eminence-gold">
+              className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 text-jainil-text focus:outline-none focus:border-jainil-gold">
               <option value="">{t("anyAvailable")}</option>
               {stylists.map((s) => (
                 <option key={s.id} value={s.id}>{s.name} · {s.role}</option>
@@ -74,14 +74,14 @@ export default function Book() {
             <div>
               <label className="overline block mb-3">{t("date")}</label>
               <input type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} required data-testid="book-date-input"
-                className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+                className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
             </div>
             <div>
               <label className="overline block mb-3">{t("time")}</label>
               <div className="grid grid-cols-5 gap-2">
                 {TIMES.map((t_item) => (
                   <button key={t_item} type="button" onClick={() => setTime(t_item)} data-testid={`book-time-${t_item}`}
-                    className={`text-xs py-2 border transition-colors ${time === t_item ? "bg-eminence-gold text-white border-eminence-gold" : "border-eminence-border text-eminence-muted hover:border-eminence-gold hover:text-eminence-gold"}`}>
+                    className={`text-xs py-2 border transition-colors ${time === t_item ? "bg-jainil-gold text-white border-jainil-gold" : "border-jainil-border text-jainil-muted hover:border-jainil-gold hover:text-jainil-gold"}`}>
                     {t_item}
                   </button>
                 ))}
@@ -93,18 +93,18 @@ export default function Book() {
             <label className="overline block mb-3">{t("notes")}</label>
             <textarea rows="3" value={notes} onChange={(e) => setNotes(e.target.value)} data-testid="book-notes-input"
               placeholder={t("notesPlaceholder")}
-              className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 text-eminence-text focus:outline-none focus:border-eminence-gold" />
+              className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 text-jainil-text focus:outline-none focus:border-jainil-gold" />
           </div>
         </div>
 
-        <aside className="eminence-card p-6 h-fit">
+        <aside className="jainil-card p-6 h-fit">
           <p className="overline mb-4">{t("summary")}</p>
           <div className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-eminence-muted">{t("service")}</span><span>{selectedService?.name || "—"}</span></div>
-            <div className="flex justify-between"><span className="text-eminence-muted">{t("duration")}</span><span>{selectedService?.duration_min || "—"} {t("min")}</span></div>
-            <div className="flex justify-between"><span className="text-eminence-muted">{t("date")}</span><span>{date || "—"}</span></div>
-            <div className="flex justify-between"><span className="text-eminence-muted">{t("time")}</span><span>{time || "—"}</span></div>
-            <div className="border-t border-eminence-border pt-3 flex justify-between text-eminence-gold font-serif text-2xl">
+            <div className="flex justify-between"><span className="text-jainil-muted">{t("service")}</span><span>{selectedService?.name || "—"}</span></div>
+            <div className="flex justify-between"><span className="text-jainil-muted">{t("duration")}</span><span>{selectedService?.duration_min || "—"} {t("min")}</span></div>
+            <div className="flex justify-between"><span className="text-jainil-muted">{t("date")}</span><span>{date || "—"}</span></div>
+            <div className="flex justify-between"><span className="text-jainil-muted">{t("time")}</span><span>{time || "—"}</span></div>
+            <div className="border-t border-jainil-border pt-3 flex justify-between text-jainil-gold font-serif text-2xl">
               <span>{t("total")}</span>
               <span>₹{selectedService ? selectedService.price.toLocaleString("en-IN") : 0}</span>
             </div>
@@ -112,7 +112,7 @@ export default function Book() {
           <button type="submit" disabled={loading} className="btn-gold w-full mt-6" data-testid="book-submit-btn">
             {loading ? t("confirming") : t("confirmBooking")}
           </button>
-          <p className="text-xs text-eminence-muted mt-4 leading-relaxed">{t("payAtSalon")}</p>
+          <p className="text-xs text-jainil-muted mt-4 leading-relaxed">{t("payAtSalon")}</p>
         </aside>
       </form>
     </div>

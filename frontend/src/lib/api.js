@@ -10,7 +10,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("eminence_token");
+  const token = localStorage.getItem("jainil_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -23,7 +23,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const isLoginUrl = error.config.url?.endsWith("/auth/login");
       if (!isLoginUrl) {
-        localStorage.removeItem("eminence_token");
+        localStorage.removeItem("jainil_token");
         if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }

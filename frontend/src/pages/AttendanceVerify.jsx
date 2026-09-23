@@ -92,17 +92,17 @@ export default function AttendanceVerify() {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-20 px-6">
-      <div className="max-w-xl w-full bg-white p-8 md:p-12 shadow-sm border border-eminence-border text-center">
-        <h1 className="text-3xl font-serif text-eminence-gold mb-2">
+      <div className="max-w-xl w-full bg-white p-8 md:p-12 shadow-sm border border-jainil-border text-center">
+        <h1 className="text-3xl font-serif text-jainil-gold mb-2">
           {isCheckout ? "Shift Completion" : "Daily Verification"}
         </h1>
-        <p className="text-eminence-muted text-sm uppercase tracking-widest mb-8">
+        <p className="text-jainil-muted text-sm uppercase tracking-widest mb-8">
           {isCheckout 
             ? "Please capture a photo and allow location access to verify and complete your shift today."
             : "Please capture a photo and allow location access to mark your attendance today."}
         </p>
 
-        <div className="relative w-full aspect-square bg-gray-100 rounded-xl overflow-hidden mb-8 border-2 border-eminence-border border-dashed flex items-center justify-center">
+        <div className="relative w-full aspect-square bg-gray-100 rounded-xl overflow-hidden mb-8 border-2 border-jainil-border border-dashed flex items-center justify-center">
           {!imgSrc ? (
             <Webcam
               audio={false}
@@ -121,7 +121,7 @@ export default function AttendanceVerify() {
           {!imgSrc ? (
             <button
               onClick={capture}
-              className="flex items-center gap-2 bg-eminence-gold text-white px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-black transition-colors"
+              className="flex items-center gap-2 bg-jainil-gold text-white px-8 py-4 uppercase tracking-[0.2em] text-xs hover:bg-black transition-colors"
             >
               <Camera size={16} /> Capture Photo
             </button>
@@ -130,14 +130,14 @@ export default function AttendanceVerify() {
               <button
                 onClick={retake}
                 disabled={loading}
-                className="flex items-center gap-2 border border-eminence-border px-6 py-4 uppercase tracking-[0.2em] text-xs hover:bg-gray-50 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 border border-jainil-border px-6 py-4 uppercase tracking-[0.2em] text-xs hover:bg-gray-50 transition-colors disabled:opacity-50"
               >
                 <RefreshCw size={16} /> Retake
               </button>
               <button
                 onClick={submitAttendance}
                 disabled={loading}
-                className="flex items-center gap-2 bg-eminence-gold text-white px-6 py-4 uppercase tracking-[0.2em] text-xs hover:bg-black transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 bg-jainil-gold text-white px-6 py-4 uppercase tracking-[0.2em] text-xs hover:bg-black transition-colors disabled:opacity-50"
               >
                 {loading ? "Verifying..." : <><CheckCircle size={16} /> Submit & Verify</>}
               </button>
@@ -152,7 +152,7 @@ export default function AttendanceVerify() {
               const destination = locationState.state?.from?.pathname || (user?.role === "admin" ? "/admin" : (user?.role === "service" ? "/service-panel" : (user?.role === "receptionist" ? "/receptionist-panel" : "/sales-panel")));
               nav(destination, { replace: true });
             }}
-            className="text-xs uppercase tracking-widest text-eminence-muted hover:text-black transition-colors underline"
+            className="text-xs uppercase tracking-widest text-jainil-muted hover:text-black transition-colors underline"
           >
             Skip & Enter Panel directly &rarr;
           </button>

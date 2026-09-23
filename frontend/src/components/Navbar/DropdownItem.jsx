@@ -9,7 +9,7 @@ export default function DropdownItem({ to, label, onClick }) {
       className={({ isActive }) =>
         `block w-full text-left px-4 py-2.5 text-xs uppercase tracking-wider font-semibold rounded-lg transition-all duration-200 ${
           isActive
-            ? "bg-eminence-gold text-white shadow-sm"
+            ? "bg-jainil-gold text-white shadow-sm"
             : "text-gray-700 hover:bg-gray-100 hover:text-black"
         }`
       }

@@ -89,13 +89,13 @@ def apply_patch():
     <div className="space-y-6 animate-fade-in">
       <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
         <h2 className="font-serif text-2xl text-gray-800">Client Pending Balances</h2>
-        <p className="text-xs text-eminence-muted">Track and collect outstanding balances from clients.</p>
+        <p className="text-xs text-jainil-muted">Track and collect outstanding balances from clients.</p>
       </div>
 
-      <div className="eminence-card overflow-hidden">
+      <div className="jainil-card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-eminence-border text-left overline text-eminence-muted">
+            <tr className="border-b border-jainil-border text-left overline text-jainil-muted">
               <th className="px-6 py-4">Client Name</th>
               <th>Contact Number</th>
               <th>Branch</th>
@@ -108,11 +108,11 @@ def apply_patch():
               <tr><td colSpan="5" className="text-center py-12">Loading...</td></tr>
             ) : leads.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center py-12 text-eminence-muted italic">All accounts are settled! No pending balances.</td>
+                <td colSpan="5" className="text-center py-12 text-jainil-muted italic">All accounts are settled! No pending balances.</td>
               </tr>
             ) : (
               leads.map(l => (
-                <tr key={l.id} className="border-b border-eminence-border/30 hover:bg-eminence-surface/30">
+                <tr key={l.id} className="border-b border-jainil-border/30 hover:bg-jainil-surface/30">
                   <td className="px-6 py-4 font-bold">{l.name}</td>
                   <td>{l.phone}</td>
                   <td>{l.branch || "—"}</td>

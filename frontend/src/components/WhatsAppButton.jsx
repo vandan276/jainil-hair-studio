@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MessageCircle, X } from "lucide-react";
 
 const PHONE = "912652468800"; // E.164 without +
-const DEFAULT_MSG = "Hi Eminence Salon! I'd like to book an appointment.";
+const DEFAULT_MSG = "Hi Jainil Salon! I'd like to book an appointment.";
 
 export default function WhatsAppButton() {
   const [open, setOpen] = useState(false);
@@ -17,7 +17,7 @@ export default function WhatsAppButton() {
   return (
     <>
       {open && (
-        <div className="fixed bottom-24 right-8 z-[60] w-[320px] bg-white border border-eminence-border shadow-2xl rounded-lg overflow-hidden" data-testid="whatsapp-popup">
+        <div className="fixed bottom-24 right-8 z-[60] w-[320px] bg-white border border-jainil-border shadow-2xl rounded-lg overflow-hidden" data-testid="whatsapp-popup">
           <div className="flex items-center justify-between p-4 bg-[#25D366] text-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -26,7 +26,7 @@ export default function WhatsAppButton() {
                 </svg>
               </div>
               <div>
-                <div className="font-semibold text-sm">Eminence Salon</div>
+                <div className="font-semibold text-sm">Jainil Salon</div>
                 <div className="text-xs opacity-90">Typically replies in minutes</div>
               </div>
             </div>
@@ -35,13 +35,13 @@ export default function WhatsAppButton() {
             </button>
           </div>
           <div className="p-4">
-            <p className="text-xs text-eminence-muted mb-2 uppercase tracking-[0.18em]">Your message</p>
+            <p className="text-xs text-jainil-muted mb-2 uppercase tracking-[0.18em]">Your message</p>
             <textarea
               value={msg}
               onChange={(e) => setMsg(e.target.value)}
               rows={3}
               data-testid="whatsapp-message"
-              className="w-full border border-eminence-border p-3 text-sm focus:outline-none focus:border-[#25D366] rounded"
+              className="w-full border border-jainil-border p-3 text-sm focus:outline-none focus:border-[#25D366] rounded"
             />
             <button onClick={send} data-testid="whatsapp-send" className="w-full mt-3 bg-[#25D366] hover:bg-[#1faa55] text-white py-3 text-xs uppercase tracking-[0.18em] font-semibold transition-colors rounded shadow-lg">
               Send via WhatsApp

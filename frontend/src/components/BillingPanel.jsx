@@ -37,7 +37,7 @@ const TAX_OPTIONS = [
 
 const SERVICE_FOR_OPTS = ["Men", "Women", "Men & Women"];
 
-export default function BillingPanel({ leads, initialClientName = "", initialContactNumber = "", editOrder = null }) {
+export default function BillingPanel({ leads, initialClientName = "", initialContactNumber = "", editOrder = null, onClose }) {
   const { user } = useAuth();
   const [products, setProducts] = useState([]);
 
@@ -197,7 +197,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             source: found.source || "—",
             city: found.city || "—",
             packages: found.packages || [],
-            wallet: found.wallet || 0, total_pending: found.total_pending_amount || found.total_pending || 0
+            wallet: found.wallet || 0, total_pending: found.total_pending_amount || found.total_pending || found.pending_payment || 0
           });
         }
       }
@@ -317,7 +317,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           source: found.source || "—",
           city: found.city || "—",
           packages: found.packages || [],
-          wallet: found.wallet || 0, total_pending: found.total_pending_amount || found.total_pending || 0
+          wallet: found.wallet || 0, total_pending: found.total_pending_amount || found.total_pending || found.pending_payment || 0
         });
         if (found.assigned_to) setSelectedEmployee(found.assigned_to);
       } else {
@@ -347,7 +347,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
       source: lead.source || "—",
       city: lead.city || "—",
       packages: lead.packages || [],
-      wallet: lead.wallet || 0
+      wallet: lead.wallet || 0,
+      total_pending: lead.total_pending_amount || lead.total_pending || lead.pending_payment || 0
     });
     setAddToWallet(false);
     setAppliedPackageId("");
@@ -719,7 +720,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           key: keyId,
           amount: orderAmount,
           currency: "INR",
-          name: "Eminence Salon",
+          name: "Jainil Salon",
           description: "Billing Payment",
           order_id: razorpayOrderId,
           prefill: {
@@ -771,8 +772,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
     return localLeads?.filter(l => l.phone?.includes(contactNumber)) || [];
   }, [contactNumber, localLeads]);
 
-  const inputCls = "w-full bg-eminence-surface border border-eminence-border px-3 py-2 text-sm rounded focus:outline-none focus:border-eminence-gold transition-colors";
-  const labelCls = "text-[10px] text-eminence-muted uppercase font-bold tracking-widest mb-1 block";
+  const inputCls = "w-full bg-jainil-surface border border-jainil-border px-3 py-2 text-sm rounded focus:outline-none focus:border-jainil-gold transition-colors";
+  const labelCls = "text-[10px] text-jainil-muted uppercase font-bold tracking-widest mb-1 block";
 
   return (
     <div className="animate-fade-in">
@@ -781,9 +782,9 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
         <div className="xl:col-span-3 space-y-5">
 
           {/* Header: Generate New Bill */}
-          <div className="eminence-card p-4 sm:p-6">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-eminence-text mb-4 flex items-center gap-2">
-              <FileText size={15} className="text-eminence-gold" />
+          <div className="jainil-card p-4 sm:p-6">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-jainil-text mb-4 flex items-center gap-2">
+              <FileText size={15} className="text-jainil-gold" />
               Generate New Bill
             </h3>
 
@@ -813,15 +814,15 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   placeholder="Client contact"
                 />
                 {showPhoneDropdown && filteredPhoneLeads.length > 0 && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-40 overflow-y-auto">
+                  <div className="absolute z-20 w-full mt-1 bg-white border border-jainil-border rounded-lg shadow-xl max-h-40 overflow-y-auto">
                     {filteredPhoneLeads.slice(0, 8).map(l => (
                       <div
                         key={l.id}
                         onClick={() => { selectLead(l); setShowPhoneDropdown(false); }}
-                        className="px-3 py-2 hover:bg-eminence-surface cursor-pointer text-sm flex justify-between"
+                        className="px-3 py-2 hover:bg-jainil-surface cursor-pointer text-sm flex justify-between"
                       >
                         <span className="font-medium">{l.name}</span>
-                        <span className="text-eminence-muted text-xs">{l.phone}</span>
+                        <span className="text-jainil-muted text-xs">{l.phone}</span>
                       </div>
                     ))}
                   </div>
@@ -847,10 +848,10 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   className={inputCls} placeholder="Autocomplete (Phone)"
                 />
                 {showLeadDropdown && filteredLeads.length > 0 && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-40 overflow-y-auto">
+                  <div className="absolute z-20 w-full mt-1 bg-white border border-jainil-border rounded-lg shadow-xl max-h-40 overflow-y-auto">
                     {filteredLeads.slice(0, 8).map(l => (
-                      <div key={l.id} onClick={() => selectLead(l)} className="px-3 py-2 hover:bg-eminence-surface cursor-pointer text-sm flex justify-between">
-                        <span className="font-medium">{l.name}</span><span className="text-eminence-muted text-xs">{l.phone}</span>
+                      <div key={l.id} onClick={() => selectLead(l)} className="px-3 py-2 hover:bg-jainil-surface cursor-pointer text-sm flex justify-between">
+                        <span className="font-medium">{l.name}</span><span className="text-jainil-muted text-xs">{l.phone}</span>
                       </div>
                     ))}
                   </div>
@@ -864,7 +865,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
             {/* Quick Client Status / Save as New Client bar */}
             {contactNumber && contactNumber.length >= 10 && (
-              <div className="mb-4 p-2.5 bg-eminence-surface/60 border border-eminence-border rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+              <div className="mb-4 p-2.5 bg-jainil-surface/60 border border-jainil-border rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
                 {clientData ? (
                   <div className="flex items-center gap-2 text-emerald-700 font-medium">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -876,13 +877,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     <div className="flex items-center gap-2 text-amber-700 font-medium">
                       <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                       <span>New / Unregistered Client Number: <strong>{contactNumber}</strong></span>
-                      {clientName && <span className="text-eminence-text font-bold">({clientName})</span>}
+                      {clientName && <span className="text-jainil-text font-bold">({clientName})</span>}
                     </div>
                     <button
                       type="button"
                       disabled={isSavingClient || !clientName?.trim()}
                       onClick={handleSaveNewClient}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-md shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-md shadow-sm transition-all disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
                     >
                       <UserPlus size={13} />
                       {isSavingClient ? "Saving Client..." : "+ Save as New Client"}
@@ -946,9 +947,9 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           </div>
 
           {/* Line Items Table */}
-          <div className="eminence-card overflow-hidden">
-            <div className="px-4 sm:px-6 py-4 border-b border-eminence-border/20 flex justify-between items-center">
-              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-eminence-text">
+          <div className="jainil-card overflow-hidden">
+            <div className="px-4 sm:px-6 py-4 border-b border-jainil-border/20 flex justify-between items-center">
+              <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-jainil-text">
                 Services & Products
               </h3>
             </div>
@@ -956,7 +957,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             <div className="overflow-x-auto w-full">
               <table className="w-full text-sm min-w-[760px]">
                 <thead>
-                  <tr className="text-[9px] text-eminence-muted uppercase tracking-wider bg-eminence-surface/30 border-b border-eminence-border/20">
+                  <tr className="text-[9px] text-jainil-muted uppercase tracking-wider bg-jainil-surface/30 border-b border-jainil-border/20">
                     <th className="px-3 py-3 text-left w-8">#</th>
                     <th className="px-3 py-3 text-left">Category</th>
                     <th className="px-3 py-3 text-left">Item</th>
@@ -971,11 +972,11 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                 </thead>
                 <tbody>
                   {lineItems.map((item, idx) => (
-                    <tr key={item.id} className="border-b border-eminence-border/10 hover:bg-eminence-surface/20">
-                      <td className="px-3 py-2 text-xs text-eminence-muted">{idx + 1}</td>
+                    <tr key={item.id} className="border-b border-jainil-border/10 hover:bg-jainil-surface/20">
+                      <td className="px-3 py-2 text-xs text-jainil-muted">{idx + 1}</td>
                       <td className="px-3 py-2">
                         <select value={item.category} onChange={e => updateLineItem(idx, "category", e.target.value)}
-                          className="bg-eminence-surface border border-eminence-border rounded px-1.5 py-1 text-xs w-[95px] focus:outline-none focus:border-eminence-gold">
+                          className="bg-jainil-surface border border-jainil-border rounded px-1.5 py-1 text-xs w-[95px] focus:outline-none focus:border-jainil-gold">
                           <option value="">Category</option>
                           {categories.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
@@ -987,7 +988,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                           placeholder="Search & select item..."
                           value={item.item_name || ""}
                           onChange={e => updateLineItem(idx, "item_name", e.target.value)}
-                          className="bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs w-full min-w-[120px] focus:outline-none focus:border-eminence-gold"
+                          className="bg-jainil-surface border border-jainil-border rounded px-2 py-1 text-xs w-full min-w-[120px] focus:outline-none focus:border-jainil-gold"
                         />
                         <datalist id={`items-list-${idx}`}>
                           {catalogItems
@@ -1007,14 +1008,14 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                       </td>
                       <td className="px-3 py-2 text-center">
                         <input type="number" min={1} value={item.qty} onChange={e => updateLineItem(idx, "qty", Number(e.target.value) || 1)}
-                          className="w-10 bg-eminence-surface border border-eminence-border rounded px-1 py-1 text-xs text-center focus:outline-none focus:border-eminence-gold" />
+                          className="w-10 bg-jainil-surface border border-jainil-border rounded px-1 py-1 text-xs text-center focus:outline-none focus:border-jainil-gold" />
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex gap-1 items-center">
                           <input type="number" min={0} value={item.discount} onChange={e => updateLineItem(idx, "discount", Number(e.target.value) || 0)}
-                            className="w-11 bg-eminence-surface border border-eminence-border rounded px-1 py-1 text-xs text-center focus:outline-none focus:border-eminence-gold" />
+                            className="w-11 bg-jainil-surface border border-jainil-border rounded px-1 py-1 text-xs text-center focus:outline-none focus:border-jainil-gold" />
                           <select value={item.discount_type} onChange={e => updateLineItem(idx, "discount_type", e.target.value)}
-                            className="bg-eminence-surface border border-eminence-border rounded px-0.5 py-1 text-xs focus:outline-none focus:border-eminence-gold w-11">
+                            className="bg-jainil-surface border border-jainil-border rounded px-0.5 py-1 text-xs focus:outline-none focus:border-jainil-gold w-11">
                             <option value="INR">INR</option>
                             <option value="%">%</option>
                           </select>
@@ -1024,7 +1025,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-1">
                             <select value={item.service_provider} onChange={e => updateLineItem(idx, "service_provider", e.target.value)}
-                              className="bg-eminence-surface border border-eminence-border rounded px-1 py-1 text-xs flex-1 min-w-[95px] focus:outline-none focus:border-eminence-gold">
+                              className="bg-jainil-surface border border-jainil-border rounded px-1 py-1 text-xs flex-1 min-w-[95px] focus:outline-none focus:border-jainil-gold">
                               <option value="">Provider</option>
                               {serviceEmployees
                                 .filter(emp => emp.role === "service" || emp.role === "employee" || emp.role === "sales" || !emp.role)
@@ -1037,7 +1038,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                               type="button"
                               onClick={() => addExtraProvider(idx)}
                               title="Add another service provider"
-                              className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-eminence-gold text-white rounded text-xs font-bold hover:bg-eminence-gold/80 transition-colors"
+                              className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-jainil-gold text-white rounded text-xs font-bold hover:bg-jainil-gold/80 transition-colors"
                             >
                               +
                             </button>
@@ -1045,7 +1046,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                           {(item.extra_providers || []).map((ep, pIdx) => (
                             <div key={pIdx} className="flex items-center gap-1">
                               <select value={ep} onChange={e => updateExtraProvider(idx, pIdx, e.target.value)}
-                                className="bg-eminence-surface border border-eminence-border rounded px-1 py-1 text-xs flex-1 min-w-[95px] focus:outline-none focus:border-eminence-gold">
+                                className="bg-jainil-surface border border-jainil-border rounded px-1 py-1 text-xs flex-1 min-w-[95px] focus:outline-none focus:border-jainil-gold">
                                 <option value="">Provider {pIdx + 2}</option>
                                 {serviceEmployees
                                   .filter(emp => emp.role === "service" || emp.role === "employee")
@@ -1083,10 +1084,10 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-1 text-xs">
                           <input type="time" value={item.start_time} onChange={e => updateLineItem(idx, "start_time", e.target.value)}
-                            className="bg-eminence-surface border border-eminence-border rounded px-0.5 py-1 text-[10px] focus:outline-none focus:border-eminence-gold w-[66px]" />
-                          <span className="text-eminence-muted text-[10px]">to</span>
+                            className="bg-jainil-surface border border-jainil-border rounded px-0.5 py-1 text-[10px] focus:outline-none focus:border-jainil-gold w-[66px]" />
+                          <span className="text-jainil-muted text-[10px]">to</span>
                           <input type="time" value={item.end_time} onChange={e => updateLineItem(idx, "end_time", e.target.value)}
-                            className="bg-eminence-surface border border-eminence-border rounded px-0.5 py-1 text-[10px] focus:outline-none focus:border-eminence-gold w-[66px]" />
+                            className="bg-jainil-surface border border-jainil-border rounded px-0.5 py-1 text-[10px] focus:outline-none focus:border-jainil-gold w-[66px]" />
                         </div>
                       </td>
                       <td className="px-3 py-2 text-right font-serif text-sm">₹{(item.price * item.qty).toLocaleString("en-IN")}</td>
@@ -1101,7 +1102,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
               </table>
             </div>
 
-            <div className="px-6 py-3 flex justify-end border-t border-eminence-border/10">
+            <div className="px-6 py-3 flex justify-end border-t border-jainil-border/10">
               <button onClick={addLineItem} className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-colors shadow-sm">
                 <Plus size={14} /> Add Service/Product/Package
               </button>
@@ -1109,10 +1110,10 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
           </div>
 
           {/* Financials Section */}
-          <div className="eminence-card p-4 sm:p-6 space-y-4">
+          <div className="jainil-card p-4 sm:p-6 space-y-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="flex justify-between items-center col-span-2 md:col-span-4 border-b border-eminence-border/20 pb-3">
-                <span className="text-xs text-eminence-muted uppercase font-bold tracking-widest">Subtotal</span>
+              <div className="flex justify-between items-center col-span-2 md:col-span-4 border-b border-jainil-border/20 pb-3">
+                <span className="text-xs text-jainil-muted uppercase font-bold tracking-widest">Subtotal</span>
                 <span className="font-serif text-lg">INR {subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
               </div>
             </div>
@@ -1120,11 +1121,11 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             {/* Coupon, Discount, Tax, Total */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm">
               <div className="flex justify-between items-center gap-2">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Coupon</span>
-                <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="w-36 sm:w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" placeholder="Enter code" />
+                <span className="text-jainil-muted text-xs font-bold uppercase tracking-widest">Coupon</span>
+                <input type="text" value={couponCode} onChange={e => setCouponCode(e.target.value)} className="w-36 sm:w-40 text-right bg-jainil-surface border border-jainil-border rounded px-2 py-1 text-xs focus:outline-none focus:border-jainil-gold" placeholder="Enter code" />
               </div>
               <div className="flex justify-between items-center gap-2 relative">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Referred By</span>
+                <span className="text-jainil-muted text-xs font-bold uppercase tracking-widest">Referred By</span>
                 <div className="relative w-40 sm:w-48">
                   <input
                     type="text"
@@ -1138,11 +1139,11 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     }}
                     onFocus={() => setShowReferredDropdown(true)}
                     onBlur={() => setTimeout(() => setShowReferredDropdown(false), 200)}
-                    className="w-full text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold"
+                    className="w-full text-right bg-jainil-surface border border-jainil-border rounded px-2 py-1 text-xs focus:outline-none focus:border-jainil-gold"
                     placeholder="Search client..."
                   />
                   {showReferredDropdown && searchReferredBy && (
-                    <div className="absolute right-0 z-30 w-56 mt-1 bg-white border border-eminence-border rounded-lg shadow-xl max-h-40 overflow-y-auto text-left">
+                    <div className="absolute right-0 z-30 w-56 mt-1 bg-white border border-jainil-border rounded-lg shadow-xl max-h-40 overflow-y-auto text-left">
                       {(localLeads || [])
                         .filter(l => l.name?.toLowerCase().includes(searchReferredBy.toLowerCase()) || l.phone?.includes(searchReferredBy))
                         .slice(0, 5)
@@ -1154,10 +1155,10 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                               setSearchReferredBy(l.phone);
                               setShowReferredDropdown(false);
                             }}
-                            className="px-3 py-2 hover:bg-eminence-surface cursor-pointer text-xs flex justify-between"
+                            className="px-3 py-2 hover:bg-jainil-surface cursor-pointer text-xs flex justify-between"
                           >
                             <span className="font-medium text-gray-900">{l.name}</span>
-                            <span className="text-eminence-muted font-mono">{l.phone}</span>
+                            <span className="text-jainil-muted font-mono">{l.phone}</span>
                           </div>
                         ))}
                     </div>
@@ -1165,45 +1166,45 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                 </div>
               </div>
               <div className="flex justify-between items-center gap-2">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Discount</span>
-                <input type="number" min={0} value={discountAmt} onChange={e => setDiscountAmt(Number(e.target.value))} className="w-36 sm:w-40 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" />
+                <span className="text-jainil-muted text-xs font-bold uppercase tracking-widest">Discount</span>
+                <input type="number" min={0} value={discountAmt} onChange={e => setDiscountAmt(Number(e.target.value))} className="w-36 sm:w-40 text-right bg-jainil-surface border border-jainil-border rounded px-2 py-1 text-xs focus:outline-none focus:border-jainil-gold" />
               </div>
               <div className="flex justify-between items-center gap-2">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Advance Received</span>
+                <span className="text-jainil-muted text-xs font-bold uppercase tracking-widest">Advance Received</span>
                 <div className="flex items-center gap-2 sm:gap-3">
                   <label className="flex items-center gap-1 text-xs cursor-pointer">
-                    <input type="radio" name="advance" value="Yes" checked={advanceReceived === "Yes"} onChange={e => setAdvanceReceived(e.target.value)} className="accent-eminence-gold" /> Yes
+                    <input type="radio" name="advance" value="Yes" checked={advanceReceived === "Yes"} onChange={e => setAdvanceReceived(e.target.value)} className="accent-jainil-gold" /> Yes
                   </label>
                   <label className="flex items-center gap-1 text-xs cursor-pointer">
-                    <input type="radio" name="advance" value="No" checked={advanceReceived === "No"} onChange={e => setAdvanceReceived(e.target.value)} className="accent-eminence-gold" /> No
+                    <input type="radio" name="advance" value="No" checked={advanceReceived === "No"} onChange={e => setAdvanceReceived(e.target.value)} className="accent-jainil-gold" /> No
                   </label>
                   {advanceReceived === "Yes" && (
-                    <input type="number" min={0} value={advanceAmount} onChange={e => setAdvanceAmount(Number(e.target.value))} className="w-20 text-right bg-eminence-surface border border-eminence-border rounded px-2 py-1 text-xs focus:outline-none focus:border-eminence-gold" />
+                    <input type="number" min={0} value={advanceAmount} onChange={e => setAdvanceAmount(Number(e.target.value))} className="w-20 text-right bg-jainil-surface border border-jainil-border rounded px-2 py-1 text-xs focus:outline-none focus:border-jainil-gold" />
                   )}
                 </div>
               </div>
             </div>
 
             {/* Total */}
-            <div className="border-y border-eminence-border/30 py-4 flex justify-between items-center">
-              <span className="text-sm font-bold uppercase tracking-widest text-eminence-text">Total</span>
-              <span className="font-serif text-2xl text-eminence-gold">₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+            <div className="border-y border-jainil-border/30 py-4 flex justify-between items-center">
+              <span className="text-sm font-bold uppercase tracking-widest text-jainil-text">Total</span>
+              <span className="font-serif text-2xl text-jainil-gold">₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
             </div>
 
             {/* Amount Payable */}
             <div className="flex justify-between items-center text-sm">
-              <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Amount Payable</span>
+              <span className="text-jainil-muted text-xs font-bold uppercase tracking-widest">Amount Payable</span>
               <span className="font-serif text-base font-bold">₹{totalAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
             </div>
 
             {/* Split Payments Section */}
-            <div className="border-t border-eminence-border/30 pt-4 space-y-4">
+            <div className="border-t border-jainil-border/30 pt-4 space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold uppercase tracking-widest text-eminence-text">Split Payments</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-jainil-text">Split Payments</span>
                 <button
                   type="button"
                   onClick={addSplitPaymentRow}
-                  className="px-3 py-1.5 bg-eminence-gold text-white text-[10px] font-bold uppercase tracking-widest hover:bg-eminence-gold/90 transition-all rounded-lg"
+                  className="px-3 py-1.5 bg-jainil-gold text-white text-[10px] font-bold uppercase tracking-widest hover:bg-jainil-gold/90 transition-all rounded-lg"
                 >
                   + Add Payment Mode
                 </button>
@@ -1211,27 +1212,27 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
               <div className="space-y-3">
                 {splitPayments.map((p, idx) => (
-                  <div key={idx} className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-eminence-surface/30 p-3 rounded-xl border border-eminence-border/10">
+                  <div key={idx} className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center bg-jainil-surface/30 p-3 rounded-xl border border-jainil-border/10">
                     <div className="flex-1 flex gap-2 items-center">
-                      <span className="text-xs text-eminence-muted font-bold min-w-[20px]">{idx + 1}.</span>
+                      <span className="text-xs text-jainil-muted font-bold min-w-[20px]">{idx + 1}.</span>
                       <select
                         value={p.method}
                         onChange={e => updateSplitPaymentRow(idx, "method", e.target.value)}
-                        className="bg-white border border-eminence-border rounded px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold flex-1"
+                        className="bg-white border border-jainil-border rounded px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold flex-1"
                       >
                         {PAYMENT_METHODS.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
                     </div>
 
                     <div className="flex-1 flex gap-2 items-center">
-                      <span className="text-xs text-eminence-muted font-bold">₹</span>
+                      <span className="text-xs text-jainil-muted font-bold">₹</span>
                       <input
                         type="number"
                         min={0}
                         placeholder="Amount"
                         value={p.amount || ""}
                         onChange={e => updateSplitPaymentRow(idx, "amount", Number(e.target.value))}
-                        className="w-full bg-white border border-eminence-border rounded px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold text-right"
+                        className="w-full bg-white border border-jainil-border rounded px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold text-right"
                       />
                     </div>
 
@@ -1239,10 +1240,14 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                       <div className="flex-2 flex-grow">
                         <input
                           type="text"
-                          placeholder="TXN ID (Optional)"
+                          placeholder={
+                            p.method === "Credit/Debit Card" ? "Card Number (Optional)" :
+                            p.method === "UPI" ? "UPI ID (Optional)" :
+                            "TXN ID (Optional)"
+                          }
                           value={p.txnId}
                           onChange={e => updateSplitPaymentRow(idx, "txnId", e.target.value)}
-                          className="w-full bg-white border border-eminence-border rounded px-2 py-1.5 text-xs focus:outline-none focus:border-eminence-gold"
+                          className="w-full bg-white border border-jainil-border rounded px-2 py-1.5 text-xs focus:outline-none focus:border-jainil-gold"
                         />
                       </div>
                     )}
@@ -1263,13 +1268,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             </div>
 
             {/* Total Paid & Amount Due Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm border-t border-eminence-border/30 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-3 text-sm border-t border-jainil-border/30 pt-4">
               <div className="flex justify-between items-center">
-                <span className="text-eminence-muted text-xs font-bold uppercase tracking-widest">Total Amount Paid</span>
+                <span className="text-jainil-muted text-xs font-bold uppercase tracking-widest">Total Amount Paid</span>
                 <span className="font-serif text-base font-bold text-emerald-600">₹{totalAmountPaid.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-xs font-bold uppercase tracking-widest text-eminence-text">Amount Due/Credit</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-jainil-text">Amount Due/Credit</span>
                 <span className={`font-serif text-xl font-bold ${amountDue > 0 ? "text-rose-500" : "text-emerald-600"}`}>
                   ₹{amountDue.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                 </span>
@@ -1287,12 +1292,12 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     type="checkbox"
                     checked={addToWallet}
                     onChange={e => setAddToWallet(e.target.checked)}
-                    className="rounded text-eminence-gold focus:ring-eminence-gold accent-eminence-gold w-4 h-4"
+                    className="rounded text-jainil-gold focus:ring-jainil-gold accent-jainil-gold w-4 h-4"
                   />
                   <div>
-                    <span className="text-eminence-text font-semibold">Add change to customer's wallet</span>
+                    <span className="text-jainil-text font-semibold">Add change to customer's wallet</span>
                     {!clientData && (
-                      <span className="block text-[10px] text-eminence-muted font-normal">Change will be credited to wallet after profile is linked</span>
+                      <span className="block text-[10px] text-jainil-muted font-normal">Change will be credited to wallet after profile is linked</span>
                     )}
                   </div>
                 </label>
@@ -1302,7 +1307,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             {/* Notes */}
             <div>
               <textarea value={notes} onChange={e => setNotes(e.target.value)} rows="2" placeholder="Write notes about billing here..."
-                className="w-full bg-eminence-surface border border-eminence-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-eminence-gold resize-none" />
+                className="w-full bg-jainil-surface border border-jainil-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-jainil-gold resize-none" />
             </div>
 
             {/* Generate Button */}
@@ -1311,7 +1316,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
               disabled={isSubmitting}
               className={`w-full py-4 font-bold uppercase tracking-[0.2em] text-sm rounded-xl transition-colors flex items-center justify-center gap-2 ${isSubmitting
                 ? "bg-gray-400 text-white cursor-not-allowed"
-                : "bg-eminence-text text-white hover:bg-eminence-gold cursor-pointer"
+                : "bg-jainil-text text-white hover:bg-jainil-gold cursor-pointer"
                 }`}
             >
               {isSubmitting ? (
@@ -1338,7 +1343,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                       toast.error("Failed to trigger print.");
                     }
                   }}
-                  className="py-3 bg-eminence-gold text-white font-bold uppercase tracking-wider text-xs rounded-xl hover:bg-eminence-goldHover transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                  className="py-3 bg-jainil-gold text-white font-bold uppercase tracking-wider text-xs rounded-xl hover:bg-jainil-goldHover transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Printer size={14} /> Print
                 </button>
@@ -1350,7 +1355,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                       toast.error("Failed to download invoice.");
                     }
                   }}
-                  className="py-3 border border-eminence-border text-eminence-text font-bold uppercase tracking-wider text-xs rounded-xl hover:bg-eminence-surface transition-colors flex items-center justify-center gap-1.5 shadow-sm"
+                  className="py-3 border border-jainil-border text-jainil-text font-bold uppercase tracking-wider text-xs rounded-xl hover:bg-jainil-surface transition-colors flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   <Download size={14} /> Download
                 </button>
@@ -1378,8 +1383,8 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
 
         {/* CLIENT 360° VIEW SIDEBAR */}
         <div className="xl:col-span-1">
-          <div className="eminence-card p-5 sticky top-24 space-y-3">
-            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-eminence-gold flex items-center gap-2 mb-4">
+          <div className="jainil-card p-5 sticky top-24 space-y-3">
+            <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-jainil-gold flex items-center gap-2 mb-4">
               <User size={14} /> Client 360° View
             </h3>
 
@@ -1398,7 +1403,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                       type="button"
                       disabled={isSavingClient || !clientName?.trim()}
                       onClick={handleSaveNewClient}
-                      className="w-full py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all flex items-center justify-center gap-1.5 disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
                     >
                       <UserPlus size={13} />
                       {isSavingClient ? "Saving Client..." : "Save as New Client"}
@@ -1408,7 +1413,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     )}
                   </div>
                 ) : (
-                  <p className="text-xs text-eminence-muted italic py-6">Enter client contact to view details</p>
+                  <p className="text-xs text-jainil-muted italic py-6">Enter client contact to view details</p>
                 )}
               </div>
             ) : (
@@ -1423,11 +1428,11 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     label: "Active Packages",
                     isCustom: true,
                     render: () => (
-                      <div className="py-2.5 border-b border-eminence-border/10 space-y-2">
+                      <div className="py-2.5 border-b border-jainil-border/10 space-y-2">
                         <div className="flex justify-between items-center">
-                          <span className="text-eminence-muted font-medium">Active Packages:</span>
+                          <span className="text-jainil-muted font-medium">Active Packages:</span>
                           {!clientData.packages || clientData.packages.length === 0 ? (
-                            <span className="font-bold text-eminence-text">None</span>
+                            <span className="font-bold text-jainil-text">None</span>
                           ) : null}
                         </div>
                         {clientData.packages?.length > 0 && (
@@ -1439,7 +1444,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                                   {pkg.services?.map((s, sIdx) => (
                                     <div key={sIdx} className="flex justify-between gap-2 border-b border-dashed border-gray-200/50 pb-0.5 last:border-0 last:pb-0">
                                       <span className="truncate max-w-[65%]">{s.service_name}</span>
-                                      <span className="font-bold text-eminence-text flex-shrink-0">{s.remaining_quantity} / {s.total_quantity} left</span>
+                                      <span className="font-bold text-jainil-text flex-shrink-0">{s.remaining_quantity} / {s.total_quantity} left</span>
                                     </div>
                                   ))}
                                 </div>
@@ -1462,9 +1467,9 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                     return <React.Fragment key={i}>{row.render()}</React.Fragment>;
                   }
                   return (
-                    <div key={i} className="flex justify-between items-center py-1.5 border-b border-eminence-border/10">
-                      <span className="text-eminence-muted font-medium">{row.label}:</span>
-                      <span className="font-bold text-eminence-text text-right max-w-[55%] truncate">{row.value}</span>
+                    <div key={i} className="flex justify-between items-center py-1.5 border-b border-jainil-border/10">
+                      <span className="text-jainil-muted font-medium">{row.label}:</span>
+                      <span className="font-bold text-jainil-text text-right max-w-[55%] truncate">{row.value}</span>
                     </div>
                   );
                 })}
@@ -1472,13 +1477,13 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
             )}
 
             {clientData && availablePackages.length > 0 && (
-              <div className="pt-4 border-t border-eminence-border/10 mt-4 space-y-3">
-                <h4 className="text-[10px] font-bold text-eminence-text uppercase tracking-widest">Sell / Assign Package</h4>
+              <div className="pt-4 border-t border-jainil-border/10 mt-4 space-y-3">
+                <h4 className="text-[10px] font-bold text-jainil-text uppercase tracking-widest">Sell / Assign Package</h4>
                 <div className="flex gap-2">
                   <select
                     value={pkgToAssign}
                     onChange={e => setPkgToAssign(e.target.value)}
-                    className="flex-1 bg-eminence-surface border border-eminence-border px-2 py-1.5 text-xs rounded focus:outline-none focus:border-eminence-gold"
+                    className="flex-1 bg-jainil-surface border border-jainil-border px-2 py-1.5 text-xs rounded focus:outline-none focus:border-jainil-gold"
                   >
                     <option value="">Choose Package</option>
                     {availablePackages.map(pkg => (
@@ -1487,7 +1492,7 @@ export default function BillingPanel({ leads, initialClientName = "", initialCon
                   </select>
                   <button
                     onClick={assignPackageToClient}
-                    className="bg-eminence-gold hover:bg-opacity-95 text-white px-3 py-1.5 text-xs font-bold rounded transition-all"
+                    className="bg-jainil-gold hover:bg-opacity-95 text-white px-3 py-1.5 text-xs font-bold rounded transition-all"
                   >
                     Assign
                   </button>

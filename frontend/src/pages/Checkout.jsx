@@ -89,7 +89,7 @@ const loadRazorpayScript = () => {
           key: keyId,
           amount: orderAmount,
           currency: "INR",
-          name: "Eminence Salon",
+          name: "Jainil Salon",
           description: "Product Purchase",
           order_id: razorpayOrderId,
           prefill: {
@@ -132,13 +132,13 @@ const loadRazorpayScript = () => {
   if (successId) {
     return (
       <div className="max-w-[800px] mx-auto px-6 py-40 text-center">
-        <div className="inline-block w-20 h-20 bg-eminence-gold/10 rounded-full flex items-center justify-center mb-8 mx-auto">
-          <svg className="w-10 h-10 text-eminence-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="inline-block w-20 h-20 bg-jainil-gold/10 rounded-full flex items-center justify-center mb-8 mx-auto">
+          <svg className="w-10 h-10 text-jainil-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
           </svg>
         </div>
         <h1 className="font-serif text-5xl font-light mb-4">{t("orderPlaced")}</h1>
-        <p className="text-eminence-muted text-lg mb-12">
+        <p className="text-jainil-muted text-lg mb-12">
           {t("orderConfirmed").replace("{name}", form.full_name).replace("{id}", successId.slice(0, 8))}
         </p>
         
@@ -152,7 +152,7 @@ const loadRazorpayScript = () => {
           }} className="btn-gold px-8">
             {t("downloadInvoice")}
           </button>
-          <button onClick={() => nav("/dashboard")} className="px-8 py-4 border border-eminence-border hover:bg-eminence-surface transition-colors uppercase text-xs tracking-[0.2em]">
+          <button onClick={() => nav("/dashboard")} className="px-8 py-4 border border-jainil-border hover:bg-jainil-surface transition-colors uppercase text-xs tracking-[0.2em]">
             {t("viewOrders")}
           </button>
         </div>
@@ -176,27 +176,27 @@ const loadRazorpayScript = () => {
             <div key={f.k}>
               <label className="overline block mb-2">{f.label}</label>
               <input type="text" required={f.req} value={form[f.k]} onChange={onChange(f.k)} data-testid={`checkout-${f.k}`}
-                className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+                className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
             </div>
           ))}
           <div>
             <label className="overline block mb-2">{t("notes")}</label>
             <textarea rows="3" value={form.notes} onChange={onChange("notes")} data-testid="checkout-notes"
-              className="w-full bg-eminence-surface border border-eminence-border px-4 py-3 focus:outline-none focus:border-eminence-gold" />
+              className="w-full bg-jainil-surface border border-jainil-border px-4 py-3 focus:outline-none focus:border-jainil-gold" />
           </div>
 
           {/* LOYALTY POINTS */}
-          <div className="bg-eminence-surfaceAlt/50 p-6 border border-eminence-gold/20 rounded-sm">
+          <div className="bg-jainil-surfaceAlt/50 p-6 border border-jainil-gold/20 rounded-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <p className="font-serif text-xl text-eminence-text mb-1">{t("loyaltyRewards")}</p>
+                <p className="font-serif text-xl text-jainil-text mb-1">{t("loyaltyRewards")}</p>
                 {user ? (
-                  <p className="text-xs text-eminence-muted uppercase tracking-wider">
-                    {t("currentBalance")} <span className="text-eminence-gold font-bold">{user.points || 0} {t("points")}</span> 
+                  <p className="text-xs text-jainil-muted uppercase tracking-wider">
+                    {t("currentBalance")} <span className="text-jainil-gold font-bold">{user.points || 0} {t("points")}</span> 
                     {user.points > 0 ? ` (${t("worth")} ₹${((user.points || 0)/10).toFixed(2)})` : ` (${t("shopToEarn")})`}
                   </p>
                 ) : (
-                  <p className="text-xs text-eminence-muted uppercase tracking-wider">{t("loginToUsePoints")}</p>
+                  <p className="text-xs text-jainil-muted uppercase tracking-wider">{t("loginToUsePoints")}</p>
                 )}
               </div>
               {user && user.points > 0 ? (
@@ -205,37 +205,37 @@ const loadRazorpayScript = () => {
                   onClick={() => setUsePoints(!usePoints)}
                   className={`px-6 py-2.5 text-[10px] uppercase tracking-[0.2em] font-bold transition-all ${
                     usePoints 
-                    ? "bg-eminence-gold text-white" 
-                    : "border border-eminence-gold text-eminence-gold hover:bg-eminence-gold/5"
+                    ? "bg-jainil-gold text-white" 
+                    : "border border-jainil-gold text-jainil-gold hover:bg-jainil-gold/5"
                   }`}
                 >
                   {usePoints ? t("pointsApplied") : t("usePoints")}
                 </button>
               ) : user && (
-                <div className="px-6 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold text-eminence-muted border border-dashed border-eminence-border">
+                <div className="px-6 py-2.5 text-[9px] uppercase tracking-[0.2em] font-bold text-jainil-muted border border-dashed border-jainil-border">
                   {t("noPoints")}
                 </div>
               )}
             </div>
           </div>
 
-          <p className="text-xs text-eminence-muted">{t("codNotice")}</p>
+          <p className="text-xs text-jainil-muted">{t("codNotice")}</p>
         </div>
 
-        <aside className="eminence-card p-6 h-fit">
+        <aside className="jainil-card p-6 h-fit">
           <p className="overline mb-4">{t("orderSummary")}</p>
           <div className="space-y-3 mb-6">
             {items.map((it) => (
               <div key={it.id} className="flex justify-between text-sm">
-                <span className="text-eminence-muted">{it.name} × {it.quantity}</span>
+                <span className="text-jainil-muted">{it.name} × {it.quantity}</span>
                 <span>₹{(it.price * it.quantity).toLocaleString("en-IN")}</span>
               </div>
             ))}
           </div>
 
-          <div className="space-y-3 border-t border-eminence-border pt-4 mb-6">
+          <div className="space-y-3 border-t border-jainil-border pt-4 mb-6">
             <div className="flex justify-between text-sm">
-              <span className="text-eminence-muted">{t("subtotal")}</span>
+              <span className="text-jainil-muted">{t("subtotal")}</span>
               <span>₹{total.toLocaleString("en-IN")}</span>
             </div>
             {usePoints && pointsDiscount > 0 && (
@@ -244,15 +244,15 @@ const loadRazorpayScript = () => {
                 <span>-₹{pointsDiscount.toLocaleString("en-IN")}</span>
               </div>
             )}
-            <div className="flex justify-between font-serif text-2xl text-eminence-gold pt-2 border-t border-eminence-border/30">
+            <div className="flex justify-between font-serif text-2xl text-jainil-gold pt-2 border-t border-jainil-border/30">
               <span>{t("total")}</span>
               <span>₹{finalTotal.toLocaleString("en-IN")}</span>
             </div>
           </div>
 
-          <div className="bg-eminence-surface p-4 border border-eminence-border/50 mb-6 text-center">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-eminence-muted mb-1">{t("pointsEarned")}</p>
-            <p className="text-lg text-eminence-gold font-bold">+{pointsEarned} {t("points")}</p>
+          <div className="bg-jainil-surface p-4 border border-jainil-border/50 mb-6 text-center">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-jainil-muted mb-1">{t("pointsEarned")}</p>
+            <p className="text-lg text-jainil-gold font-bold">+{pointsEarned} {t("points")}</p>
           </div>
 
           <button type="submit" disabled={loading} className="btn-gold w-full" data-testid="checkout-submit-btn">

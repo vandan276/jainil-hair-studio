@@ -14,8 +14,8 @@ export default function ProtectedRoute({ children, adminOnly = false, serviceOnl
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-eminence-bg">
-        <div className="text-eminence-gold font-serif text-2xl tracking-wider">Loading…</div>
+      <div className="min-h-screen flex items-center justify-center bg-jainil-bg">
+        <div className="text-jainil-gold font-serif text-2xl tracking-wider">Loading…</div>
       </div>
     );
   }

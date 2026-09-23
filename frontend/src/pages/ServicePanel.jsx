@@ -126,21 +126,21 @@ export default function ServicePanel() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 md:p-8 rounded-3xl border border-gray-100 shadow-sm">
           <div>
             <div className="flex items-center gap-3">
-              <span className="bg-eminence-gold/10 text-eminence-gold p-2 rounded-xl">
+              <span className="bg-jainil-gold/10 text-jainil-gold p-2 rounded-xl">
                 <Sparkles size={20} />
               </span>
-              <p className="overline tracking-widest text-xs text-eminence-muted">Service Provider Portal</p>
+              <p className="overline tracking-widest text-xs text-jainil-muted">Service Provider Portal</p>
             </div>
             <h1 className="font-serif text-3xl md:text-4xl mt-2 text-gray-900">
               Welcome, {user?.name || "Stylist"}
             </h1>
-            <p className="text-sm text-eminence-muted mt-1">
+            <p className="text-sm text-jainil-muted mt-1">
               Manage your schedule, update appointment statuses, and track your daily services.
             </p>
           </div>
 
           {/* Attendance indicator */}
-          <div className="flex items-center justify-between gap-4 border border-eminence-border/30 p-4 rounded-2xl bg-gray-50/50 w-full md:w-auto">
+          <div className="flex items-center justify-between gap-4 border border-jainil-border/30 p-4 rounded-2xl bg-gray-50/50 w-full md:w-auto">
             <div className="flex items-center gap-4">
               {shiftCompleted ? (
                 <>
@@ -171,7 +171,7 @@ export default function ServicePanel() {
                     <p className="text-xs font-bold uppercase tracking-wider text-rose-800">Attendance Required</p>
                     <button 
                       onClick={() => { window.location.href = "/attendance-verify"; }}
-                      className="text-[10px] text-eminence-gold font-bold hover:underline uppercase tracking-widest block mt-0.5"
+                      className="text-[10px] text-jainil-gold font-bold hover:underline uppercase tracking-widest block mt-0.5"
                     >
                       Verify Now &rarr;
                     </button>
@@ -184,7 +184,7 @@ export default function ServicePanel() {
                 <RecessControls />
                 <button
                   onClick={() => { window.location.href = "/consultancy"; }}
-                  className="border border-eminence-gold text-eminence-gold hover:bg-eminence-gold hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
+                  className="border border-jainil-gold text-jainil-gold hover:bg-jainil-gold hover:text-white px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors flex items-center gap-2"
                 >
                   <Scissors size={14} /> Consultancy
                 </button>
@@ -201,40 +201,40 @@ export default function ServicePanel() {
 
         {/* Dashboard Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="glass-card p-6 rounded-2xl border-l-4 border-l-eminence-gold">
+          <div className="glass-card p-6 rounded-2xl border-l-4 border-l-jainil-gold">
             <div className="flex justify-between items-center mb-4">
-              <span className="overline text-xs text-eminence-muted">My Bookings</span>
-              <Calendar size={18} className="text-eminence-gold" />
+              <span className="overline text-xs text-jainil-muted">My Bookings</span>
+              <Calendar size={18} className="text-jainil-gold" />
             </div>
             <p className="text-3xl font-serif text-gray-900">{stats.myTotal}</p>
-            <p className="text-xs text-eminence-muted mt-1">Total appointments assigned to you</p>
+            <p className="text-xs text-jainil-muted mt-1">Total appointments assigned to you</p>
           </div>
 
           <div className="glass-card p-6 rounded-2xl border-l-4 border-l-blue-500">
             <div className="flex justify-between items-center mb-4">
-              <span className="overline text-xs text-eminence-muted">Pending Today</span>
+              <span className="overline text-xs text-jainil-muted">Pending Today</span>
               <Clock size={18} className="text-blue-500" />
             </div>
             <p className="text-3xl font-serif text-gray-900">{stats.myToday}</p>
-            <p className="text-xs text-eminence-muted mt-1">Appointments scheduled for today</p>
+            <p className="text-xs text-jainil-muted mt-1">Appointments scheduled for today</p>
           </div>
 
           <div className="glass-card p-6 rounded-2xl border-l-4 border-l-emerald-500">
             <div className="flex justify-between items-center mb-4">
-              <span className="overline text-xs text-eminence-muted">Services Done</span>
+              <span className="overline text-xs text-jainil-muted">Services Done</span>
               <CalendarCheck size={18} className="text-emerald-500" />
             </div>
             <p className="text-3xl font-serif text-gray-900">{stats.myCompleted}</p>
-            <p className="text-xs text-eminence-muted mt-1">Completed bookings</p>
+            <p className="text-xs text-jainil-muted mt-1">Completed bookings</p>
           </div>
 
           <div className="glass-card p-6 rounded-2xl border-l-4 border-l-gray-900">
             <div className="flex justify-between items-center mb-4">
-              <span className="overline text-xs text-eminence-muted">Total Value</span>
+              <span className="overline text-xs text-jainil-muted">Total Value</span>
               <DollarSign size={18} className="text-gray-900" />
             </div>
-            <p className="text-3xl font-serif text-eminence-gold">₹{stats.earnings.toLocaleString("en-IN")}</p>
-            <p className="text-xs text-eminence-muted mt-1">From completed bookings</p>
+            <p className="text-3xl font-serif text-jainil-gold">₹{stats.earnings.toLocaleString("en-IN")}</p>
+            <p className="text-xs text-jainil-muted mt-1">From completed bookings</p>
           </div>
         </div>
 
@@ -266,21 +266,21 @@ export default function ServicePanel() {
               placeholder="Search client, service..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-eminence-border rounded-xl focus:outline-none focus:border-eminence-gold text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-jainil-border rounded-xl focus:outline-none focus:border-jainil-gold text-sm"
             />
           </div>
         </div>
 
         {/* Main Content Area */}
         {loading ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm animate-pulse text-eminence-muted uppercase tracking-[0.2em] text-xs">
+          <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-sm animate-pulse text-jainil-muted uppercase tracking-[0.2em] text-xs">
             Loading your schedule...
           </div>
         ) : filteredList.length === 0 ? (
           <div className="bg-white rounded-3xl p-16 text-center border border-gray-100 shadow-sm">
             <Calendar className="mx-auto text-gray-300 mb-4" size={48} />
             <h3 className="font-serif text-xl text-gray-900 mb-1">No Bookings Found</h3>
-            <p className="text-sm text-eminence-muted">There are no matches for your selected filter or search query.</p>
+            <p className="text-sm text-jainil-muted">There are no matches for your selected filter or search query.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -292,7 +292,7 @@ export default function ServicePanel() {
                 <div className="space-y-4 flex-1">
                   {/* Header info */}
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-eminence-muted">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-jainil-muted">
                       ID: #{b.id?.slice(0, 8)}
                     </span>
                     <span className="text-[10px] text-gray-300">&bull;</span>
@@ -306,11 +306,11 @@ export default function ServicePanel() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Customer Info */}
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest text-eminence-muted font-bold">Client</p>
+                      <p className="text-[10px] uppercase tracking-widest text-jainil-muted font-bold">Client</p>
                       <h4 className="font-serif text-lg text-gray-900">{b.user_name || "Guest Customer"}</h4>
-                      {b.user_email && <p className="text-xs text-eminence-muted flex items-center gap-1.5">{b.user_email}</p>}
+                      {b.user_email && <p className="text-xs text-jainil-muted flex items-center gap-1.5">{b.user_email}</p>}
                       {b.user_phone && (
-                        <a href={`tel:${b.user_phone}`} className="text-xs text-eminence-gold hover:underline flex items-center gap-1.5 mt-1 font-medium">
+                        <a href={`tel:${b.user_phone}`} className="text-xs text-jainil-gold hover:underline flex items-center gap-1.5 mt-1 font-medium">
                           <Phone size={12} /> {b.user_phone}
                         </a>
                       )}
@@ -318,22 +318,22 @@ export default function ServicePanel() {
 
                     {/* Service Info */}
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest text-eminence-muted font-bold">Service</p>
+                      <p className="text-[10px] uppercase tracking-widest text-jainil-muted font-bold">Service</p>
                       <h4 className="font-serif text-lg text-gray-900">{b.service_name}</h4>
-                      <p className="text-sm font-bold text-eminence-gold">₹{(b.service_price || 0).toLocaleString("en-IN")}</p>
-                      <p className="text-xs text-eminence-muted mt-1 font-medium">
+                      <p className="text-sm font-bold text-jainil-gold">₹{(b.service_price || 0).toLocaleString("en-IN")}</p>
+                      <p className="text-xs text-jainil-muted mt-1 font-medium">
                         Stylist: <span className="text-gray-950 font-bold">{b.stylist_name || "Any available"}</span>
                       </p>
                     </div>
 
                     {/* Date/Time Info */}
                     <div className="space-y-1">
-                      <p className="text-[10px] uppercase tracking-widest text-eminence-muted font-bold">Schedule</p>
+                      <p className="text-[10px] uppercase tracking-widest text-jainil-muted font-bold">Schedule</p>
                       <div className="flex items-center gap-2 text-gray-900 text-sm font-semibold mt-1">
-                        <Calendar size={14} className="text-eminence-gold" />
+                        <Calendar size={14} className="text-jainil-gold" />
                         <span>{new Date(b.date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-eminence-muted text-xs mt-1">
+                      <div className="flex items-center gap-2 text-jainil-muted text-xs mt-1">
                         <Clock size={14} />
                         <span>{b.time}</span>
                       </div>
@@ -341,7 +341,7 @@ export default function ServicePanel() {
                   </div>
 
                   {b.notes && (
-                    <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-eminence-border/20 text-xs text-eminence-muted leading-relaxed">
+                    <div className="bg-[#FAF7F2] p-3 rounded-2xl border border-jainil-border/20 text-xs text-jainil-muted leading-relaxed">
                       <span className="font-bold text-gray-900 block mb-1">Notes:</span>
                       {b.notes}
                     </div>
