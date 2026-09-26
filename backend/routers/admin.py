@@ -8,6 +8,7 @@ from ..utils import unpack_data, new_id, now_iso, get_current_user, require_admi
 router = APIRouter(tags=["admin"])
 
 class RegisterIn(BaseModel):
+    model_config = {"extra": "allow"}
     name: str
     email: EmailStr
     password: str
@@ -17,9 +18,23 @@ class RegisterIn(BaseModel):
     section: Optional[str] = None
     base_salary: Optional[float] = None
     commission_rate: Optional[float] = None
+    product_commission_rate: Optional[float] = None
+    working_hours_from: Optional[str] = None
+    working_hours_to: Optional[str] = None
+    gender: Optional[str] = None
+    monthly_target: Optional[float] = None
+    sales_staff_type: Optional[str] = None
+    service_provider_type: Optional[str] = None
+    custom_commission_enabled: Optional[bool] = None
+    commission_slabs: Optional[list] = None
+    commission_type: Optional[str] = None
+    phone_numbers: Optional[list] = None
 
 class EmployeeUpdate(BaseModel):
+    model_config = {"extra": "allow"}
     name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
     phone: Optional[str] = None
     role: Optional[str] = None
     branch: Optional[str] = None
@@ -27,14 +42,34 @@ class EmployeeUpdate(BaseModel):
     is_active: Optional[bool] = None
     base_salary: Optional[float] = None
     commission_rate: Optional[float] = None
+    product_commission_rate: Optional[float] = None
+    working_hours_from: Optional[str] = None
+    working_hours_to: Optional[str] = None
+    gender: Optional[str] = None
+    monthly_target: Optional[float] = None
+    sales_staff_type: Optional[str] = None
+    service_provider_type: Optional[str] = None
+    custom_commission_enabled: Optional[bool] = None
+    commission_slabs: Optional[list] = None
+    commission_type: Optional[str] = None
+    phone_numbers: Optional[list] = None
 
 @router.get("/admin/employees")
 def list_employees(user: dict = Depends(require_employee)):
     res = supabase.table("users").select("*").execute()
-    # Remove password_hashes
-    for emp in res.data:
+    employees = res.data
+    
+    # Fetch all employee metadata from settings
+    meta_res = supabase.table("settings").select("*").like("id", "emp_meta_%").execute()
+    meta_map = {m["id"].replace("emp_meta_", ""): m.get("data", {}) for m in meta_res.data}
+    
+    for emp in employees:
         emp.pop("password_hash", None)
-    return res.data
+        # Merge metadata
+        if emp["id"] in meta_map:
+            emp.update(meta_map[emp["id"]])
+            
+    return employees
 
 @router.post("/admin/employees")
 def create_employee(data: RegisterIn, user: dict = Depends(require_admin)):
@@ -50,17 +85,24 @@ def create_employee(data: RegisterIn, user: dict = Depends(require_admin)):
         "email": email,
         "password_hash": hash_password(data.password),
         "phone": data.phone or "",
-        "branch": data.branch or "Surat",
-        "section": data.section or "Men",
         "role": data.role or "sales",
-        "base_salary": data.base_salary,
-        "commission_rate": data.commission_rate,
-        "created_at": now_iso(),
-        "is_active": True
+        "created_at": now_iso()
     }
     
     supabase.table("users").insert(user_doc).execute()
+    
+    # Extract metadata fields
+    meta_fields = {}
+    allowed_cols = ["name", "email", "password_hash", "phone", "role"]
+    for key, value in data.model_dump(exclude_unset=True).items():
+        if key not in allowed_cols and key != "password":
+            meta_fields[key] = value
+            
+    if meta_fields:
+        supabase.table("settings").insert({"id": f"emp_meta_{uid}", "data": meta_fields}).execute()
+        
     user_doc.pop("password_hash", None)
+    user_doc.update(meta_fields)
     return user_doc
 
 @router.patch("/admin/employees/{uid}")
@@ -70,10 +112,32 @@ def update_employee(uid: str, data: EmployeeUpdate, user: dict = Depends(require
         raise HTTPException(404, "Employee not found")
         
     update_data = {"updated_at": now_iso()}
-    for key, value in data.model_dump(exclude_unset=True).items():
-        update_data[key] = value
+    meta_fields = {}
+    allowed_cols = ["name", "email", "phone", "role", "password_hash"]
+    
+    dumped_data = data.model_dump(exclude_unset=True)
+    if "password" in dumped_data:
+        update_data["password_hash"] = hash_password(dumped_data.pop("password"))
         
-    supabase.table("users").update(update_data).eq("id", uid).execute()
+    for key, value in dumped_data.items():
+        if key in allowed_cols:
+            update_data[key] = value
+        else:
+            meta_fields[key] = value
+            
+    if len(update_data) > 1:
+        supabase.table("users").update(update_data).eq("id", uid).execute()
+        
+    if meta_fields:
+        # Check if meta doc exists
+        meta_res = supabase.table("settings").select("id,data").eq("id", f"emp_meta_{uid}").execute()
+        if meta_res.data:
+            existing_meta = meta_res.data[0].get("data", {})
+            existing_meta.update(meta_fields)
+            supabase.table("settings").update({"data": existing_meta}).eq("id", f"emp_meta_{uid}").execute()
+        else:
+            supabase.table("settings").insert({"id": f"emp_meta_{uid}", "data": meta_fields}).execute()
+            
     return {"ok": True}
 
 @router.get("/admin/leaves")
@@ -282,3 +346,147 @@ def set_admin_permissions(data: dict, user: dict = Depends(require_admin)):
     except Exception as e:
         print("Error setting permissions:", e)
         raise HTTPException(500, "Internal Server Error")
+from datetime import datetime
+import pytz
+
+class KioskAttendanceIn(BaseModel):
+    user_id: str
+    is_checkout: bool
+    photo_base64: str
+    latitude: Optional[float] = 0.0
+    longitude: Optional[float] = 0.0
+
+@router.post("/admin/attendance/kiosk")
+def kiosk_attendance(data: KioskAttendanceIn, user: dict = Depends(require_admin)):
+    IST = pytz.timezone('Asia/Kolkata')
+    now = datetime.now(IST)
+    today = now.strftime("%Y-%m-%d")
+    time_str = now.strftime("%H:%M")
+    
+    emp_res = supabase.table("users").select("*").eq("id", data.user_id).execute()
+    if not emp_res.data:
+        raise HTTPException(400, "Employee not found")
+    emp = emp_res.data[0]
+    
+    # Check limit logic
+    is_late = False
+    role = emp.get("role", "")
+    hour = now.hour
+    minute = now.minute
+    
+    if not data.is_checkout:
+        if role == "sales":
+            # 10:30 AM limit
+            if hour > 10 or (hour == 10 and minute > 30):
+                is_late = True
+        else:
+            # 9:30 AM limit (Service and others)
+            if hour > 9 or (hour == 9 and minute > 30):
+                is_late = True
+
+    # Find existing attendance
+    docs = supabase.table("attendance").select("*").contains("data", {"user_id": data.user_id, "date": today}).execute()
+    
+    if data.is_checkout:
+        if not docs.data:
+            raise HTTPException(400, "Cannot checkout without check-in")
+        record = docs.data[0]
+        att_data = record.get("data", {})
+        att_data["checkout_time"] = time_str
+        att_data["checkout_photo"] = data.photo_base64
+        
+        supabase.table("attendance").update({"data": att_data}).eq("id", record["id"]).execute()
+        return {"ok": True, "message": "Checkout recorded"}
+    else:
+        if docs.data:
+            raise HTTPException(400, "Already checked in today")
+            
+        aid = new_id()
+        att_data = {
+            "id": aid,
+            "user_id": data.user_id,
+            "user_name": emp.get("name"),
+            "date": today,
+            "time": time_str,
+            "status": "present",
+            "is_late": is_late,
+            "checkin_photo": data.photo_base64,
+            "latitude": data.latitude,
+            "longitude": data.longitude
+        }
+        supabase.table("attendance").insert({"id": aid, "data": att_data}).execute()
+        
+        msg = "Check-in successful!"
+        if is_late:
+            msg += " (Marked Late)"
+        return {"ok": True, "message": msg}
+import csv
+from fastapi.responses import StreamingResponse
+import io
+
+@router.get("/admin/export/clients")
+def export_clients(user: dict = Depends(require_admin)):
+    try:
+        # Fetch data
+        leads = supabase.table("leads").select("*").execute().data or []
+        consultations = supabase.table("consultations").select("*").execute().data or []
+        
+        # Build consultation lookup by phone (since lead might be linked by phone or id)
+        cons_lookup = {}
+        for c in consultations:
+            cdata = c.get("data", {})
+            phone = cdata.get("phone")
+            if phone:
+                # Store a dict instead of just string
+                cons_lookup[phone] = {
+                    "consulted_by": cdata.get("consulted_by", ""),
+                    "date": cdata.get("date", "") or c.get("created_at", "")[:10]
+                }
+
+        export_data = []
+        for lead in leads:
+            phone = lead.get("phone", "")
+            data = lead.get("data", {})
+            
+            # Combine purchased items and total revenue
+            payments = data.get("payments", [])
+            purchased_items = []
+            total_spent = 0.0
+            
+            for p in payments:
+                amt = float(p.get("amount") or 0)
+                total_spent += amt
+                items = p.get("items", [])
+                for item in items:
+                    name = item.get("name")
+                    if name:
+                        purchased_items.append(name)
+                        
+            export_data.append({
+                "Client Name": lead.get("name", ""),
+                "Phone": phone,
+                "Branch": lead.get("branch", ""),
+                "Status": lead.get("status", ""),
+                "Consulted By": cons_lookup.get(phone, {}).get("consulted_by", ""),
+                "Total Spent (₹)": total_spent,
+                "Purchased Items": ", ".join(purchased_items),
+                "Last Visited Date": cons_lookup.get(phone, {}).get("date", "") or data.get("visited_date") or "",
+                "Created At": str(lead.get("created_at", ""))[:10]
+            })
+
+        # Create CSV in memory
+        stream = io.StringIO()
+        if export_data:
+            writer = csv.DictWriter(stream, fieldnames=export_data[0].keys())
+            writer.writeheader()
+            writer.writerows(export_data)
+        
+        stream.seek(0)
+        
+        return StreamingResponse(
+            iter([stream.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=clients_data.csv"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
