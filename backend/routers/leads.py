@@ -34,6 +34,10 @@ class LeadUpdate(BaseModel):
 class LeadNoteIn(BaseModel):
     text: str
 
+class TransferLeadIn(BaseModel):
+    target_id: Optional[str] = None
+    email: Optional[str] = None
+
 class CallLogIn(BaseModel):
     duration: int
     talk_time: int
@@ -50,12 +54,28 @@ class CallLogIn(BaseModel):
     txn_id: Optional[str] = None
     consulted_by: Optional[str] = None
 
+def fetch_all_leads_chunked(query_builder, max_records: int = 10000):
+    """Fetches leads using range-based chunking so queries don't get stuck at the 1,000 limit."""
+    all_rows = []
+    chunk_size = 1000
+    offset = 0
+    while offset < max_records:
+        res = query_builder.range(offset, offset + chunk_size - 1).execute()
+        rows = res.data or []
+        all_rows.extend(rows)
+        if len(rows) < chunk_size:
+            break
+        offset += chunk_size
+    return all_rows
+
+
 @router.post("/leads")
 def create_lead(data: LeadIn, user: dict = Depends(require_employee)):
     lid = new_id()
     assigned_to = None
     assigned_to_name = None
-    if user.get("role") == "sales":
+    role = (user.get("role") or "").lower().strip()
+    if role in ["sales", "employee"]:
         assigned_to = user["id"]
         assigned_to_name = user.get("name")
     
@@ -86,12 +106,30 @@ def create_lead(data: LeadIn, user: dict = Depends(require_employee)):
 @router.get("/leads")
 def list_leads(user: dict = Depends(require_employee)):
     try:
-        role = user.get("role", "")
-        if role == "sales":
-            res = supabase.table("leads").select("*").eq("assigned_to", user.get("id")).order("created_at", desc=True).limit(1000).execute()
-            return unpack_data(res.data, "data")
-        elif role in ["employee", "service", "receptionist"]:
-            user_id = user.get("id")
+        role = (user.get("role") or "").lower().strip()
+        user_id = str(user.get("id") or "")
+        user_name = str(user.get("name") or "").strip()
+
+        if role in ["admin", "super_admin"]:
+            # Admins see global leads
+            q = supabase.table("leads").select("*").order("created_at", desc=True)
+            all_leads = fetch_all_leads_chunked(q, max_records=5000)
+            return unpack_data(all_leads, "data")
+
+        elif role in ["sales", "employee", "staff"]:
+            # Sales staff only see their own assigned leads (by ID or by Name)
+            q1 = supabase.table("leads").select("*").eq("assigned_to", user_id).order("created_at", desc=True)
+            leads1 = fetch_all_leads_chunked(q1)
+
+            leads2 = []
+            if user_name:
+                q2 = supabase.table("leads").select("*").eq("assigned_to_name", user_name).order("created_at", desc=True)
+                leads2 = fetch_all_leads_chunked(q2)
+
+            merged = {l["id"]: l for l in (leads1 + leads2)}
+            return unpack_data(sorted(merged.values(), key=lambda x: x.get("created_at", ""), reverse=True), "data")
+
+        elif role in ["service", "receptionist"]:
             user_branch = user.get("branch") or ""
             user_section = user.get("section") or ""
             
@@ -103,8 +141,7 @@ def list_leads(user: dict = Depends(require_employee)):
             merged = {l["id"]: l for l in (res1.data + res2.data + res3.data + res4.data)}
             return unpack_data(sorted(merged.values(), key=lambda x: x.get("created_at", ""), reverse=True), "data")
         else:
-            res = supabase.table("leads").select("*").order("created_at", desc=True).limit(1000).execute()
-            return unpack_data(res.data, "data")
+            return []
     except Exception as e:
         print(f"Error in list_leads: {e}")
         return []
@@ -143,10 +180,11 @@ def get_lead(lid: str, user: dict = Depends(require_employee)):
     res = supabase.table("leads").select("*").eq("id", lid).execute()
     if not res.data:
         raise HTTPException(404, "Lead not found")
-    data = res.data[0]
-    if user.get("role") == "employee" and data.get("assigned_to") and data.get("assigned_to") != user["id"]:
-        raise HTTPException(403, "Not assigned to this lead")
-    return data
+    role = (user.get("role") or "").lower().strip()
+    if role in ["employee", "sales", "staff"] and data.get("assigned_to") and data.get("assigned_to") != user["id"]:
+        if not (user.get("name") and data.get("assigned_to_name") == user.get("name")):
+            raise HTTPException(403, "Not assigned to this lead")
+    return unpack_data([data], "data")[0]
 
 
 @router.patch("/leads/{lid}")
@@ -233,6 +271,63 @@ def assign_lead(lid: str, data: dict, user: dict = Depends(require_admin)):
     }).eq("id", lid).execute()
     
     return unpack_data(res.data, "data")[0] if res.data else {}
+
+
+@router.post("/leads/{lid}/transfer")
+def transfer_lead(lid: str, data: TransferLeadIn, user: dict = Depends(require_employee)):
+    res = supabase.table("leads").select("*").eq("id", lid).execute()
+    if not res.data:
+        raise HTTPException(404, "Lead not found")
+    existing_lead = res.data[0]
+    existing_data = existing_lead.get("data") or {}
+
+    target_user = None
+    if data.target_id:
+        target_res = supabase.table("users").select("*").eq("id", data.target_id).execute()
+        if target_res.data:
+            target_user = target_res.data[0]
+    elif data.email:
+        target_email = data.email.strip().lower()
+        target_res = supabase.table("users").select("*").ilike("email", target_email).limit(1).execute()
+        if target_res.data:
+            target_user = target_res.data[0]
+
+    if not target_user:
+        raise HTTPException(404, "Target employee not found")
+    if target_user["id"] == user["id"]:
+        raise HTTPException(400, "Cannot transfer lead to yourself")
+
+    target_name = target_user.get("name") or "Staff"
+    current_user_name = user.get("name") or "Staff"
+
+    update_data = {
+        "assigned_to": target_user["id"],
+        "assigned_to_name": target_name,
+        "updated_at": now_iso()
+    }
+
+    if target_user.get("branch"):
+        update_data["branch"] = target_user["branch"]
+    if target_user.get("section"):
+        update_data["section"] = target_user["section"]
+
+    existing_data["is_transferred"] = True
+    existing_data["transferred_from_id"] = user["id"]
+    existing_data["transferred_from_name"] = current_user_name
+    existing_data["transferred_at"] = now_iso()
+    update_data["data"] = existing_data
+
+    current_notes = existing_lead.get("notes") or []
+    note = {
+        "text": f"Lead transferred from {current_user_name} to {target_name}",
+        "author": "System",
+        "timestamp": now_iso()
+    }
+    current_notes.append(note)
+    update_data["notes"] = current_notes
+
+    supabase.table("leads").update(update_data).eq("id", lid).execute()
+    return {"ok": True, "status": "success", "assigned_to": target_name}
 
 
 @router.post("/leads/{lid}/calls")
@@ -456,23 +551,32 @@ def get_sales_dashboard(
     user: dict = Depends(require_employee)
 ):
     try:
-        fields = "created_at, updated_at, status, grade, follow_up_date, assigned_to, branch, section, data"
-        role = user.get("role", "")
-        if role == "sales":
-            res = supabase.table("leads").select(fields).eq("assigned_to", user.get("id")).limit(1000).execute()
-            docs = res.data
-        elif role in ["employee", "service", "receptionist"]:
-            user_id = user.get("id")
+        fields = "created_at, updated_at, status, grade, follow_up_date, assigned_to, assigned_to_name, branch, section, data"
+        role = (user.get("role") or "").lower().strip()
+        user_id = str(user.get("id") or "")
+        user_name = str(user.get("name") or "").strip()
+
+        if role in ["admin", "super_admin"]:
+            q = supabase.table("leads").select(fields).order("created_at", desc=True)
+            docs = fetch_all_leads_chunked(q, max_records=5000)
+        elif role in ["sales", "employee", "staff"]:
+            q1 = supabase.table("leads").select(fields).eq("assigned_to", user_id)
+            docs1 = fetch_all_leads_chunked(q1)
+            docs2 = []
+            if user_name:
+                q2 = supabase.table("leads").select(fields).eq("assigned_to_name", user_name)
+                docs2 = fetch_all_leads_chunked(q2)
+            merged = {l["id"]: l for l in (docs1 + docs2)}
+            docs = list(merged.values())
+        elif role in ["service", "receptionist"]:
             user_branch = user.get("branch") or ""
             user_section = user.get("section") or ""
-            
             res1 = supabase.table("leads").select(fields).eq("assigned_to", user_id).limit(500).execute()
             res2 = supabase.table("leads").select(fields).is_("assigned_to", "null").eq("branch", user_branch).eq("section", user_section).limit(300).execute()
             merged = {l["id"]: l for l in (res1.data + res2.data)}
             docs = list(merged.values())
         else:
-            res = supabase.table("leads").select(fields).order("created_at", desc=True).limit(1000).execute()
-            docs = res.data
+            docs = []
 
         target_date = date if date else now_iso()[:10]
         res_date = results_date if results_date else target_date

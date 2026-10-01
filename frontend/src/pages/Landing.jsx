@@ -14,6 +14,7 @@ import {
   MessageCircle,
   MapPin,
   ChevronRight,
+  ChevronLeft,
   Award,
   Layers,
   HeartHandshake,
@@ -153,19 +154,69 @@ const TESTIMONIALS = [
 
 const HERO_SLIDES = [
   {
+    id: "flagship-4k",
+    image: "/assets/hero/hero_web.jpg",
+    fallbackImage: "/assets/hero/Create_website_hero_background_logo_4K_20260926164550.jpg",
+    tabLabel: "Studio Flagship",
+    tag: "Vadodara Flagship · Sama-Savli & Sevasi",
+    title: "Natural Hair Systems,",
+    titleHighlight: "Crafted with Precision.",
+    desc: "Vadodara’s premier destination for undetectable non-surgical hair restoration across our Sama-Savli and Sevasi branches. Experience 100% natural virgin human hair, custom breathable bases, and private consultation suites.",
+    ctaPrimary: { text: "Book Consultation", link: "/book" },
+    ctaSecondary: { text: "Explore Services", link: "/services" },
+    features: ["4.9★ Google Rating", "8,000+ Happy Clients", "100% Virgin Hair"]
+  },
+  {
+    id: "breathable-base",
     image: "/assets/slider/slide4.jpeg",
-    title: "100% Breathable Base",
-    desc: "Undetectable hairline blending & featherlight comfort"
+    fallbackImage: "/assets/slider/slide1.jpeg",
+    tabLabel: "Breathable Bases",
+    tag: "Custom Base Engineering · Featherlight",
+    title: "100% Breathable Base,",
+    titleHighlight: "Featherlight Comfort.",
+    desc: "Ultra-thin French lace, skin poly, and breathable honeycomb mesh mapped to your scalp contour. Undetectable hairline blending, hypoallergenic bonding, and maximum scalp ventilation.",
+    ctaPrimary: { text: "Explore Hair Systems", link: "/services" },
+    ctaSecondary: { text: "Take Scalp Quiz", link: "/consultancy" },
+    features: ["Medical-Grade Bonding", "Hypoallergenic", "Active Scalp Ventilation"]
   },
   {
+    id: "mens-restoration",
+    image: "/assets/men_ai_hero.jpg",
+    fallbackImage: "/assets/slider/slide3.jpeg",
+    tabLabel: "Men's Systems",
+    tag: "Men's Non-Surgical Hair Replacement",
+    title: "Confidence Restored,",
+    titleHighlight: "Completely Undetectable.",
+    desc: "Custom-fitted hair patch systems tailored for modern active men facing crown or frontal thinning. Seamless integration, zero surgery, swimmable & gym-ready from day one.",
+    ctaPrimary: { text: "View Men's Collection", link: "/men" },
+    ctaSecondary: { text: "Book Consultation", link: "/book" },
+    features: ["Seamless Natural Hairline", "Gym & Swim Ready", "Zero Downtime"]
+  },
+  {
+    id: "luxury-suites",
     image: "/assets/slider/slide6.jpeg",
-    title: "Luxury Vadodara Studio",
-    desc: "Private 1-on-1 suites & artisanal styling rituals"
+    fallbackImage: "/assets/professional_hairstylist_working_202604251521.jpeg",
+    tabLabel: "Private Suites",
+    tag: "Private 1-on-1 Suites · Total Discretion",
+    title: "Private Consultation Suites,",
+    titleHighlight: "Master Stylist Care.",
+    desc: "Experience total confidentiality in our executive private styling suites at Sama-Savli Road & Sevasi. One-on-one personalized density calibration and master scissor contouring.",
+    ctaPrimary: { text: "Visit Our Studios", link: "/services" },
+    ctaSecondary: { text: "Call +91 77790 55771", isPhone: true, link: "tel:+917779055771" },
+    features: ["100% Confidential Suites", "Private Fitting Lab", "Certified Specialists"]
   },
   {
+    id: "virgin-hair",
     image: "/assets/slider/slide2.jpeg",
-    title: "Virgin Human Hair",
-    desc: "Ethically sourced, customized density & texture"
+    fallbackImage: "/assets/realistic_human_hair_202604251524.jpeg",
+    tabLabel: "Virgin Human Hair",
+    tag: "Ethical Sourcing · Master Color Blending",
+    title: "100% Virgin Human Hair,",
+    titleHighlight: "Masterful Tone Matching.",
+    desc: "Ethically sourced cuticle-intact virgin hair that moves, reacts, and reflects light just like natural growth. Artisanal density tuning and luxury multidimensional color blending.",
+    ctaPrimary: { text: "Book Consultation", link: "/book" },
+    ctaSecondary: { text: "Take Scalp Quiz", link: "/consultancy" },
+    features: ["Cuticle Intact", "Multidimensional Tone", "Tangle-Free Natural Feel"]
   }
 ];
 
@@ -173,14 +224,56 @@ export default function Landing() {
   const { t } = useLang();
   const [services, setServices] = useState([]);
   const [stylists, setStylists] = useState([]);
-  const [heroSlide, setHeroSlide] = useState(0);
+  const [activeHeroIdx, setActiveHeroIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const heroScrollRef = React.useRef(null);
+
+  const handleHeroScroll = () => {
+    if (!heroScrollRef.current) return;
+    const { scrollLeft, clientWidth } = heroScrollRef.current;
+    if (clientWidth > 0) {
+      const newIdx = Math.round(scrollLeft / clientWidth);
+      if (newIdx !== activeHeroIdx && newIdx >= 0 && newIdx < HERO_SLIDES.length) {
+        setActiveHeroIdx(newIdx);
+      }
+    }
+  };
+
+  const scrollToSlide = (idx) => {
+    if (!heroScrollRef.current) return;
+    const clientWidth = heroScrollRef.current.clientWidth;
+    heroScrollRef.current.scrollTo({
+      left: idx * clientWidth,
+      behavior: "smooth"
+    });
+    setActiveHeroIdx(idx);
+  };
+
+  const nextHeroSlide = () => {
+    const nextIdx = (activeHeroIdx + 1) % HERO_SLIDES.length;
+    scrollToSlide(nextIdx);
+  };
+
+  const prevHeroSlide = () => {
+    const prevIdx = (activeHeroIdx - 1 + HERO_SLIDES.length) % HERO_SLIDES.length;
+    scrollToSlide(prevIdx);
+  };
 
   useEffect(() => {
+    if (isPaused) return;
     const timer = setInterval(() => {
-      setHeroSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-    }, 4500);
+      if (heroScrollRef.current) {
+        const nextIdx = (activeHeroIdx + 1) % HERO_SLIDES.length;
+        const clientWidth = heroScrollRef.current.clientWidth;
+        heroScrollRef.current.scrollTo({
+          left: nextIdx * clientWidth,
+          behavior: "smooth"
+        });
+        setActiveHeroIdx(nextIdx);
+      }
+    }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [activeHeroIdx, isPaused]);
 
   useEffect(() => {
     api.get("/services")
@@ -206,118 +299,206 @@ export default function Landing() {
 
   return (
     <div data-testid="landing-page" className="bg-[#FAFDFB] text-[#142820] font-sans antialiased selection:bg-[#0F5A3B] selection:text-white">
-      {/* ─── HERO SECTION ──────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-28 sm:pt-32 md:pt-40 pb-12 md:pb-16 border-b border-[#E0EBE5]">
-        {/* Subtle background decoration */}
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#EBF5F0]/60 to-transparent pointer-events-none" />
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#E8F3EE]/50 rounded-full blur-3xl pointer-events-none" />
+      {/* ─── SCROLLABLE HERO SECTION ────────────────────────────────────────── */}
+      <section 
+        className="relative overflow-hidden pt-24 sm:pt-28 bg-[#040e08] border-b border-[#0F5A3B]/30"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => setIsPaused(false)}
+      >
+        {/* Scrollable Track */}
+        <div
+          ref={heroScrollRef}
+          onScroll={handleHeroScroll}
+          className="flex w-full overflow-x-auto snap-x snap-mandatory scroll-smooth select-none"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          {HERO_SLIDES.map((slide, idx) => (
+            <div
+              key={slide.id}
+              className="w-full shrink-0 min-w-full snap-start relative min-h-[820px] sm:min-h-[860px] lg:min-h-[900px] flex items-center overflow-hidden"
+            >
+              {/* Background Image with Fallback */}
+              <div className="absolute inset-0 z-0 overflow-hidden">
+                <img
+                  src={slide.image}
+                  onError={(e) => {
+                    if (slide.fallbackImage && e.target.src !== slide.fallbackImage) {
+                      e.target.src = slide.fallbackImage;
+                    }
+                  }}
+                  alt={slide.title}
+                  className={`w-full h-full object-cover object-center transition-transform duration-1000 ease-out ${
+                    activeHeroIdx === idx ? "scale-105" : "scale-100"
+                  }`}
+                />
 
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 relative z-10">
-          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-            
-            {/* Left Content */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[#E8F3EE] border border-[#D5E4DD] text-[#0F5A3B] text-[11px] font-semibold uppercase tracking-[0.2em]">
-                <span className="w-2 h-2 rounded-full bg-[#0F5A3B] animate-pulse" />
-                <span>Vadodara · Sama-Savli & Sevasi Studios</span>
+                {/* Cinematic Luxury Dark Gradients - smooth transition covering background text on left while keeping model bright */}
+                <div className="absolute inset-0 bg-gradient-to-r from-[#030c07] via-[#030c07]/90 sm:via-[#030c07]/80 via-40% to-transparent z-10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#030c07] via-transparent to-[#030c07]/60 z-10" />
               </div>
 
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-light text-[#142820] leading-[1.1] tracking-tight">
-                Natural Hair Systems, <br />
-                <span className="font-normal italic text-[#0F5A3B]">Crafted with Precision.</span>
-              </h1>
-
-              <p className="text-[#556B61] text-base sm:text-lg font-light leading-relaxed max-w-xl">
-                Vadodara’s premier destination for undetectable non-surgical hair restoration across our Sama-Savli and Sevasi branches. Experience 100% natural virgin human hair, custom breathable bases, and private consultation suites.
-              </p>
-
-              {/* Minimalist CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-                <Link
-                  to="/book"
-                  className="inline-flex items-center justify-center gap-3 bg-[#0F5A3B] hover:bg-[#0A3D27] text-white px-8 py-4 rounded-full font-medium text-xs uppercase tracking-[0.18em] transition-all duration-300 shadow-sm hover:shadow-md group"
+              {/* Slide Content with Bulletproof Solid Frosted Dark Card */}
+              <div className="relative z-20 max-w-[1400px] w-full mx-auto px-6 lg:px-12 pt-16 pb-28 sm:pt-20 sm:pb-32">
+                <div 
+                  style={{ 
+                    backgroundColor: "rgba(5, 18, 12, 0.88)", 
+                    backdropFilter: "blur(28px)", 
+                    WebkitBackdropFilter: "blur(28px)",
+                    boxShadow: "0 32px 64px -16px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(16, 185, 129, 0.25)"
+                  }}
+                  className="max-w-2xl lg:max-w-[700px] rounded-3xl p-8 sm:p-11 lg:p-12 space-y-6 sm:space-y-7 text-white"
                 >
-                  <span>Book Consultation</span>
-                  <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
 
-                <Link
-                  to="/services"
-                  className="inline-flex items-center justify-center gap-2 border border-[#0F5A3B] text-[#0F5A3B] hover:bg-[#E8F3EE] px-8 py-4 rounded-full font-medium text-xs uppercase tracking-[0.18em] transition-all duration-300"
-                >
-                  <span>Explore Services</span>
-                </Link>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="pt-6 border-t border-[#E0EBE5] flex flex-wrap items-center gap-6 text-xs text-[#556B61]">
-                <div className="flex items-center gap-1.5 font-semibold text-[#0F5A3B]">
-                  <div className="flex text-[#0F5A3B]">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="fill-[#0F5A3B]" />
-                    ))}
-                  </div>
-                  <span>4.9 / 5.0 Rating</span>
-                </div>
-                <span className="text-[#D5E4DD]">•</span>
-                <span>8,000+ Happy Clients</span>
-                <span className="text-[#D5E4DD]">•</span>
-                <Link to="/consultancy" className="text-[#0F5A3B] font-medium hover:underline inline-flex items-center gap-1">
-                  <span>Take Scalp Quiz</span>
-                  <ChevronRight size={13} />
-                </Link>
-              </div>
-            </div>
-
-            {/* Right Showcase Image Slider */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative rounded-3xl overflow-hidden border border-[#D5E4DD] shadow-lg bg-[#FAFDFB] aspect-[4/5] max-w-md mx-auto lg:max-w-none">
-                {HERO_SLIDES.map((slide, idx) => (
-                  <div
-                    key={idx}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-                      idx === heroSlide ? "opacity-100 z-10" : "opacity-0 z-0"
-                    }`}
+                  {/* Overline Badge */}
+                  <div 
+                    style={{ backgroundColor: "rgba(16, 185, 129, 0.15)", borderColor: "rgba(52, 211, 153, 0.35)" }}
+                    className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full border text-emerald-300 text-[11px] font-bold uppercase tracking-[0.2em] shadow-sm"
                   >
-                    <img
-                      src={slide.image}
-                      alt={slide.title}
-                      className="w-full h-full object-cover"
-                    />
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-emerald-300 font-bold">{slide.tag}</span>
                   </div>
-                ))}
 
-                {/* Subtle Dots Indicator */}
-                <div className="absolute top-4 right-4 z-20 flex gap-1.5 bg-black/30 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/20">
-                  {HERO_SLIDES.map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setHeroSlide(i)}
-                      aria-label={`Slide ${i + 1}`}
-                      className={`h-1.5 rounded-full transition-all duration-300 ${
-                        i === heroSlide ? "w-5 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
-                      }`}
-                    />
-                  ))}
-                </div>
+                  {/* Heading */}
+                  <h1 className="font-serif text-3xl sm:text-4xl lg:text-[44px] font-light text-white leading-[1.18] tracking-tight drop-shadow-md">
+                    {slide.title} <br className="hidden sm:inline" />
+                    <span className="font-normal italic text-emerald-400">{slide.titleHighlight}</span>
+                  </h1>
 
-                {/* Floating Minimalist Info Pill */}
-                <div className="absolute bottom-5 left-5 right-5 z-20 bg-white/95 backdrop-blur-sm p-4 rounded-2xl border border-[#E0EBE5] shadow-sm flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-[#E8F3EE] text-[#0F5A3B] flex items-center justify-center shrink-0">
-                    <Sparkles size={20} />
+                  {/* Description */}
+                  <p className="text-gray-200 text-sm sm:text-base font-light leading-relaxed max-w-xl">
+                    {slide.desc}
+                  </p>
+
+                  {/* 100% Guaranteed High-Contrast CTA Buttons */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-1">
+                    <Link
+                      to={slide.ctaPrimary.link}
+                      style={{ backgroundColor: "#10B981", color: "#000000" }}
+                      className="inline-flex items-center justify-center gap-3 font-extrabold px-8 py-4 rounded-full text-xs uppercase tracking-[0.18em] transition-all duration-300 shadow-xl shadow-emerald-950/50 hover:scale-[1.03] group hover:brightness-110 active:scale-95"
+                    >
+                      <span style={{ color: "#000000" }} className="font-black text-black text-xs uppercase tracking-wider">
+                        {slide.ctaPrimary.text}
+                      </span>
+                      <ArrowRight size={16} style={{ color: "#000000" }} className="group-hover:translate-x-1.5 transition-transform text-black stroke-[3]" />
+                    </Link>
+
+                    {slide.ctaSecondary.isPhone ? (
+                      <a
+                        href={slide.ctaSecondary.link}
+                        style={{ backgroundColor: "#ffffff", color: "#000000" }}
+                        className="inline-flex items-center justify-center gap-2.5 font-extrabold px-8 py-4 rounded-full text-xs uppercase tracking-[0.18em] transition-all duration-300 shadow-lg hover:scale-[1.03] active:scale-95 border-2 border-white hover:bg-gray-100"
+                      >
+                        <Phone size={15} style={{ color: "#000000" }} className="text-black stroke-[3]" />
+                        <span style={{ color: "#000000" }} className="font-black text-black text-xs uppercase tracking-wider">
+                          {slide.ctaSecondary.text}
+                        </span>
+                      </a>
+                    ) : (
+                      <Link
+                        to={slide.ctaSecondary.link}
+                        style={{ backgroundColor: "#ffffff", color: "#000000" }}
+                        className="inline-flex items-center justify-center gap-2.5 font-extrabold px-8 py-4 rounded-full text-xs uppercase tracking-[0.18em] transition-all duration-300 shadow-lg hover:scale-[1.03] active:scale-95 border-2 border-white hover:bg-gray-100"
+                      >
+                        <span style={{ color: "#000000" }} className="font-black text-black text-xs uppercase tracking-wider">
+                          {slide.ctaSecondary.text}
+                        </span>
+                      </Link>
+                    )}
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#142820] tracking-wide">
-                      {HERO_SLIDES[heroSlide].title}
-                    </p>
-                    <p className="text-[11px] text-[#556B61] font-light">
-                      {HERO_SLIDES[heroSlide].desc}
-                    </p>
+
+                  {/* Features Trust Strip */}
+                  <div className="pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                      {slide.features.map((feat, fIdx) => (
+                        <div key={fIdx} className="inline-flex items-center gap-2 text-gray-200 font-medium text-xs">
+                          <CheckCircle2 size={14} className="text-emerald-400 shrink-0" />
+                          <span>{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <Link 
+                      to="/consultancy" 
+                      className="inline-flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 font-semibold text-xs transition-colors hover:underline"
+                    >
+                      <span>Take Scalp Quiz</span>
+                      <ChevronRight size={14} />
+                    </Link>
                   </div>
+
                 </div>
               </div>
             </div>
+          ))}
+        </div>
 
+        {/* Floating Navigation Arrows - Sleek Frosted Glass with Glowing Hover */}
+        <button
+          onClick={prevHeroSlide}
+          aria-label="Previous slide"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.65)", color: "#ffffff" }}
+          className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 text-white hover:text-emerald-400 hover:border-emerald-400/60 cursor-pointer shadow-2xl"
+        >
+          <ChevronLeft size={22} className="stroke-[2.5]" />
+        </button>
+
+        <button
+          onClick={nextHeroSlide}
+          aria-label="Next slide"
+          style={{ backgroundColor: "rgba(0, 0, 0, 0.65)", color: "#ffffff" }}
+          className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full border border-white/20 backdrop-blur-md flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 text-white hover:text-emerald-400 hover:border-emerald-400/60 cursor-pointer shadow-2xl"
+        >
+          <ChevronRight size={22} className="stroke-[2.5]" />
+        </button>
+
+        {/* Bottom Interactive Thumbnail & Tab Strip */}
+        <div className="absolute bottom-6 sm:bottom-8 left-0 right-0 z-30 max-w-[1400px] mx-auto px-6 lg:px-12 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Slide Tab Buttons */}
+          <div 
+            style={{ 
+              backgroundColor: "rgba(4, 16, 10, 0.95)", 
+              backdropFilter: "blur(20px)",
+              scrollbarWidth: "none" 
+            }} 
+            className="flex items-center gap-2 overflow-x-auto max-w-full p-1.5 rounded-full border border-emerald-500/30 shadow-2xl"
+          >
+            {HERO_SLIDES.map((s, idx) => (
+              <button
+                key={s.id}
+                onClick={() => scrollToSlide(idx)}
+                style={
+                  activeHeroIdx === idx
+                    ? { backgroundColor: "#10B981", color: "#000000" }
+                    : { color: "#ffffff", backgroundColor: "transparent" }
+                }
+                className={`px-3.5 py-1.5 rounded-full text-[11px] font-bold transition-all duration-300 flex items-center gap-2 ${
+                  activeHeroIdx === idx
+                    ? "shadow-lg scale-105"
+                    : "hover:text-emerald-300 hover:bg-white/10"
+                }`}
+              >
+                <span 
+                  style={{ backgroundColor: activeHeroIdx === idx ? "#000000" : "#10B981" }}
+                  className="w-1.5 h-1.5 rounded-full" 
+                />
+                <span className="whitespace-nowrap">{`0${idx + 1}`} · {s.tabLabel}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Slide Counter & Mode Indicator */}
+          <div 
+            style={{ backgroundColor: "rgba(4, 16, 10, 0.95)", backdropFilter: "blur(20px)" }}
+            className="hidden sm:flex items-center gap-3 text-xs font-mono text-gray-200 px-4 py-2 rounded-full border border-emerald-500/30 shadow-2xl"
+          >
+            <span className="font-bold text-emerald-400">
+              {`0${activeHeroIdx + 1}`} / {`0${HERO_SLIDES.length}`}
+            </span>
+            <span className="text-white/30">•</span>
+            <span className="text-[10px] uppercase tracking-wider text-emerald-200">
+              {isPaused ? "Paused" : "Auto-playing"}
+            </span>
           </div>
         </div>
       </section>

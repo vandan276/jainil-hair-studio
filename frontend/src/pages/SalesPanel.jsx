@@ -458,9 +458,9 @@ export default function SalesPanel() {
     setEmployeesLoading(true);
     try {
       const res = await api.get("/admin/employees");
-      // Filter to only sales/employee staff — exclude current user
-      const staff = res.data.filter(
-        e => e.role === "sales" && e.id !== user?.id
+      // Filter to sales/employee/admin staff — exclude current user
+      const staff = (Array.isArray(res.data) ? res.data : []).filter(
+        e => (e.role === "sales" || e.role === "employee" || e.role === "admin" || e.role === "receptionist") && e.id !== user?.id
       );
       setAllEmployees(staff);
     } catch {
@@ -629,9 +629,26 @@ export default function SalesPanel() {
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  // --- Filtering ---
-  // Get leads for the current selected section
-  const sectionLeads = leads.filter(l => user?.role === "admin" ? (sectionFilter === "All" ? true : l.section === sectionFilter) : true);
+  // Get leads for the current selected section (and strictly for this user if not admin)
+  const sectionLeads = leads.filter(l => {
+    if (user?.role === "admin") {
+      return sectionFilter === "All" ? true : l.section === sectionFilter;
+    }
+    // For sales employees: ensure leads belong to this user
+    if (l.assigned_to && user?.id && String(l.assigned_to) !== String(user.id)) {
+      if (l.assigned_to_name && user?.name && l.assigned_to_name.trim().toLowerCase() === user.name.trim().toLowerCase()) {
+        return true;
+      }
+      return false;
+    }
+    if (l.assigned_to_name && user?.name && String(l.assigned_to_name).trim().toLowerCase() !== String(user.name).trim().toLowerCase()) {
+      if (l.assigned_to && user?.id && String(l.assigned_to) === String(user.id)) {
+        return true;
+      }
+      return false;
+    }
+    return true;
+  });
 
   const getFilteredLeads = () => {
     let filtered = sectionLeads;
@@ -825,7 +842,9 @@ export default function SalesPanel() {
           <div>
             <h1 className="text-xl font-bold text-gray-800">Welcome, {user?.name || "Team Member"}</h1>
             <p className="text-sm text-gray-500">
-              {user?.role === "admin" ? "Global Sales Dashboard" : `${user?.branch} - ${user?.section} Section Dashboard`}
+              {user?.role === "admin" 
+                ? "Global Sales Dashboard" 
+                : `${user?.branch || "Main"} - ${user?.section || "Sales"} Section Dashboard`}
             </p>
           </div>
 

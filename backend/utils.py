@@ -76,8 +76,20 @@ async def get_current_user(request: Request) -> dict:
         raise HTTPException(401, "User not found")
         
     user = res.data[0]
-    # If there's an is_active field you can check it here
     user.pop("password_hash", None)
+
+    # Attach employee metadata (branch, section, etc.) from settings if present
+    try:
+        meta_res = supabase.table("settings").select("data").eq("id", f"emp_meta_{user['id']}").execute()
+        if meta_res.data and meta_res.data[0].get("data"):
+            user.update(meta_res.data[0]["data"])
+    except Exception:
+        pass
+
+    # Normalize role
+    if user.get("role"):
+        user["role"] = str(user["role"]).lower().strip()
+
     return user
 
 
@@ -95,6 +107,14 @@ async def get_optional_user(request: Request) -> Optional[dict]:
         if res.data:
             user = res.data[0]
             user.pop("password_hash", None)
+            try:
+                meta_res = supabase.table("settings").select("data").eq("id", f"emp_meta_{user['id']}").execute()
+                if meta_res.data and meta_res.data[0].get("data"):
+                    user.update(meta_res.data[0]["data"])
+            except Exception:
+                pass
+            if user.get("role"):
+                user["role"] = str(user["role"]).lower().strip()
             return user
     except:
         pass
