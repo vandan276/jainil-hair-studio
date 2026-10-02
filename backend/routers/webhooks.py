@@ -20,45 +20,55 @@ async def get_phone_lock(key: str) -> asyncio.Lock:
         return _phone_locks[key]
 
 def get_next_salesperson():
-    res = supabase.table("users").select("*").eq("role", "sales").execute()
-    sales_users = res.data
+    res = supabase.table("users").select("*").eq("role", "sales").order("id").execute()
+    sales_users = res.data or []
     if not sales_users:
         return None
-        
+
+    # Attach employee metadata (is_active, leaves, branch, section)
+    try:
+        meta_res = supabase.table("settings").select("*").like("id", "emp_meta_%").execute()
+        meta_map = {m["id"].replace("emp_meta_", ""): m.get("data", {}) for m in (meta_res.data or [])}
+        for u in sales_users:
+            u.update(meta_map.get(u["id"], {}))
+    except Exception:
+        pass
+
     ist_now = datetime.now(timezone.utc) + timedelta(hours=5, minutes=30)
     today_str = ist_now.strftime("%Y-%m-%d")
-    
+
     available = []
     for u in sales_users:
-        # Check if active and not on leave
+        # Check if active and not on leave today
         if u.get("is_active") is not False:
-            leaves = []
-            if "leaves" in u and u["leaves"]:
-                leaves = u["leaves"]
+            leaves = u.get("leaves") or []
             if today_str not in leaves:
                 available.append(u)
-                
+
     if not available:
         available = [u for u in sales_users if u.get("is_active") is not False]
-        
+
+    if not available:
+        available = sales_users
+
     if not available:
         return None
-        
+
     # Read state
     state_res = supabase.table("settings").select("data").eq("id", "round_robin").execute()
     state = state_res.data[0].get("data") if state_res.data else {}
     last_idx = state.get("last_sales_index", -1)
-    
+
     next_idx = (last_idx + 1) % len(available)
     assigned = available[next_idx]
-    
+
     # Update state
     state["last_sales_index"] = next_idx
     if state_res.data:
         supabase.table("settings").update({"data": state}).eq("id", "round_robin").execute()
     else:
         supabase.table("settings").insert({"id": "round_robin", "data": state}).execute()
-        
+
     return assigned
 
 def normalize_phone(phone: str):
